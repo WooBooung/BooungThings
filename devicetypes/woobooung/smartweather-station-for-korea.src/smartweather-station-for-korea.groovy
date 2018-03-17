@@ -36,13 +36,7 @@ metadata {
 		attribute "o3_value", "number"
 		attribute "no2_value", "number"
 		attribute "so2_value", "number"
-        //attribute "co_value", "number" -> Capabilty : Carbon Monoxide Detector
-        
-   		// Air Korea infos for only display
-		attribute "o3_display", "string"
-		attribute "no2_display", "string"
-		attribute "so2_display", "string"
-        attribute "co_display", "string"
+        attribute "co_value", "number"
         
         // Weather Station infos
         attribute "localSunrise", "string"
@@ -472,34 +466,31 @@ def pollAirKorea() {
                     if( resp.data.list[0].o3Value != "-" ) {
                     	log.debug "Ozone: ${resp.data.list[0].o3Value}"
                         display_value = "\n" + resp.data.list[0].o3Value + "\n"
-                        sendEvent(name: "o3_value", value: resp.data.list[0].o3Value as Float, unit: "ppm", isStateChange: true)
-                        sendEvent(name: "o3_display", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "o3_value", value: display_value as String, unit: "ppm", isStateChange: true)
                     } else
-                    	sendEvent(name: "o3_display", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "o3_value", value: "--", unit: "ppm", isStateChange: true)
                     
                     if( resp.data.list[0].no2Value != "-" ) {
                         log.debug "NO2: ${resp.data.list[0].no2Value}"
                         display_value = "\n" + resp.data.list[0].no2Value + "\n"
-                        sendEvent(name: "no2_value", value: resp.data.list[0].no2Value as Float, unit: "ppm", isStateChange: true)
-                        sendEvent(name: "no2_display", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "no2_value", value: display_value as String, unit: "ppm", isStateChange: true)
                     } else
-                    	sendEvent(name: "no2_display", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "no2_value", value: "--", unit: "ppm", isStateChange: true)
                     
                     if( resp.data.list[0].so2Value != "-" ) {
                         log.debug "SO2: ${resp.data.list[0].so2Value}"
                         display_value = "\n" + resp.data.list[0].so2Value + "\n"
-                        sendEvent(name: "so2_value", value: resp.data.list[0].so2Value as Float, unit: "ppm", isStateChange: true)
-                        sendEvent(name: "so2_display", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "so2_value", value: display_value as String, unit: "ppm", isStateChange: true)
                     } else
-                    	sendEvent(name: "so2_display", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "so2_value", value: "--", unit: "ppm", isStateChange: true)
                     
                     if( resp.data.list[0].coValue != "-" ) {
                         log.debug "CO: ${resp.data.list[0].coValue}"
                         display_value = "\n" + resp.data.list[0].coValue + "\n"
                         sendEvent(name: "carbonMonoxide", value: resp.data.list[0].coValue as Float, unit: "ppm", isStateChange: true)
-                        sendEvent(name: "co_display", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "co_value", value: display_value as String, unit: "ppm", isStateChange: true)
                     } else
-                    	sendEvent(name: "co_display", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "co_value", value: "--", unit: "ppm", isStateChange: true)
                     
                     def khai_text = "알수없음"
                     if( resp.data.list[0].khaiValue != "-" ) {
@@ -524,7 +515,14 @@ def pollAirKorea() {
                         sendEvent(name: "airQualityStatus", value: khai_text, unit: "", isStateChange: true)
                         
                     } else {
-                    	sendEvent(name: "airQuality", value: "--", isStateChange: true)
+                        def station_display_name = resp.data.parm.stationName
+                        
+                        if (fakeStationName)
+                        	station_display_name = fakeStationName
+
+                    
+	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: 정보없음\n 측정 시간: " + resp.data.list[0].dataTime, isStateChange: true)                    
+                    	sendEvent(name: "airQualityStatus", value: khai_text, isStateChange: true)
                     }
           		}
             	else if (resp.status==429) log.debug "You have exceeded the maximum number of refreshes today"	
