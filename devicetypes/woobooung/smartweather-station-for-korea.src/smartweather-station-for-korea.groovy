@@ -155,7 +155,7 @@ metadata {
             state "default", label:'오존\nppm'
         }
 
-        valueTile("o3_value", "device.o3_display", decoration: "flat") {
+        valueTile("o3_value", "device.o3_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
@@ -171,7 +171,7 @@ metadata {
             state "default", label:'이산화질소\nppm'
         }
 
-        valueTile("no2_value", "device.no2_display", decoration: "flat") {
+        valueTile("no2_value", "device.no2_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
@@ -186,7 +186,7 @@ metadata {
             state "default", label:'이산화황\nppm'
         }
         
-        valueTile("so2_value", "device.so2_display", decoration: "flat") {
+        valueTile("so2_value", "device.so2_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
@@ -201,7 +201,7 @@ metadata {
             state "default", label:'일산화탄소\nppm'
         }
 
-        valueTile("co_value", "device.co_display", decoration: "flat") {
+        valueTile("co_value", "device.co_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
