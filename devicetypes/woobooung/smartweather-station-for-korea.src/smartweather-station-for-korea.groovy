@@ -99,7 +99,8 @@ metadata {
         standardTile("refresh_air_value", "device.weather", decoration: "flat") {
 			state "default", label: "", action: "pollAirKorea", icon:"st.secondary.refresh"
 		}
-
+        
+        /*
         valueTile("airQuality_label", "", decoration: "flat") {
             state "default", label:'대기질 수치'
         }
@@ -114,7 +115,8 @@ metadata {
             	[value: 200, color: "#d86450"]
             ]
         }
-        
+      */
+      
         valueTile("pm10_label", "", decoration: "flat") {
             state "default", label:'PM10\nμg/m'
         }
@@ -124,9 +126,8 @@ metadata {
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 35, color: "#51B2E8"],
-            	[value: 70, color: "#4abd73"],
-            	[value: 100, color: "#FFCF38"],
-            	[value: 150, color: "#E56262"],
+            	[value: 85, color: "#FDFE02"],
+            	[value: 150, color: "#E40000"],
             	[value: 500, color: "#970203"]
             ]
         }
@@ -139,10 +140,9 @@ metadata {
         	state "default", label:'${currentValue}', unit:"μg/m³", backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 10, color: "#51B2E8"],
-            	[value: 37, color: "#4abd73"],
-            	[value: 50, color: "#FFCF38"],
-            	[value: 75, color: "#E56262"],
+            	[value: 15, color: "#51B2E8"],
+            	[value: 50, color: "#FDFE02"],
+            	[value: 75, color: "#E40000"],
             	[value: 500, color: "#970203"]
             ]
         }
@@ -158,12 +158,11 @@ metadata {
         valueTile("o3_value", "device.o3_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
-            	[value: 0, color: "#7EC6EE"],
-            	[value: 30, color: "#51B2E8"],
-            	[value: 80, color: "#4abd73"],
-            	[value: 110, color: "#FFCF38"],
-            	[value: 150, color: "#E56262"],
-            	[value: 500, color: "#970203"]
+            	[value: 0.001, color: "#7EC6EE"],
+            	[value: 0.03, color: "#51B2E8"],
+            	[value: 0.10, color: "#FDFE02"],
+            	[value: 0.15, color: "#E40000"],
+            	[value: 0.5, color: "#970203"]
             ]
         }
        
@@ -175,10 +174,10 @@ metadata {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 30, color: "#51B2E8"],
-            	[value: 50, color: "#FDFE02"],
-            	[value: 200, color: "#E40000"],
-            	[value: 500, color: "#970203"]
+            	[value: 0.03, color: "#51B2E8"],
+            	[value: 0.05, color: "#FDFE02"],
+            	[value: 0.2, color: "#E40000"],
+            	[value: 0.5, color: "#970203"]
             ]
         }
         
@@ -190,10 +189,10 @@ metadata {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 20, color: "#51B2E8"],
-            	[value: 40, color: "#FDFE02"],
-            	[value: 150, color: "#E40000"],
-            	[value: 500, color: "#970203"]
+            	[value: 0.02, color: "#51B2E8"],
+            	[value: 0.04, color: "#FDFE02"],
+            	[value: 0.15, color: "#E40000"],
+            	[value: 0.5, color: "#970203"]
             ]
         }
                
@@ -205,10 +204,10 @@ metadata {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#1e9cbb"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 200, color: "#51B2E8"],
-            	[value: 700, color: "#FDFE02"],
-            	[value: 1500, color: "#E40000"],
-            	[value: 5000, color: "#970203"]
+            	[value: 0.2, color: "#51B2E8"],
+            	[value: 0.7, color: "#FDFE02"],
+            	[value: 1.5, color: "#E40000"],
+            	[value: 5.0, color: "#970203"]
             ]
         }
         
@@ -367,6 +366,34 @@ metadata {
 			state "default", label:'${currentValue}'
 		}
         
+        valueTile("color_infos", "", width: 6, height: 1, decoration: "flat") {
+            state "default", label:'대기 오염 색상 정보'
+        }
+
+        valueTile("color1_value", "", decoration: "flat") {
+            state "default", label:'오류', backgroundColor: "#1e9cbb"
+        }
+		
+        valueTile("color2_value", "", decoration: "flat") {
+            state "default", label:'1단계', backgroundColor: "#7EC6EE"
+        }
+        
+        valueTile("color3_value", "", decoration: "flat") {
+            state "default", label:'2단계', backgroundColor: "#51B2E8"
+        }
+        
+        valueTile("color4_value", "", decoration: "flat") {
+            state "default", label:'3단계', backgroundColor: "#FDFE02"
+        }
+        
+        valueTile("color5_value", "", decoration: "flat") {
+            state "default", label:'4단계', backgroundColor: "#E40000"
+        }
+        
+        valueTile("color6_value", "", decoration: "flat") {
+            state "default", label:'5단계', backgroundColor: "#970203"
+        }
+                
         /*
 		valueTile("refresh_label", "", width: 2, decoration: "flat") {
 			state "default", label:'Refresh', action: "linkStationSearch"
@@ -385,7 +412,10 @@ metadata {
                 "weatherIcon_value", "temperature_label", "humidity_label", "ultravioletIndex_label", "illuminance_label", "feelsLike_label",
                 "weather_value", "temperature_value", "humidity_value", "ultravioletIndex_value", "illuminance_value", "feelsLike_value",
                 "wind_label", "percentPrecip_label", "rise_label", "set_label",
-                "wind_value", "percentPrecip_value", "rise_value", "set_value"])}
+                "wind_value", "percentPrecip_value", "rise_value", "set_value",
+                "color_infos",
+                "color1_value", "color2_value", "color3_value", "color4_value", "color5_value", "color6_value",
+                ])}
 }
 
 // parse events into attributes
