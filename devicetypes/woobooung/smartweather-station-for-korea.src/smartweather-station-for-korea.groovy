@@ -401,32 +401,42 @@ def uninstalled() {
 	unschedule()
 }
 
-def refresh() {
-	unschedule()
-	// Last update time stamp
-	//def timeStamp = new Date().format("yyyy MMM dd EEE h:mm:ss a", location.timeZone)
-	//sendEvent(name: "lastUpdate", value: timeStamp)
+def updated() {
+	refresh()
+}
 
-	pollAirKorea()
-	pollWunderground()
+def refresh() {
+	log.debug "refresh()"
+	try {
+        pollAirKorea()
+    } catch (e) {
+        log.error "error: pollAirKorea $e"
+    }
     
-    def refreshInterval =  refreshRateMin * 60
-    runIn (refreshInterval, poll)
-    log.debug "Data will repoll every ${refreshRate} minutes"   
+	try {
+        pollWunderground()
+    } catch (e) {
+        log.error "error: pollWunderground $e"
+    }
 }
 
 def configure() {
-	refresh()
+	log.debug "Configuare()"
 }
 
 // Air Korea handle commands
 def pollAirKorea() {
+	log.debug "pollAirKorea()"
     if (stationName && accessKey) {
         def params = [
     	    uri: "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName=${stationName}&dataTerm=DAILY&pageNo=1&numOfRows=1&ServiceKey=${accessKey}&ver=1.3&_returnType=json",
         	contentType: 'application/json'
     	]
         try {
+         	def refreshTime = (refreshRateMin as int) * 60
+    	    runIn(refreshTime, pollAirKorea)
+    		log.debug "Data will repoll every ${refreshRateMin} minutes"
+        
         	log.debug "uri: ${params.uri}"
             
             httpGet(params) {resp ->
@@ -537,7 +547,11 @@ def pollAirKorea() {
 
 // WunderGround weather handle commands
 def pollWunderground() {
-	log.debug "WUSTATION: Executing 'poll', location: ${location.name}"
+	log.debug "pollAirKorea()"
+	
+    def refreshTime = (refreshRateMin as int) * 60
+    runIn(refreshTime, pollWunderground)
+    log.debug "Data will repoll every ${refreshRateMin} minutes"
 
 	// Current conditions
 	def obs = get("conditions")?.current_observation
