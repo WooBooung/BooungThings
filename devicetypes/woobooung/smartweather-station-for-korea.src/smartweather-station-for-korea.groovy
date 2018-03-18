@@ -123,10 +123,10 @@ metadata {
         
         valueTile("pm10_value", "device.pm10_value", decoration: "flat") {
         	state "default", label:'${currentValue}', unit:"μg/m³", backgroundColors:[
-				[value: -1, color: "#1e9cbb"],
+				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 35, color: "#51B2E8"],
-            	[value: 85, color: "#FDFE02"],
+            	[value: 85, color: "#e5c757"],
             	[value: 150, color: "#E40000"],
             	[value: 500, color: "#970203"]
             ]
@@ -138,10 +138,10 @@ metadata {
 
 		valueTile("pm25_value", "device.fineDustLevel", decoration: "flat") {
         	state "default", label:'${currentValue}', unit:"μg/m³", backgroundColors:[
-				[value: -1, color: "#1e9cbb"],
+				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 15, color: "#51B2E8"],
-            	[value: 50, color: "#FDFE02"],
+            	[value: 50, color: "#e5c757"],
             	[value: 75, color: "#E40000"],
             	[value: 500, color: "#970203"]
             ]
@@ -157,10 +157,10 @@ metadata {
 
         valueTile("o3_value", "device.o3_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
-				[value: -1, color: "#1e9cbb"],
+				[value: -1, color: "#C4BBB5"],
             	[value: 0.001, color: "#7EC6EE"],
             	[value: 0.03, color: "#51B2E8"],
-            	[value: 0.10, color: "#FDFE02"],
+            	[value: 0.10, color: "#e5c757"],
             	[value: 0.15, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
             ]
@@ -172,10 +172,10 @@ metadata {
 
         valueTile("no2_value", "device.no2_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
-				[value: -1, color: "#1e9cbb"],
+				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 0.03, color: "#51B2E8"],
-            	[value: 0.05, color: "#FDFE02"],
+            	[value: 0.05, color: "#e5c757"],
             	[value: 0.2, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
             ]
@@ -187,10 +187,10 @@ metadata {
         
         valueTile("so2_value", "device.so2_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
-				[value: -1, color: "#1e9cbb"],
+				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 0.02, color: "#51B2E8"],
-            	[value: 0.04, color: "#FDFE02"],
+            	[value: 0.04, color: "#e5c757"],
             	[value: 0.15, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
             ]
@@ -202,10 +202,10 @@ metadata {
 
         valueTile("co_value", "device.co_value", decoration: "flat") {
             state "default", label:'${currentValue}', backgroundColors:[
-				[value: -1, color: "#1e9cbb"],
+				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 0.2, color: "#51B2E8"],
-            	[value: 0.7, color: "#FDFE02"],
+            	[value: 0.7, color: "#e5c757"],
             	[value: 1.5, color: "#E40000"],
             	[value: 5.0, color: "#970203"]
             ]
@@ -371,7 +371,7 @@ metadata {
         }
 
         valueTile("color1_value", "", decoration: "flat") {
-            state "default", label:'오류', backgroundColor: "#1e9cbb"
+            state "default", label:'오류', backgroundColor: "#C4BBB5"
         }
 		
         valueTile("color2_value", "", decoration: "flat") {
@@ -383,7 +383,7 @@ metadata {
         }
         
         valueTile("color4_value", "", decoration: "flat") {
-            state "default", label:'3단계', backgroundColor: "#FDFE02"
+            state "default", label:'3단계', backgroundColor: "#e5c757"
         }
         
         valueTile("color5_value", "", decoration: "flat") {
