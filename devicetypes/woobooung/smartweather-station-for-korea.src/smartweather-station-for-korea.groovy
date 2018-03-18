@@ -1,6 +1,7 @@
 /**
  *  SmartWeather Station For Korea
- *
+ *  Version 0.0.1
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -59,7 +60,7 @@ metadata {
 
 	preferences {
 		input "accessKey", "text", type: "password", title: "AirKorea API Key", description: "www.data.go.kr에서 apikey 발급 받으세요", required: true 
-		input "stationName", "text", title: "Station name", description: "관측소 이름을 입력해주세요", required: true
+		input "stationName", "text", title: "Station name(조회: 아래 링크)", description: "weekendproject.net:8081/api/airstation/지역명", required: true
         input "fakeStationName", "text", title: "Fake Station name(option)", description: "Tile에 보여질 이름 입력하세요", required: false
         input "refreshRateMin", "enum", title: "Update interval", defaultValue: 60, options:[15: "15 Min", 30: "30 Min", 60 : "1 Hour", 180 :"3 Hour", 360: "6 Hour", 720: "12 Hour", 1440: "Daily"], displayDuringSetup: true
 	}
