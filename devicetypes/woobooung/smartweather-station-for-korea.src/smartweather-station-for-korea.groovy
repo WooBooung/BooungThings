@@ -1,6 +1,6 @@
 /**
  *  SmartWeather Station For Korea
- *  Version 0.0.1
+ *  Version 0.0.2
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -34,7 +34,9 @@ metadata {
 		capability "Sensor"
 
 		// Air Korea infos for WebCore
-		attribute "o3_value", "number"
+		attribute "pm25_value", "number"
+        attribute "pm10_value", "number"
+        attribute "o3_value", "number"
 		attribute "no2_value", "number"
 		attribute "so2_value", "number"
         attribute "co_value", "number"
@@ -44,14 +46,12 @@ metadata {
 		attribute "localSunset", "string"
         attribute "city", "string"
 		attribute "timeZoneOffset", "string"
-		//attribute "weather", "string"
+		attribute "weather", "string"
 		attribute "wind", "string"
 		attribute "weatherIcon", "string"
 		attribute "forecastIcon", "string"
 		attribute "feelsLike", "string"
 		attribute "percentPrecip", "string"
-		attribute "sunriseDate", "string"
-		attribute "sunsetDate", "string"
         
         command "refresh"
         command "pollAirKorea"
@@ -491,9 +491,10 @@ def pollAirKorea() {
                     
                     if( resp.data.list[0].pm25Value != "-" ) { 
                         log.debug "PM25 value: ${resp.data.list[0].pm25Value}"
+                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value, unit: "μg/m³", isStateChange: true)
                         sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value, unit: "μg/m³", isStateChange: true)
                     } else {
-                    	sendEvent(name: "fineDustLevel", value: "--", unit: "μg/m³", isStateChange: true)
+                    	sendEvent(name: "pm25_value", value: "--", unit: "μg/m³", isStateChange: true)
                     }
                     
                     if( resp.data.list[0].pm25Grade != "-" ) { 
