@@ -1,6 +1,6 @@
 /**
  *  SmartWeather Station For Korea
- *  Version 0.0.2
+ *  Version 0.0.3
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -17,13 +17,17 @@
  *   - Tile remake by ShinJjang
  *   - Created Icon by Onaldo
  *   - Merged dth SmartWeather Station Tile and AirKorea DTH by WooBooung
+ *   - Version 0.0.3
+ *      Refine capability Carbon Monoxide Detector / Dust Sensor 
+ *      Changed unit string
+ *      Added CO detect threshold in preferences
  *
  */
 metadata {
 	definition (name: "SmartWeather Station For Korea", namespace: "WooBooung", author: "Booung", ocfResourceType: "x.com.st.airqualitylevel") {
 		capability "Air Quality Sensor"
-		capability "Carbon Monoxide Detector" // co
-		capability "Dust Sensor" // For PM2.5
+		capability "Carbon Monoxide Detector" // co : clear, detected
+		capability "Dust Sensor" // fineDustLevel : PM 2.5   dustLevel : PM 10
         capability "Illuminance Measurement"
         capability "Temperature Measurement"
         capability "Relative Humidity Measurement"
@@ -63,6 +67,7 @@ metadata {
 		input "stationName", "text", title: "Station name(조회: 아래 링크)", description: "weekendproject.net:8081/api/airstation/지역명", required: true
         input "fakeStationName", "text", title: "Fake Station name(option)", description: "Tile에 보여질 이름 입력하세요", required: false
         input "refreshRateMin", "enum", title: "Update interval", defaultValue: 60, options:[15: "15 Min", 30: "30 Min", 60 : "1 Hour", 180 :"3 Hour", 360: "6 Hour", 720: "12 Hour", 1440: "Daily"], displayDuringSetup: true
+        input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
 	}
 
 	simulator {
@@ -123,7 +128,7 @@ metadata {
         }
         
         valueTile("pm10_value", "device.pm10_value", decoration: "flat") {
-        	state "default", label:'${currentValue}', unit:"μg/m³", backgroundColors:[
+        	state "default", label:'${currentValue}', unit:"㎍/㎥", backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 35, color: "#51B2E8"],
@@ -138,7 +143,7 @@ metadata {
         }
 
 		valueTile("pm25_value", "device.fineDustLevel", decoration: "flat") {
-        	state "default", label:'${currentValue}', unit:"μg/m³", backgroundColors:[
+        	state "default", label:'${currentValue}', unit:"㎍/㎥", backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 15, color: "#51B2E8"],
@@ -484,24 +489,20 @@ def pollAirKorea() {
               
                     if( resp.data.list[0].pm10Value != "-" ) {
                         log.debug "PM10 value: ${resp.data.list[0].pm10Value}"
-                        sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value, unit: "μg/m³", isStateChange: true)
+                        sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value, unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "dustLevel", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥", isStateChange: true)
                     } else {
-                    	sendEvent(name: "pm10_value", value: "--", unit: "μg/m³", isStateChange: true)
+                    	sendEvent(name: "pm10_value", value: "--", unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "dustLevel", value: "--", unit: "㎍/㎥", isStateChange: true)
                     }
                     
                     if( resp.data.list[0].pm25Value != "-" ) { 
                         log.debug "PM25 value: ${resp.data.list[0].pm25Value}"
-                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value, unit: "μg/m³", isStateChange: true)
-                        sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value, unit: "μg/m³", isStateChange: true)
+                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value, unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥", isStateChange: true)
                     } else {
-                    	sendEvent(name: "pm25_value", value: "--", unit: "μg/m³", isStateChange: true)
-                    }
-                    
-                    if( resp.data.list[0].pm25Grade != "-" ) { 
-                        log.debug "PM25 grade: ${resp.data.list[0].pm25Grade}"
-                        sendEvent(name: "dustLevel", value: resp.data.list[0].pm25Grade, unit: "", isStateChange: true)
-                    } else {
-                    	sendEvent(name: "dustLevel", value: "--", unit: "μg/m³", isStateChange: true)
+                    	sendEvent(name: "pm25_value", value: "--", unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "fineDustLevel", value: "--", unit: "㎍/㎥", isStateChange: true)
                     }
                     
                     def display_value
@@ -529,7 +530,14 @@ def pollAirKorea() {
                     if( resp.data.list[0].coValue != "-" ) {
                         log.debug "CO: ${resp.data.list[0].coValue}"
                         display_value = "\n" + resp.data.list[0].coValue + "\n"
-                        sendEvent(name: "carbonMonoxide", value: resp.data.list[0].coValue as Float, unit: "ppm", isStateChange: true)
+                        
+                        def carbonMonoxide_value = "clear"
+                        
+                        if ((resp.data.list[0].coValue as Float) >= (coThresholdValue as Float)) {
+                        	carbonMonoxide_value = "detected"
+                        }
+                        
+                        sendEvent(name: "carbonMonoxide", value: carbonMonoxide_value, isStateChange: true)
                         sendEvent(name: "co_value", value: display_value as String, unit: "ppm", isStateChange: true)
                     } else
                     	sendEvent(name: "co_value", value: "--", unit: "ppm", isStateChange: true)
