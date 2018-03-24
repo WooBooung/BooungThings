@@ -1,6 +1,6 @@
 /**
  *  SmartWeather Station For Korea
- *  Version 0.0.3
+ *  Version 0.0.4
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -17,11 +17,15 @@
  *   - Tile remake by ShinJjang
  *   - Created Icon by Onaldo
  *   - Merged dth SmartWeather Station Tile and AirKorea DTH by WooBooung
+ *
  *   - Version 0.0.3
  *      Refine capability Carbon Monoxide Detector / Dust Sensor 
  *      Changed unit string
  *      Added CO detect threshold in preferences
  *
+ *   - Version 0.0.4
+ *      Changed unit string
+ *      Fixed check logic for air quality display
  */
 metadata {
 	definition (name: "SmartWeather Station For Korea", namespace: "WooBooung", author: "Booung", ocfResourceType: "x.com.st.airqualitylevel") {
@@ -81,7 +85,7 @@ metadata {
                 attributeState "좋음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/05/06/885720_green_512x512.png", backgroundColor:"#6eca8f"
                 attributeState "보통", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/10/29/848792_miscellaneous_512x512.png", backgroundColor:"FFDE61"
                 attributeState "나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/08/18/812527_fall_512x512.png", backgroundColor:"#ff9eb2"
-                attributeState "아주나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/11/15/852865_medical_512x512.png", backgroundColor:"#d86450"
+                attributeState "매우나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/11/15/852865_medical_512x512.png", backgroundColor:"#d86450"
                 attributeState "알수없음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/01/23/874894_question_512x512.png", backgroundColor:"#C4BBB5"
             }
             /*tileAttribute("device.airQualityStatus", key: "PRIMARY_CONTROL") {
@@ -89,7 +93,7 @@ metadata {
                 attributeState "좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMjYx/MDAxNTIxMjUzNjI3NDY3.buZqB49WFRlPSJejVL3v6grlgL6ElOMY7DyWR4ZHMwgg.A0Oc0Tv6PEvxGGf1wzaGxUX4YyJWMayLbXMoIx1Ulj4g.PNG.fuls/Good.png?type=w2", backgroundColor:"#6eca8f"
                 attributeState "보통", label:'${name}', icon:"http://postfiles10.naver.net/MjAxODAzMTdfOTIg/MDAxNTIxMjUzODM2NjE3.uKxYFh-UKOU_8rVL11jRwEpXamq16Zh2j3tjep0_eaIg.RkHNjXtsLpTIpadPWlVcUYCRPc9q5gpK4XDCsb4_rccg.PNG.fuls/nomal.png?type=w2", backgroundColor:"FFDE61"
                 attributeState "나쁨", label:'${name}', icon:"http://postfiles7.naver.net/MjAxODAzMTdfMjA2/MDAxNTIxMjU0NDQyNjg1.tQqUGjj_sMgr6-5s_NI5Bs7hIE6GuAJGwMVmUiDnL-Eg.HJfx-MyfH3GIoxbBPZPNa-Jfk-oPszVXV3XPMc55rNIg.PNG.fuls/812527_fall_512x512.png?type=w2", backgroundColor:"#ff9eb2"
-                attributeState "아주나쁨", label:'${name}', icon:"http://postfiles4.naver.net/MjAxODAzMTdfMTk1/MDAxNTIxMjU0NDQyNTEy.F1no5ZbsQK4Yle3mfc3XAKMTlKVrKSS1NTpWPmY_Qzgg.oujDDUVV4nuAUfuECNpCXXfXRdTIPN-4xpigosU-jDsg.PNG.fuls/gasmask.png?type=w2", backgroundColor:"#d86450"
+                attributeState "매우나쁨", label:'${name}', icon:"http://postfiles4.naver.net/MjAxODAzMTdfMTk1/MDAxNTIxMjU0NDQyNTEy.F1no5ZbsQK4Yle3mfc3XAKMTlKVrKSS1NTpWPmY_Qzgg.oujDDUVV4nuAUfuECNpCXXfXRdTIPN-4xpigosU-jDsg.PNG.fuls/gasmask.png?type=w2", backgroundColor:"#d86450"
                 attributeState "알수없음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/01/23/874894_question_512x512.png", backgroundColor:"#C4BBB5"
             }*/
 
@@ -124,7 +128,7 @@ metadata {
       */
       
         valueTile("pm10_label", "", decoration: "flat") {
-            state "default", label:'PM10\nμg/m'
+            state "default", label:'PM10\n㎍/㎥'
         }
         
         valueTile("pm10_value", "device.pm10_value", decoration: "flat") {
@@ -139,7 +143,7 @@ metadata {
         }
 
         valueTile("pm25_label", "", decoration: "flat") {
-            state "default", label:'PM2.5\nμg/m'
+            state "default", label:'PM2.5\n㎍/㎥'
         }
 
 		valueTile("pm25_value", "device.fineDustLevel", decoration: "flat") {
