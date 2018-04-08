@@ -1,6 +1,6 @@
 /**
  *  SmartWeather Station For Korea
- *  Version 0.0.4
+ *  Version 0.0.6
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -11,9 +11,9 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- *  Based on original DH codes by SmartThings and SeungCheol Lee
+ *  Based on original DH codes by SmartThings and SeungCheol Lee(slasher)
  *   - SmartWeather Station Tile by SmartThings
- *   - AirKorea DTH by SeunCheol Lee
+ *   - AirKorea DTH by SeunCheol Lee(slasher)
  *   - Tile remake by ShinJjang
  *   - Created Icon by Onaldo
  *   - Merged dth SmartWeather Station Tile and AirKorea DTH by WooBooung
@@ -26,7 +26,14 @@
  *   - Version 0.0.4
  *      Changed unit string
  *      Fixed check logic for air quality display
+ *
+ *   - Version 0.0.5
+ *      Changed Icon by Onaldo
+ *
+ *   - Version 0.0.6
+ *      Added Lincense by AIRKOREA
  */
+  
 metadata {
 	definition (name: "SmartWeather Station For Korea", namespace: "WooBooung", author: "Booung", ocfResourceType: "x.com.st.airqualitylevel") {
 		capability "Air Quality Sensor"
@@ -68,10 +75,13 @@ metadata {
 
 	preferences {
 		input "accessKey", "text", type: "password", title: "AirKorea API Key", description: "www.data.go.kr에서 apikey 발급 받으세요", required: true 
-		input "stationName", "text", title: "Station name(조회: 아래 링크)", description: "weekendproject.net:8081/api/airstation/지역명", required: true
+		input "stationName", "text", title: "Station name(조회: 아래 참조)", description: "아래 측정소 조회 방법 참조", required: true
         input "fakeStationName", "text", title: "Fake Station name(option)", description: "Tile에 보여질 이름 입력하세요", required: false
         input "refreshRateMin", "enum", title: "Update interval", defaultValue: 60, options:[15: "15 Min", 30: "30 Min", 60 : "1 Hour", 180 :"3 Hour", 360: "6 Hour", 720: "12 Hour", 1440: "Daily"], displayDuringSetup: true
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
+        input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
+		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.6", displayDuringSetup: false
 	}
 
 	simulator {
@@ -80,20 +90,23 @@ metadata {
 
 	tiles {
 		multiAttributeTile(name:"airQuality", type:"generic", width:6, height:4) {
+            // onaldo Version
             tileAttribute("device.airQualityStatus", key: "PRIMARY_CONTROL") {
-                attributeState "매우좋음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/07/06/105340_send_512x512.png", backgroundColor:"#73C1EC"
-                attributeState "좋음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/05/06/885720_green_512x512.png", backgroundColor:"#6eca8f"
-                attributeState "보통", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/10/29/848792_miscellaneous_512x512.png", backgroundColor:"FFDE61"
-                attributeState "나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/08/18/812527_fall_512x512.png", backgroundColor:"#ff9eb2"
-                attributeState "매우나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/11/15/852865_medical_512x512.png", backgroundColor:"#d86450"
+                attributeState "매우좋음", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMTUw/MDAxNTIyMDc3NTg3NTc0.LTQaSOOWQPze0tT2_CwLRGlLBcqULzdlSzW-2mFHmMwg.SMzGfa_nFw0jCXAcW8HtsTw22p63Cki0T-I1nxU9OE8g.PNG.fuls/%EB%A7%A4%EC%9A%B0%EC%A2%8B%EC%9D%8C.png?type=w773", backgroundColor:"#73C1EC"
+                attributeState "좋음", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMjI1/MDAxNTIyMDc3NTg3NTc1.0VWOmi2rK-ziFTCRDjUPNJvpRCc2MiOzt4NJyI5Pyigg.1lpKyyAAP9W0MP2YDLLginykR3-cm6e2cGGftaaQ97Ug.PNG.fuls/%EC%A2%8B%EC%9D%8C.png?type=w773", backgroundColor:"#6ECA8F"
+                attributeState "보통", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMTM0/MDAxNTIyMDc3NTg3NTc0.dFndKDfGFkGqaVQMExoDayNIQYFY4El923ilwXNTdZYg.ol3CHMu7cWuMs5FuzN9bJpl4BOmNlhkymNCeEjGrZ5Ag.PNG.fuls/%EB%B3%B4%ED%86%B51.png?type=w773", backgroundColor:"FFDE61"
+                attributeState "나쁨", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMjUz/MDAxNTIyMDc3NTg3NTc1.m5TQzkuNAPQB_eir0wkvXoSxhiM1oL6KyZt324x7BvMg.x7Y0hCXgFZ4_EFHc2ZdmqazFLTnDnHDDLm5oE14ZMI4g.PNG.fuls/%EB%82%98%EC%81%A81.png?type=w773", backgroundColor:"#FF9EB2"
+                attributeState "매우나쁨", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMjY1/MDAxNTIyMTEyODE4MjE5.V4XfrTDD1f6ScSUoTFPSW7x_5iz1cU8U_ICmjhykcGkg.iJ2ZYiSsgS1XkqDS310ev05EUlZ4PrFWG4Rc3MiglaYg.PNG.fuls/%EA%B7%B8%EB%A6%BC1.png?type=w773", backgroundColor:"#D86450"
                 attributeState "알수없음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/01/23/874894_question_512x512.png", backgroundColor:"#C4BBB5"
             }
-            /*tileAttribute("device.airQualityStatus", key: "PRIMARY_CONTROL") {
-                attributeState "매우좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMTA2/MDAxNTIxMjQ2NDcyNTg2.J8_9e2JL-r01FZHQoHYl6bQP7ueZ-WjyxPW3Qp3bWnEg.b5uV7OgbzneOob6Cub6o4TFvPDdQYLbLtPK1geLI7YQg.PNG.fuls/%EC%9D%B4%EB%A6%84_%EC%97%86%EC%9D%8C.png?type=w2", backgroundColor:"#73C1EC"
-                attributeState "좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMjYx/MDAxNTIxMjUzNjI3NDY3.buZqB49WFRlPSJejVL3v6grlgL6ElOMY7DyWR4ZHMwgg.A0Oc0Tv6PEvxGGf1wzaGxUX4YyJWMayLbXMoIx1Ulj4g.PNG.fuls/Good.png?type=w2", backgroundColor:"#6eca8f"
-                attributeState "보통", label:'${name}', icon:"http://postfiles10.naver.net/MjAxODAzMTdfOTIg/MDAxNTIxMjUzODM2NjE3.uKxYFh-UKOU_8rVL11jRwEpXamq16Zh2j3tjep0_eaIg.RkHNjXtsLpTIpadPWlVcUYCRPc9q5gpK4XDCsb4_rccg.PNG.fuls/nomal.png?type=w2", backgroundColor:"FFDE61"
-                attributeState "나쁨", label:'${name}', icon:"http://postfiles7.naver.net/MjAxODAzMTdfMjA2/MDAxNTIxMjU0NDQyNjg1.tQqUGjj_sMgr6-5s_NI5Bs7hIE6GuAJGwMVmUiDnL-Eg.HJfx-MyfH3GIoxbBPZPNa-Jfk-oPszVXV3XPMc55rNIg.PNG.fuls/812527_fall_512x512.png?type=w2", backgroundColor:"#ff9eb2"
-                attributeState "매우나쁨", label:'${name}', icon:"http://postfiles4.naver.net/MjAxODAzMTdfMTk1/MDAxNTIxMjU0NDQyNTEy.F1no5ZbsQK4Yle3mfc3XAKMTlKVrKSS1NTpWPmY_Qzgg.oujDDUVV4nuAUfuECNpCXXfXRdTIPN-4xpigosU-jDsg.PNG.fuls/gasmask.png?type=w2", backgroundColor:"#d86450"
+            
+            /* slasher version
+            tileAttribute("device.airQualityStatus", key: "PRIMARY_CONTROL") {
+                attributeState "매우좋음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/07/06/105340_send_512x512.png", backgroundColor:"#73C1EC"
+                attributeState "좋음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/05/06/885720_green_512x512.png", backgroundColor:"#6ECA8F"
+                attributeState "보통", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/10/29/848792_miscellaneous_512x512.png", backgroundColor:"FFDE61"
+                attributeState "나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/08/18/812527_fall_512x512.png", backgroundColor:"#FF9EB2"
+                attributeState "매우나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/11/15/852865_medical_512x512.png", backgroundColor:"#D86450"
                 attributeState "알수없음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/01/23/874894_question_512x512.png", backgroundColor:"#C4BBB5"
             }*/
 
@@ -117,12 +130,12 @@ metadata {
         
         valueTile("airQuality_value", "device.airQuality", decoration: "flat") {
         	state "default", label:'${currentValue}', backgroundColors:[
-				[value: -1, color: "#1e9cbb"],
-            	[value: 0, color: "#73C1EC"],
-            	[value: 50, color: "#6eca8f"],
-            	[value: 100, color: "#FFDE61"],
-            	[value: 150, color: "#ff9eb2"],
-            	[value: 200, color: "#d86450"]
+                [value: -1, color: "#C4BBB5"],
+            	[value: 0, color: "#7EC6EE"],
+            	[value: 50, color: "#51B2E8"],
+            	[value: 100, color: "#E5C757"],
+            	[value: 150, color: "#E40000"],
+            	[value: 200, color: "#970203"]
             ]
         }
       */
@@ -136,7 +149,7 @@ metadata {
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 35, color: "#51B2E8"],
-            	[value: 85, color: "#e5c757"],
+            	[value: 85, color: "#E5C757"],
             	[value: 150, color: "#E40000"],
             	[value: 500, color: "#970203"]
             ]
@@ -151,7 +164,7 @@ metadata {
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 15, color: "#51B2E8"],
-            	[value: 50, color: "#e5c757"],
+            	[value: 50, color: "#E5C757"],
             	[value: 75, color: "#E40000"],
             	[value: 500, color: "#970203"]
             ]
@@ -170,7 +183,7 @@ metadata {
 				[value: -1, color: "#C4BBB5"],
             	[value: 0.001, color: "#7EC6EE"],
             	[value: 0.03, color: "#51B2E8"],
-            	[value: 0.10, color: "#e5c757"],
+            	[value: 0.10, color: "#E5C757"],
             	[value: 0.15, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
             ]
@@ -185,7 +198,7 @@ metadata {
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 0.03, color: "#51B2E8"],
-            	[value: 0.05, color: "#e5c757"],
+            	[value: 0.05, color: "#E5C757"],
             	[value: 0.2, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
             ]
@@ -200,7 +213,7 @@ metadata {
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 0.02, color: "#51B2E8"],
-            	[value: 0.04, color: "#e5c757"],
+            	[value: 0.04, color: "#E5C757"],
             	[value: 0.15, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
             ]
@@ -215,7 +228,7 @@ metadata {
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
             	[value: 0.2, color: "#51B2E8"],
-            	[value: 0.7, color: "#e5c757"],
+            	[value: 0.7, color: "#E5C757"],
             	[value: 1.5, color: "#E40000"],
             	[value: 5.0, color: "#970203"]
             ]
@@ -393,7 +406,7 @@ metadata {
         }
         
         valueTile("color4_value", "", decoration: "flat") {
-            state "default", label:'3단계', backgroundColor: "#e5c757"
+            state "default", label:'3단계', backgroundColor: "#E5C757"
         }
         
         valueTile("color5_value", "", decoration: "flat") {
@@ -467,6 +480,7 @@ def configure() {
 // Air Korea handle commands
 def pollAirKorea() {
 	log.debug "pollAirKorea()"
+    def dthVersion = "0.0.6"
     if (stationName && accessKey) {
         def params = [
     	    uri: "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName=${stationName}&dataTerm=DAILY&pageNo=1&numOfRows=1&ServiceKey=${accessKey}&ver=1.3&_returnType=json",
@@ -556,7 +570,7 @@ def pollAirKorea() {
                         if (fakeStationName)
                         	station_display_name = fakeStationName
                         
-	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.list[0].dataTime, isStateChange: true)
+	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.list[0].dataTime + "\nVersion: " + dthVersion, isStateChange: true)
                         
                   		sendEvent(name: "airQuality", value: khai, isStateChange: true)
 
