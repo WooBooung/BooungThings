@@ -49,6 +49,7 @@ metadata {
 		capability "Sensor"
 
 		// Air Korea infos for WebCore
+		attribute "airQualityStatus", "string"
 		attribute "pm25_value", "number"
         attribute "pm10_value", "number"
         attribute "o3_value", "number"
