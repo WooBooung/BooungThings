@@ -1,6 +1,6 @@
 /**
  *  SmartWeather Station For Korea
- *  Version 0.0.6
+ *  Version 0.0.7
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -32,6 +32,9 @@
  *
  *   - Version 0.0.6
  *      Added Lincense by AIRKOREA
+ *
+ *   - Version 0.0.7
+ *      Fixed current value type
  */
   
 metadata {
@@ -82,7 +85,7 @@ metadata {
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
         input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.6", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.7", displayDuringSetup: false
 	}
 
 	simulator {
@@ -508,7 +511,7 @@ def pollAirKorea() {
               
                     if( resp.data.list[0].pm10Value != "-" ) {
                         log.debug "PM10 value: ${resp.data.list[0].pm10Value}"
-                        sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value, unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥", isStateChange: true)
                         sendEvent(name: "dustLevel", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥", isStateChange: true)
                     } else {
                     	sendEvent(name: "pm10_value", value: "--", unit: "㎍/㎥", isStateChange: true)
@@ -517,7 +520,7 @@ def pollAirKorea() {
                     
                     if( resp.data.list[0].pm25Value != "-" ) { 
                         log.debug "PM25 value: ${resp.data.list[0].pm25Value}"
-                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value, unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥", isStateChange: true)
                         sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥", isStateChange: true)
                     } else {
                     	sendEvent(name: "pm25_value", value: "--", unit: "㎍/㎥", isStateChange: true)
@@ -573,10 +576,10 @@ def pollAirKorea() {
                         
 	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.list[0].dataTime + "\nVersion: " + dthVersion, isStateChange: true)
                         
-                  		sendEvent(name: "airQuality", value: khai, isStateChange: true)
+                  		sendEvent(name: "airQuality", value: resp.data.list[0].khaiValue as Integer, isStateChange: true)
 
                         if (khai > 200) khai_text="매우나쁨"
-                        else if (khai > 150 ) khai_text="나쁨"
+                        else if (khai > 150) khai_text="나쁨"
                         else if (khai > 100) khai_text="보통"
                         else if (khai > 50) khai_text="좋음"
                         else if (khai >= 0) khai_text="매우좋음"
