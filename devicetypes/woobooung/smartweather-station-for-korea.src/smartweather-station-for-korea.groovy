@@ -96,11 +96,11 @@ metadata {
 		multiAttributeTile(name:"airQuality", type:"generic", width:6, height:4) {
             // onaldo Version
             tileAttribute("device.airQualityStatus", key: "PRIMARY_CONTROL") {
-                attributeState "매우좋음", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMTUw/MDAxNTIyMDc3NTg3NTc0.LTQaSOOWQPze0tT2_CwLRGlLBcqULzdlSzW-2mFHmMwg.SMzGfa_nFw0jCXAcW8HtsTw22p63Cki0T-I1nxU9OE8g.PNG.fuls/%EB%A7%A4%EC%9A%B0%EC%A2%8B%EC%9D%8C.png?type=w773", backgroundColor:"#73C1EC"
-                attributeState "좋음", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMjI1/MDAxNTIyMDc3NTg3NTc1.0VWOmi2rK-ziFTCRDjUPNJvpRCc2MiOzt4NJyI5Pyigg.1lpKyyAAP9W0MP2YDLLginykR3-cm6e2cGGftaaQ97Ug.PNG.fuls/%EC%A2%8B%EC%9D%8C.png?type=w773", backgroundColor:"#6ECA8F"
-                attributeState "보통", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMTM0/MDAxNTIyMDc3NTg3NTc0.dFndKDfGFkGqaVQMExoDayNIQYFY4El923ilwXNTdZYg.ol3CHMu7cWuMs5FuzN9bJpl4BOmNlhkymNCeEjGrZ5Ag.PNG.fuls/%EB%B3%B4%ED%86%B51.png?type=w773", backgroundColor:"FFDE61"
-                attributeState "나쁨", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMjUz/MDAxNTIyMDc3NTg3NTc1.m5TQzkuNAPQB_eir0wkvXoSxhiM1oL6KyZt324x7BvMg.x7Y0hCXgFZ4_EFHc2ZdmqazFLTnDnHDDLm5oE14ZMI4g.PNG.fuls/%EB%82%98%EC%81%A81.png?type=w773", backgroundColor:"#FF9EB2"
-                attributeState "매우나쁨", label:'${name}', icon:"https://postfiles.pstatic.net/MjAxODAzMjdfMjY1/MDAxNTIyMTEyODE4MjE5.V4XfrTDD1f6ScSUoTFPSW7x_5iz1cU8U_ICmjhykcGkg.iJ2ZYiSsgS1XkqDS310ev05EUlZ4PrFWG4Rc3MiglaYg.PNG.fuls/%EA%B7%B8%EB%A6%BC1.png?type=w773", backgroundColor:"#D86450"
+                attributeState "매우좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMTA2/MDAxNTIxMjQ2NDcyNTg2.J8_9e2JL-r01FZHQoHYl6bQP7ueZ-WjyxPW3Qp3bWnEg.b5uV7OgbzneOob6Cub6o4TFvPDdQYLbLtPK1geLI7YQg.PNG.fuls/%EC%9D%B4%EB%A6%84_%EC%97%86%EC%9D%8C.png?type=w2", backgroundColor:"#73C1EC"
+                attributeState "좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMjYx/MDAxNTIxMjUzNjI3NDY3.buZqB49WFRlPSJejVL3v6grlgL6ElOMY7DyWR4ZHMwgg.A0Oc0Tv6PEvxGGf1wzaGxUX4YyJWMayLbXMoIx1Ulj4g.PNG.fuls/Good.png?type=w2", backgroundColor:"#6ECA8F"
+                attributeState "보통", label:'${name}', icon:"http://postfiles10.naver.net/MjAxODAzMTdfOTIg/MDAxNTIxMjUzODM2NjE3.uKxYFh-UKOU_8rVL11jRwEpXamq16Zh2j3tjep0_eaIg.RkHNjXtsLpTIpadPWlVcUYCRPc9q5gpK4XDCsb4_rccg.PNG.fuls/nomal.png?type=w2", backgroundColor:"FFDE61"
+                attributeState "나쁨", label:'${name}', icon:"http://postfiles7.naver.net/MjAxODAzMTdfMjA2/MDAxNTIxMjU0NDQyNjg1.tQqUGjj_sMgr6-5s_NI5Bs7hIE6GuAJGwMVmUiDnL-Eg.HJfx-MyfH3GIoxbBPZPNa-Jfk-oPszVXV3XPMc55rNIg.PNG.fuls/812527_fall_512x512.png?type=w2", backgroundColor:"#FF9EB2"
+                attributeState "매우나쁨", label:'${name}', icon:"http://postfiles4.naver.net/MjAxODAzMTdfMTk1/MDAxNTIxMjU0NDQyNTEy.F1no5ZbsQK4Yle3mfc3XAKMTlKVrKSS1NTpWPmY_Qzgg.oujDDUVV4nuAUfuECNpCXXfXRdTIPN-4xpigosU-jDsg.PNG.fuls/gasmask.png?type=w2", backgroundColor:"#D86450"
                 attributeState "알수없음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/01/23/874894_question_512x512.png", backgroundColor:"#C4BBB5"
             }
             
