@@ -35,6 +35,9 @@
  *
  *   - Version 0.0.7
  *      Fixed current value type
+ *
+ *   - Version 0.0.8
+ *      Changed type wind, feelsLike, percentPrecip
  */
   
 metadata {
@@ -66,11 +69,11 @@ metadata {
         attribute "city", "string"
 		attribute "timeZoneOffset", "string"
 		attribute "weather", "string"
-		attribute "wind", "string"
+		attribute "wind", "number"
 		attribute "weatherIcon", "string"
 		attribute "forecastIcon", "string"
-		attribute "feelsLike", "string"
-		attribute "percentPrecip", "string"
+		attribute "feelsLike", "number"
+		attribute "percentPrecip", "number"
         
         command "refresh"
         command "pollAirKorea"
@@ -85,7 +88,7 @@ metadata {
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
         input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.7", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.8", displayDuringSetup: false
 	}
 
 	simulator {
@@ -631,7 +634,8 @@ def pollWunderground() {
 		send(name: "humidity", value: obs.relative_humidity[0..-2] as Integer, unit: "%")
 		send(name: "weather", value: obs.weather)
 		send(name: "weatherIcon", value: weatherIcon, displayed: false)
-		send(name: "wind", value: Math.round(obs.wind_mph) as String, unit: "MPH") // as String because of bug in determining state change of 0 numbers
+        send(name: "wind", value: Math.round(obs.wind_mph) as Integer, unit: "MPH") // Changed 0.0.8 
+		//send(name: "wind", value: Math.round(obs.wind_mph) as String, unit: "MPH") // as String because of bug in determining state change of 0 numbers
 
 		if (obs.local_tz_offset != device.currentValue("timeZoneOffset")) {
 			send(name: "timeZoneOffset", value: obs.local_tz_offset, isStateChange: true)
@@ -669,7 +673,8 @@ def pollWunderground() {
 		def f1= f?.forecast?.simpleforecast?.forecastday
 		if (f1) {
 			def icon = f1[0].icon_url.split("/")[-1].split("\\.")[0]
-			def value = f1[0].pop as String // as String because of bug in determining state change of 0 numbers
+            def value = f1[0].pop as Integer // Changed 0.0.8 
+			//def value = f1[0].pop as String // as String because of bug in determining state change of 0 numbers
 			send(name: "percentPrecip", value: value, unit: "%")
 			send(name: "forecastIcon", value: icon, displayed: false)
 		}
