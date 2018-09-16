@@ -88,7 +88,19 @@ LANGUAGE_MAP = [
     "lightning_strike_count_last_3hr": [
         "Korean": "번개 발생 (3시간 동안)",
         "English": "Lightning strike count last 3hr"
-    ]
+    ],
+    "latitude": [
+        "Korean": "위도",
+        "English": "Latitude"
+    ],
+    "longitude": [
+        "Korean": "경도",
+        "English": "Longitude"
+    ],
+    "timezone": [
+        "Korean": "시간대",
+        "English": "TimeZone"
+    ],
 ]
 
 metadata {
@@ -323,7 +335,7 @@ metadata {
 		}
         
         valueTile("latitude_label", "device.latitude_label", decoration: "flat") {
-            state "default", label: 'latitude'
+            state "default", label: '${currentValue}'
         }
 
 		valueTile("latitude", "device.latitude", width: 2, decoration: "flat") {
@@ -331,7 +343,7 @@ metadata {
 		}
         
         valueTile("longitude_label", "device.longitude_label", decoration: "flat") {
-            state "default", label: 'longitude'
+            state "default", label: '${currentValue}'
         }
 
 		valueTile("longitude", "device.longitude", width: 2, decoration: "flat") {
@@ -339,7 +351,7 @@ metadata {
 		}
         
         valueTile("timezone_label", "device.timezone_label", decoration: "flat") {
-            state "default", label: 'timezone'
+            state "default", label:'${currentValue}'
         }
 
 		valueTile("timezone", "device.timezone", width: 2, decoration: "flat") {
@@ -405,6 +417,9 @@ def setLanguage(language){
     sendEvent(name:"lightning_strike_last_epoch_label", value: LANGUAGE_MAP["lightning_strike_last_epoch"][language])
     sendEvent(name:"lightning_strike_last_distance_label", value: LANGUAGE_MAP["lightning_strike_last_distance"][language])
     sendEvent(name:"lightning_strike_count_last_3hr_label", value: LANGUAGE_MAP["lightning_strike_count_last_3hr"][language])
+    sendEvent(name:"latitude_label", value: LANGUAGE_MAP["latitude"][language])
+	sendEvent(name:"longitude_label", value: LANGUAGE_MAP["longitude"][language])
+    sendEvent(name:"timezone_label", value: LANGUAGE_MAP["timezone"][language])
 }
 
 def configure() {
