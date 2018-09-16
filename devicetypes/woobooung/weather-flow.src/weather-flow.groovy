@@ -170,10 +170,10 @@ metadata {
 		input name: "api_key", title: "API Key", type: "text", defaultValue: "20c70eae-e62f-4d3b-b3a4-8586e90f3ac8", required: true
 		input name: "station_id", title: "Station Id", type: "password", description: "Refer to below \"how to get station id\"", required: true
         input name: "polling_interval", title: "Update interval", type: "enum", options:[10: "10 sec", 30: "30 sec", 60 : "1 min", 300 : "5 min", 600 : "10 min", 1800 : "30 min"], defaultValue: "1 min", displayDuringSetup: true
-        input name: "rain_detected_option", title: "Rain Detected Option", type: "enum", options: [1 : "Every", 2: "First time"], defaultValue: "Every", description: "Refor to below \"Rain detect options\"", displayDuringSetup: true
+        input name: "rain_detected_option", title: "Rain Detected Option", type: "enum", options: ["Every time", "First time"], defaultValue: "Every time", description: "Refor to below \"Rain detect options\"", displayDuringSetup: true
         input name: "selected_lang", title:"Select a language", type: "enum", options: ["English", "Korean"], defaultValue: "English", displayDuringSetup: true
         input type: "paragraph", element: "paragraph", title: "How to get station Id", description: "Weather Flow app -> Settings's Manage -> Stations -> Status click", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Rain detect option", description: "Every : (Default value)\nif (precip > 0) then Rain detected\nif (precip == 0) then Rain not detected\n\nFirst time :\nif (precip_accum_last_1hr == 0 && precip > 0) then Rain detected\nif (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Rain detect option", description: "Every time : (Default value)\nif (precip > 0) then Rain detected\nif (precip == 0) then Rain not detected\n\nFirst time :\nif (precip_accum_last_1hr == 0 && precip > 0) then Rain detected\nif (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected", displayDuringSetup: false
         input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.2", displayDuringSetup: false
 	}
 
@@ -652,28 +652,6 @@ def pollWeatherFlow() {
                         sendEvent(name: "sea_level_pressure", value: -100, isStateChange: true)
                     }
 
-                    if (precip != "") {
-                        debugLog("precip: ${precip} ${units_precip}")
-                        def label = "${LANGUAGE_MAP["precip"][state.language]} ${units_precip}"
-                        sendEvent(name: "precip_label", value:label)
-                        sendEvent(name: "precip", value: precip, unit: units_precip, isStateChange: true)
-                           
-                        debugLog("precip option: ${rain_detected_option}")
-
-                        if (rain_detected_option == 2) {
-                         	if (precip_accum_last_1hr == 0) {
-                        		sendEvent(name:"water", value: "dry", isStateChange: true)
-                            } else if (precip_accum_last_1hr > 0 || precip > 0){
-								sendEvent(name:"water", value: "wet", isStateChange: true)                             	
-                            }
-                        } else {
-                        	sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"), isStateChange: true)
-                        }
-                    } else {
-                        log.error "precip error: ${precip}"
-                        sendEvent(name: "precip", value: 0, isStateChange: true)
-                    }
-                    
                     if (precip_accum_last_1hr != "") {
                         debugLog("precip_accum_last_1hr: ${precip_accum_last_1hr} ${units_precip}")
                         sendEvent(name: "precip_accum_last_1hr", value: precip_accum_last_1hr, unit: units_precip, isStateChange: true)
@@ -681,7 +659,7 @@ def pollWeatherFlow() {
                         log.error "precip_accum_last_1hr error: ${precip_accum_last_1hr}"
                         sendEvent(name: "precip_accum_last_1hr", value: 0, isStateChange: true)
                     }
-                    
+                  
                     if (precip_accum_local_day != "") {
                         debugLog("precip_accum_local_day: ${precip_accum_local_day} ${units_precip}")
                         def label = "${LANGUAGE_MAP["precip_accum_local_day"][state.language]} ${units_precip}"
@@ -700,6 +678,28 @@ def pollWeatherFlow() {
                     } else {
                         log.error "precip_accum_local_yesterday error: ${precip_accum_local_yesterday}"
                         sendEvent(name: "precip_accum_local_yesterday", value: 0, isStateChange: true)
+                    }
+                    
+                    if (precip != "") {
+                        debugLog("precip: ${precip} ${units_precip}")
+                        def label = "${LANGUAGE_MAP["precip"][state.language]} ${units_precip}"
+                        sendEvent(name: "precip_label", value:label)
+                        sendEvent(name: "precip", value: precip, unit: units_precip, isStateChange: true)
+                           
+                        debugLog("precip option: ${rain_detected_option}")
+
+                        if (rain_detected_option == "First time") {
+                         	if (precip_accum_last_1hr == 0) {
+                        		sendEvent(name:"water", value: "dry", isStateChange: true)
+                            } else if (precip_accum_last_1hr > 0 || precip > 0){
+								sendEvent(name:"water", value: "wet", isStateChange: true)                             	
+                            }
+                        } else {
+                        	sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"), isStateChange: true)
+                        }
+                    } else {
+                        log.error "precip error: ${precip}"
+                        sendEvent(name: "precip", value: 0, isStateChange: true)
                     }
 
                     if (wind_avg != "") {
