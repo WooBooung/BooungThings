@@ -661,9 +661,9 @@ def pollWeatherFlow() {
                         debugLog("precip option: ${rain_detected_option}")
 
                         if (rain_detected_option == 2) {
-                         	if (precip_accum_last_1hr == 0 && precip == 0) {
+                         	if (precip_accum_last_1hr == 0) {
                         		sendEvent(name:"water", value: "dry", isStateChange: true)
-                            } else {
+                            } else if (precip_accum_last_1hr > 0 || precip > 0){
 								sendEvent(name:"water", value: "wet", isStateChange: true)                             	
                             }
                         } else {
@@ -672,6 +672,14 @@ def pollWeatherFlow() {
                     } else {
                         log.error "precip error: ${precip}"
                         sendEvent(name: "precip", value: 0, isStateChange: true)
+                    }
+                    
+                    if (precip_accum_last_1hr != "") {
+                        debugLog("precip_accum_last_1hr: ${precip_accum_last_1hr} ${units_precip}")
+                        sendEvent(name: "precip_accum_last_1hr", value: precip_accum_last_1hr, unit: units_precip, isStateChange: true)
+                    } else {
+                        log.error "precip_accum_last_1hr error: ${precip_accum_last_1hr}"
+                        sendEvent(name: "precip_accum_last_1hr", value: 0, isStateChange: true)
                     }
                     
                     if (precip_accum_local_day != "") {
