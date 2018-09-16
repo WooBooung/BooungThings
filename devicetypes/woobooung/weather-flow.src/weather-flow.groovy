@@ -13,10 +13,10 @@
  *
  *   - Version 0.0.2 (2018-09-16)
  *      Added rain detected logic
- *		Before Every time detect option: 
+ *      Before Every time detect option: 
  *				if (precip > 0) then Rain detected
  *				if (precip == 0) then Rain not detected
- *      Additonal option first time detect :
+ *      Additional option first time detect :
  *				if (precip_accum_last_1hr == 0 && precip > 0) then Rain detected
  *				if (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected
  *
@@ -167,8 +167,8 @@ metadata {
 	}
 
 	preferences {
-		input name: "api_key", title: "API Key", type: "text", defaultValue: "20c70eae-e62f-4d3b-b3a4-8586e90f3ac8"
-		input name: "station_id", title: "Station Id", type: "text", description: "Refer to below \"how to get station id\"", required: true
+		input name: "api_key", title: "API Key", type: "text", defaultValue: "20c70eae-e62f-4d3b-b3a4-8586e90f3ac8", required: true
+		input name: "station_id", title: "Station Id", type: "password", description: "Refer to below \"how to get station id\"", required: true
         input name: "polling_interval", title: "Update interval", type: "enum", options:[10: "10 sec", 30: "30 sec", 60 : "1 min", 300 : "5 min", 600 : "10 min", 1800 : "30 min"], defaultValue: "1 min", displayDuringSetup: true
         input name: "rain_detected_option", title: "Rain Detected Option", type: "enum", options: [1 : "Every", 2: "First time"], defaultValue: "Every", description: "Refor to below \"Rain detect options\"", displayDuringSetup: true
         input name: "selected_lang", title:"Select a language", type: "enum", options: ["English", "Korean"], defaultValue: "English", displayDuringSetup: true
@@ -216,22 +216,6 @@ metadata {
 			state "default", label:'${currentValue}°'
 		}
 		
-        valueTile("barometric_pressure_label", "device.barometric_pressure_label", width: 2, decoration: "flat") {
-            state "default", label: '${currentValue}'
-        }
-
-		valueTile("barometric_pressure", "device.barometric_pressure", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
-        valueTile("sea_level_pressure_label", "device.sea_level_pressure_label", width: 2, decoration: "flat") {
-            state "default", label: '${currentValue}'
-        }
-
-		valueTile("sea_level_pressure", "device.sea_level_pressure", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
         valueTile("precip_label", "device.precip_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
@@ -327,20 +311,20 @@ metadata {
 		valueTile("lightning_strike_count_last_3hr", "device.lightning_strike_count_last_3hr", decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
-	
-        valueTile("station_id_label", "device.station_id_label", decoration: "flat") {
-            state "default", label: 'Station Id'
+        
+        valueTile("barometric_pressure_label", "device.barometric_pressure_label", width: 2, decoration: "flat") {
+            state "default", label: '${currentValue}'
         }
 
-		valueTile("station_id", "device.station_id", width: 2, decoration: "flat") {
+		valueTile("barometric_pressure", "device.barometric_pressure", decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
         
-        valueTile("station_name_label", "device.station_name_label", decoration: "flat") {
-            state "default", label: 'Station Name'
+        valueTile("sea_level_pressure_label", "device.sea_level_pressure_label", width: 2, decoration: "flat") {
+            state "default", label: '${currentValue}'
         }
 
-		valueTile("station_name", "device.station_name", width: 2, decoration: "flat") {
+		valueTile("sea_level_pressure", "device.sea_level_pressure", decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
         
@@ -359,15 +343,31 @@ metadata {
 		valueTile("longitude", "device.longitude", width: 2, decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
-        
+	
+/*        valueTile("station_id_label", "device.station_id_label", decoration: "flat") {
+            state "default", label: 'Station Id'
+        }
+
+		valueTile("station_id", "device.station_id", width: 2, decoration: "flat") {
+			state "default", label:'${currentValue}'
+		}
+*/
         valueTile("timezone_label", "device.timezone_label", decoration: "flat") {
             state "default", label:'${currentValue}'
         }
-
-		valueTile("timezone", "device.timezone", width: 2, decoration: "flat") {
+        
+        valueTile("timezone", "device.timezone", width: 2, decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
+        
+        valueTile("station_name_label", "device.station_name_label", decoration: "flat") {
+            state "default", label: 'Station Name'
+        }
 
+		valueTile("station_name", "device.station_name", width: 2, decoration: "flat") {
+			state "default", label:'${currentValue}'
+		}
+        
         standardTile("refresh_value", "device.refresh", width: 2, decoration: "flat") {
 			state "default", label: "", action: "refresh", icon:"st.secondary.refresh"
 		}
@@ -660,8 +660,10 @@ def pollWeatherFlow() {
                            
                         debugLog("precip option: ${rain_detected_option}")
 
-                        if (rain_detected_option == 2 && precip_accum_last_1hr == 0) {
-                        	sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"), isStateChange: true)
+                        if (rain_detected_option == 2) {
+                         	if (precip_accum_last_1hr == 0) {
+                        		sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"), isStateChange: true)
+                            }
                         } else {
                         	sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"), isStateChange: true)
                         }
