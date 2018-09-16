@@ -661,8 +661,10 @@ def pollWeatherFlow() {
                         debugLog("precip option: ${rain_detected_option}")
 
                         if (rain_detected_option == 2) {
-                         	if (precip_accum_last_1hr == 0) {
-                        		sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"), isStateChange: true)
+                         	if (precip_accum_last_1hr == 0 && precip == 0) {
+                        		sendEvent(name:"water", value: "dry", isStateChange: true)
+                            } else {
+								sendEvent(name:"water", value: "wet", isStateChange: true)                             	
                             }
                         } else {
                         	sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"), isStateChange: true)
