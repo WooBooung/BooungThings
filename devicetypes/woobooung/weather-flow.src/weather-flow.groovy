@@ -11,6 +11,10 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
+ *   - Version 0.0.3 (2018-09-20)
+ *      When occured exception error, do rescheduling
+ *      Modified interval minimum(10 sec -> 1 min)
+ * 
  *   - Version 0.0.2 (2018-09-16)
  *      Added rain detected logic
  *      Before Every time detect option: 
@@ -169,12 +173,12 @@ metadata {
 	preferences {
 		input name: "api_key", title: "API Key", type: "text", defaultValue: "20c70eae-e62f-4d3b-b3a4-8586e90f3ac8", required: true
 		input name: "station_id", title: "Station Id", type: "password", description: "Refer to below \"how to get station id\"", required: true
-        input name: "polling_interval", title: "Update interval", type: "enum", options:[10: "10 sec", 30: "30 sec", 60 : "1 min", 300 : "5 min", 600 : "10 min", 1800 : "30 min"], defaultValue: "1 min", displayDuringSetup: true
+        input name: "polling_interval", title: "Update interval", type: "enum", options:[60 : "1 min", 300 : "5 min", 600 : "10 min", 1800 : "30 min"], defaultValue: "1 min", displayDuringSetup: true
         input name: "rain_detected_option", title: "Rain Detected Option", type: "enum", options: ["Every time", "First time"], defaultValue: "Every time", description: "Refor to below \"Rain detect options\"", displayDuringSetup: true
         input name: "selected_lang", title:"Select a language", type: "enum", options: ["English", "Korean"], defaultValue: "English", displayDuringSetup: true
         input type: "paragraph", element: "paragraph", title: "How to get station Id", description: "Weather Flow app -> Settings's Manage -> Stations -> Status click", displayDuringSetup: false
         input type: "paragraph", element: "paragraph", title: "Rain detect option", description: "Every time : (Default value)\nif (precip > 0) then Rain detected\nif (precip == 0) then Rain not detected\n\nFirst time :\nif (precip_accum_last_1hr == 0 && precip > 0) then Rain detected\nif (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.2", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.3", displayDuringSetup: false
 	}
 
 	simulator {
@@ -447,8 +451,9 @@ def pollWeatherFlow() {
     	    uri: "https://swd.weatherflow.com/swd/rest/observations/station/${station_id}?api_key=${api_key}",
         	contentType: 'application/json'
     	]
+        def refreshTime = (polling_interval as int)
+        
         try {
-         	def refreshTime = (polling_interval as int)
     	    runIn(refreshTime, pollWeatherFlow)
     		debugLog("Data will repoll every ${polling_interval} seconds")
            
@@ -785,6 +790,8 @@ def pollWeatherFlow() {
             }
         } catch (e) {
             log.error "error: $e"
+            runIn(refreshTime, pollWeatherFlow)
+    		debugLog("Data will repoll every ${polling_interval} seconds")
         }
 	}
     else log.error "Missing data from the device settings station id or api key"
