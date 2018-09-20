@@ -1,6 +1,6 @@
 /**
  *  SmartWeather Station For Korea
- *  Version 0.0.7
+ *  Version 0.0.9
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -38,10 +38,13 @@
  *
  *   - Version 0.0.8
  *      Changed type wind, feelsLike, percentPrecip
+ *
+ *   - Version 0.0.9
+ *      When occured exception, do rescheduling
  */
   
 metadata {
-	definition (name: "SmartWeather Station For Korea", namespace: "WooBooung", author: "Booung", ocfResourceType: "x.com.st.airqualitylevel") {
+	definition (name: "SmartWeather Station For Korea", namespace: "WooBooung", author: "Booung", ocfDeviceType: "oic.d.thermostat") {
 		capability "Air Quality Sensor"
 		capability "Carbon Monoxide Detector" // co : clear, detected
 		capability "Dust Sensor" // fineDustLevel : PM 2.5   dustLevel : PM 10
@@ -88,7 +91,7 @@ metadata {
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
         input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.8", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.9", displayDuringSetup: false
 	}
 
 	simulator {
@@ -493,8 +496,9 @@ def pollAirKorea() {
     	    uri: "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName=${stationName}&dataTerm=DAILY&pageNo=1&numOfRows=1&ServiceKey=${accessKey}&ver=1.3&_returnType=json",
         	contentType: 'application/json'
     	]
+        
+        def refreshTime = (refreshRateMin as int) * 60
         try {
-         	def refreshTime = (refreshRateMin as int) * 60
     	    runIn(refreshTime, pollAirKorea)
     		log.debug "Data will repoll every ${refreshRateMin} minutes"
         
@@ -605,6 +609,7 @@ def pollAirKorea() {
             }
         } catch (e) {
             log.error "error: $e"
+            runIn(refreshTime, pollAirKorea)
         }
 	}
     else log.debug "Missing data from the device settings station name or access key"
