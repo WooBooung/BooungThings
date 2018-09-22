@@ -1,6 +1,5 @@
 /**
- *  Weather Flow
- *  Version 0.0.1
+ *  Weather Flow (woobooung@gmail.com)
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -10,6 +9,9 @@
  *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
+ *
+ *   - Version 0.0.4 (2018-09-22)
+ *      Changed schedule function
  *
  *   - Version 0.0.3 (2018-09-20)
  *      When occured exception error, do rescheduling
@@ -173,12 +175,12 @@ metadata {
 	preferences {
 		input name: "api_key", title: "API Key", type: "text", defaultValue: "20c70eae-e62f-4d3b-b3a4-8586e90f3ac8", required: true
 		input name: "station_id", title: "Station Id", type: "password", description: "Refer to below \"how to get station id\"", required: true
-        input name: "polling_interval", title: "Update interval", type: "enum", options:[60 : "1 min", 300 : "5 min", 600 : "10 min", 1800 : "30 min"], defaultValue: "1 min", displayDuringSetup: true
+        input name: "polling_interval", title: "Update interval", type: "enum", options:[1 : "1 min", 5 : "5 min", 10 : "10 min", 30 : "30 min"], defaultValue: 1, displayDuringSetup: true
         input name: "rain_detected_option", title: "Rain Detected Option", type: "enum", options: ["Every time", "First time"], defaultValue: "Every time", description: "Refor to below \"Rain detect options\"", displayDuringSetup: true
         input name: "selected_lang", title:"Select a language", type: "enum", options: ["English", "Korean"], defaultValue: "English", displayDuringSetup: true
         input type: "paragraph", element: "paragraph", title: "How to get station Id", description: "Weather Flow app -> Settings's Manage -> Stations -> Status click", displayDuringSetup: false
         input type: "paragraph", element: "paragraph", title: "Rain detect option", description: "Every time : (Default value)\nif (precip > 0) then Rain detected\nif (precip == 0) then Rain not detected\n\nFirst time :\nif (precip_accum_last_1hr == 0 && precip > 0) then Rain detected\nif (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.3", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.4", displayDuringSetup: false
 	}
 
 	simulator {
@@ -404,10 +406,16 @@ def refresh() {
 	debugLog("refresh()")
     unschedule()
 	try {
-        pollWeatherFlow()
+        startPoll()
     } catch (e) {
         log.error "error: pollWeatherFlow $e"
     }
+}
+
+def startPoll() {
+	def healthCheckInterval = "0/${settings.polling_interval}"
+    log.debug "startPoll $healthCheckInterval"
+    schedule("0 $healthCheckInterval * * * ?", pollWeatherFlow)
 }
 
 def setLanguage(language){
@@ -442,7 +450,7 @@ def configure() {
     setLanguage(settings.selected_lang)
 }
 
-// Air Korea handle commands
+// Weather Flow handle commands
 def pollWeatherFlow() {
 	debugLog("pollWeatherFlow()")
     def dthVersion = "0.0.1"
@@ -451,11 +459,11 @@ def pollWeatherFlow() {
     	    uri: "https://swd.weatherflow.com/swd/rest/observations/station/${station_id}?api_key=${api_key}",
         	contentType: 'application/json'
     	]
-        def refreshTime = (polling_interval as int)
+        //def refreshTime = (polling_interval as int)
         
         try {
-    	    runIn(refreshTime, pollWeatherFlow)
-    		debugLog("Data will repoll every ${polling_interval} seconds")
+    	    //runIn(refreshTime, pollWeatherFlow)
+    		//debugLog("Data will repoll every ${polling_interval} seconds")
            
             httpGet(params) {response ->
                 response.headers.each {
@@ -790,8 +798,8 @@ def pollWeatherFlow() {
             }
         } catch (e) {
             log.error "error: $e"
-            runIn(refreshTime, pollWeatherFlow)
-    		debugLog("Data will repoll every ${polling_interval} seconds")
+            //runIn(refreshTime, pollWeatherFlow)
+    		//debugLog("Data will repoll every ${polling_interval} seconds")
         }
 	}
     else log.error "Missing data from the device settings station id or api key"
