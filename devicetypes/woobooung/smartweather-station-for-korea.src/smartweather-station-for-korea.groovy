@@ -41,6 +41,10 @@
  *
  *   - Version 0.0.9
  *      When occured exception, do rescheduling
+ *
+ *   - Version 0.0.10
+ *      Changed scheduling method
+ *
  */
   
 metadata {
@@ -85,13 +89,13 @@ metadata {
 
 	preferences {
 		input "accessKey", "text", type: "password", title: "AirKorea API Key", description: "www.data.go.kr에서 apikey 발급 받으세요", required: true 
-		input "stationName", "text", title: "Station name(조회: 아래 참조)", description: "아래 측정소 조회 방법 참조", required: true
+		input "stationName", "text", title: "Station name", description: "측청소 이름", required: true
         input "fakeStationName", "text", title: "Fake Station name(option)", description: "Tile에 보여질 이름 입력하세요", required: false
         input "refreshRateMin", "enum", title: "Update interval", defaultValue: 60, options:[15: "15 Min", 30: "30 Min", 60 : "1 Hour", 180 :"3 Hour", 360: "6 Hour", 720: "12 Hour", 1440: "Daily"], displayDuringSetup: true
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
-        input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
+        //input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.9", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.10", displayDuringSetup: false
 	}
 
 	simulator {
@@ -470,17 +474,15 @@ def updated() {
 
 def refresh() {
 	log.debug "refresh()"
-	try {
-        pollAirKorea()
-    } catch (e) {
-        log.error "error: pollAirKorea $e"
-    }
-    
-	try {
-        pollWunderground()
-    } catch (e) {
-        log.error "error: pollWunderground $e"
-    }
+	unschedule()
+	def healthCheckInterval = "0/${settings.refreshRateMin}"
+    log.debug "startPoll $healthCheckInterval"
+    schedule("0 $healthCheckInterval * * * ?", allPoll)
+}
+
+def allPoll() {
+	pollAirKorea()
+    pollWunderground()
 }
 
 def configure() {
@@ -497,11 +499,7 @@ def pollAirKorea() {
         	contentType: 'application/json'
     	]
         
-        def refreshTime = (refreshRateMin as int) * 60
         try {
-    	    runIn(refreshTime, pollAirKorea)
-    		log.debug "Data will repoll every ${refreshRateMin} minutes"
-        
         	log.debug "uri: ${params.uri}"
             
             httpGet(params) {resp ->
@@ -609,7 +607,6 @@ def pollAirKorea() {
             }
         } catch (e) {
             log.error "error: $e"
-            runIn(refreshTime, pollAirKorea)
         }
 	}
     else log.debug "Missing data from the device settings station name or access key"
@@ -619,10 +616,6 @@ def pollAirKorea() {
 def pollWunderground() {
 	log.debug "pollAirKorea()"
 	
-    def refreshTime = (refreshRateMin as int) * 60
-    runIn(refreshTime, pollWunderground)
-    log.debug "Data will repoll every ${refreshRateMin} minutes"
-
 	// Current conditions
 	def obs = get("conditions")?.current_observation
 	if (obs) {
