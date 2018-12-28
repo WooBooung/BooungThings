@@ -1,7 +1,6 @@
 /**
  *  SmartWeather Station For Korea
- *  Version 0.0.9
- *  
+  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -45,6 +44,10 @@
  *   - Version 0.0.10
  *      Changed scheduling method
  *
+ *   - Version 0.0.11
+ *      Bug fix
+ *      Modified interval option
+ *      Removed isStateChange options
  */
   
 metadata {
@@ -91,11 +94,11 @@ metadata {
 		input "accessKey", "text", type: "password", title: "AirKorea API Key", description: "www.data.go.kr에서 apikey 발급 받으세요", required: true 
 		input "stationName", "text", title: "Station name", description: "측청소 이름", required: true
         input "fakeStationName", "text", title: "Fake Station name(option)", description: "Tile에 보여질 이름 입력하세요", required: false
-        input "refreshRateMin", "enum", title: "Update interval", defaultValue: 60, options:[15: "15 Min", 30: "30 Min", 60 : "1 Hour", 180 :"3 Hour", 360: "6 Hour", 720: "12 Hour", 1440: "Daily"], displayDuringSetup: true
+        input name: "refreshRateMin", title: "Update time in every hour", type: "enum", options:[0 : "0", 15 : "15", 30 : "30"], defaultValue: 0, displayDuringSetup: true
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
         //input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.10", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.11", displayDuringSetup: false
 	}
 
 	simulator {
@@ -469,20 +472,19 @@ def uninstalled() {
 }
 
 def updated() {
+	log.debug "updated()"
 	refresh()
 }
 
 def refresh() {
 	log.debug "refresh()"
 	unschedule()
-	def healthCheckInterval = "0/${settings.refreshRateMin}"
-    log.debug "startPoll $healthCheckInterval"
-    schedule("0 $healthCheckInterval * * * ?", allPoll)
-}
-
-def allPoll() {
-	pollAirKorea()
-    pollWunderground()
+	def airKoreaHealthCheckInterval = Integer.parseInt("$settings.refreshRateMin")
+    def wunderGroundHealthCheckInterval = airKoreaHealthCheckInterval + 1
+    log.debug "airKoreaHealthCheckInterval $airKoreaHealthCheckInterval"
+    schedule("0 $airKoreaHealthCheckInterval * * * ?", pollAirKorea)
+    log.debug "wunderGroundHealthCheckInterval $wunderGroundHealthCheckInterval"
+    schedule("0 $wunderGroundHealthCheckInterval * * * ?", pollWunderground)
 }
 
 def configure() {
@@ -492,7 +494,7 @@ def configure() {
 // Air Korea handle commands
 def pollAirKorea() {
 	log.debug "pollAirKorea()"
-    def dthVersion = "0.0.6"
+    def dthVersion = "0.0.11"
     if (stationName && accessKey) {
         def params = [
     	    uri: "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName=${stationName}&dataTerm=DAILY&pageNo=1&numOfRows=1&ServiceKey=${accessKey}&ver=1.3&_returnType=json",
@@ -516,43 +518,43 @@ def pollAirKorea() {
               
                     if( resp.data.list[0].pm10Value != "-" ) {
                         log.debug "PM10 value: ${resp.data.list[0].pm10Value}"
-                        sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥", isStateChange: true)
-                        sendEvent(name: "dustLevel", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥")
+                        sendEvent(name: "dustLevel", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥")
                     } else {
-                    	sendEvent(name: "pm10_value", value: "--", unit: "㎍/㎥", isStateChange: true)
-                        sendEvent(name: "dustLevel", value: "--", unit: "㎍/㎥", isStateChange: true)
+                    	sendEvent(name: "pm10_value", value: "--", unit: "㎍/㎥")
+                        sendEvent(name: "dustLevel", value: "--", unit: "㎍/㎥")
                     }
                     
                     if( resp.data.list[0].pm25Value != "-" ) { 
                         log.debug "PM25 value: ${resp.data.list[0].pm25Value}"
-                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥", isStateChange: true)
-                        sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥", isStateChange: true)
+                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥")
+                        sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥")
                     } else {
-                    	sendEvent(name: "pm25_value", value: "--", unit: "㎍/㎥", isStateChange: true)
-                        sendEvent(name: "fineDustLevel", value: "--", unit: "㎍/㎥", isStateChange: true)
+                    	sendEvent(name: "pm25_value", value: "--", unit: "㎍/㎥")
+                        sendEvent(name: "fineDustLevel", value: "--", unit: "㎍/㎥")
                     }
                     
                     def display_value
                     if( resp.data.list[0].o3Value != "-" ) {
                     	log.debug "Ozone: ${resp.data.list[0].o3Value}"
                         display_value = "\n" + resp.data.list[0].o3Value + "\n"
-                        sendEvent(name: "o3_value", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "o3_value", value: display_value as String, unit: "ppm")
                     } else
-                    	sendEvent(name: "o3_value", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "o3_value", value: "--", unit: "ppm")
                     
                     if( resp.data.list[0].no2Value != "-" ) {
                         log.debug "NO2: ${resp.data.list[0].no2Value}"
                         display_value = "\n" + resp.data.list[0].no2Value + "\n"
-                        sendEvent(name: "no2_value", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "no2_value", value: display_value as String, unit: "ppm")
                     } else
-                    	sendEvent(name: "no2_value", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "no2_value", value: "--", unit: "ppm")
                     
                     if( resp.data.list[0].so2Value != "-" ) {
                         log.debug "SO2: ${resp.data.list[0].so2Value}"
                         display_value = "\n" + resp.data.list[0].so2Value + "\n"
-                        sendEvent(name: "so2_value", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "so2_value", value: display_value as String, unit: "ppm")
                     } else
-                    	sendEvent(name: "so2_value", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "so2_value", value: "--", unit: "ppm")
                     
                     if( resp.data.list[0].coValue != "-" ) {
                         log.debug "CO: ${resp.data.list[0].coValue}"
@@ -564,10 +566,10 @@ def pollAirKorea() {
                         	carbonMonoxide_value = "detected"
                         }
                         
-                        sendEvent(name: "carbonMonoxide", value: carbonMonoxide_value, isStateChange: true)
-                        sendEvent(name: "co_value", value: display_value as String, unit: "ppm", isStateChange: true)
+                        sendEvent(name: "carbonMonoxide", value: carbonMonoxide_value)
+                        sendEvent(name: "co_value", value: display_value as String, unit: "ppm")
                     } else
-                    	sendEvent(name: "co_value", value: "--", unit: "ppm", isStateChange: true)
+                    	sendEvent(name: "co_value", value: "--", unit: "ppm")
                     
                     def khai_text = "알수없음"
                     if( resp.data.list[0].khaiValue != "-" ) {
@@ -579,9 +581,9 @@ def pollAirKorea() {
                         if (fakeStationName)
                         	station_display_name = fakeStationName
                         
-	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.list[0].dataTime + "\nVersion: " + dthVersion, isStateChange: true)
+	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.list[0].dataTime + "\nVersion: " + dthVersion)
                         
-                  		sendEvent(name: "airQuality", value: resp.data.list[0].khaiValue as Integer, isStateChange: true)
+                  		sendEvent(name: "airQuality", value: resp.data.list[0].khaiValue as Integer)
 
                         if (khai > 200) khai_text="매우나쁨"
                         else if (khai > 150) khai_text="나쁨"
@@ -589,7 +591,7 @@ def pollAirKorea() {
                         else if (khai > 50) khai_text="좋음"
                         else if (khai >= 0) khai_text="매우좋음"
                         
-                        sendEvent(name: "airQualityStatus", value: khai_text, unit: "", isStateChange: true)
+                        sendEvent(name: "airQualityStatus", value: khai_text, unit: "")
                         
                     } else {
                         def station_display_name = resp.data.parm.stationName
@@ -598,8 +600,8 @@ def pollAirKorea() {
                         	station_display_name = fakeStationName
 
                     
-	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: 정보없음\n 측정 시간: " + resp.data.list[0].dataTime, isStateChange: true)                    
-                    	sendEvent(name: "airQualityStatus", value: khai_text, isStateChange: true)
+	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: 정보없음\n 측정 시간: " + resp.data.list[0].dataTime)                    
+                    	sendEvent(name: "airQualityStatus", value: khai_text)
                     }
           		}
             	else if (resp.status==429) log.debug "You have exceeded the maximum number of refreshes today"	
@@ -636,12 +638,12 @@ def pollWunderground() {
 		//send(name: "wind", value: Math.round(obs.wind_mph) as String, unit: "MPH") // as String because of bug in determining state change of 0 numbers
 
 		if (obs.local_tz_offset != device.currentValue("timeZoneOffset")) {
-			send(name: "timeZoneOffset", value: obs.local_tz_offset, isStateChange: true)
+			send(name: "timeZoneOffset", value: obs.local_tz_offset)
 		}
         
    		def cityValue = "${obs.display_location.city}, ${obs.display_location.state}"
 		if (cityValue != device.currentValue("city")) {
-			send(name: "city", value: cityValue, isStateChange: true)
+			send(name: "city", value: cityValue)
 		}
 
 		send(name: "ultravioletIndex", value: Math.round(obs.UV as Double))
