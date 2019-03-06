@@ -291,7 +291,7 @@ metadata {
             state "default", label:'날씨Icon'
         }
 
-		valueTile("weatherIcon", "device.weatherIcon", decoration: "flat") {
+		standardTile("weatherIcon", "device.weatherIcon", decoration: "flat") {
         	//날씨 아이콘 수정
             state "00", icon:"https://smartthings-twc-icons.s3.amazonaws.com/00.png", label: ""
             state "01", icon:"https://smartthings-twc-icons.s3.amazonaws.com/01.png", label: ""
