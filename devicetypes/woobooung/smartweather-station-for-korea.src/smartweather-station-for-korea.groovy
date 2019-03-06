@@ -48,6 +48,9 @@
  *      Bug fix
  *      Modified interval option
  *      Removed isStateChange options
+ *
+ *   - Version 0.0.12
+ *      Changed wunderground API by dianakoh
  */
   
 metadata {
@@ -98,7 +101,7 @@ metadata {
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
         //input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.11", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.12", displayDuringSetup: false
 	}
 
 	simulator {
@@ -288,50 +291,57 @@ metadata {
             state "default", label:'날씨Icon'
         }
 
-		valueTile("weatherIcon_value", "device.weatherIcon", decoration: "flat") {
-			state "chanceflurries", icon:"st.custom.wu1.chanceflurries", label: ""
-			state "chancerain", icon:"st.custom.wu1.chancerain", label: ""
-			state "chancesleet", icon:"st.custom.wu1.chancesleet", label: ""
-			state "chancesnow", icon:"st.custom.wu1.chancesnow", label: ""
-			state "chancetstorms", icon:"st.custom.wu1.chancetstorms", label: ""
-			state "clear", icon:"st.custom.wu1.clear", label: ""
-			state "cloudy", icon:"st.custom.wu1.cloudy", label: ""
-			state "flurries", icon:"st.custom.wu1.flurries", label: ""
-			state "fog", icon:"st.custom.wu1.fog", label: ""
-			state "hazy", icon:"st.custom.wu1.hazy", label: ""
-			state "mostlycloudy", icon:"st.custom.wu1.mostlycloudy", label: ""
-			state "mostlysunny", icon:"st.custom.wu1.mostlysunny", label: ""
-			state "partlycloudy", icon:"st.custom.wu1.partlycloudy", label: ""
-			state "partlysunny", icon:"st.custom.wu1.partlysunny", label: ""
-			state "rain", icon:"st.custom.wu1.rain", label: ""
-			state "sleet", icon:"st.custom.wu1.sleet", label: ""
-			state "snow", icon:"st.custom.wu1.snow", label: ""
-			state "sunny", icon:"st.custom.wu1.sunny", label: ""
-			state "tstorms", icon:"st.custom.wu1.tstorms", label: ""
-			state "cloudy", icon:"st.custom.wu1.cloudy", label: ""
-			state "partlycloudy", icon:"st.custom.wu1.partlycloudy", label: ""
-			state "nt_chanceflurries", icon:"st.custom.wu1.nt_chanceflurries", label: ""
-			state "nt_chancerain", icon:"st.custom.wu1.nt_chancerain", label: ""
-			state "nt_chancesleet", icon:"st.custom.wu1.nt_chancesleet", label: ""
-			state "nt_chancesnow", icon:"st.custom.wu1.nt_chancesnow", label: ""
-			state "nt_chancetstorms", icon:"st.custom.wu1.nt_chancetstorms", label: ""
-			state "nt_clear", icon:"st.custom.wu1.nt_clear", label: ""
-			state "nt_cloudy", icon:"st.custom.wu1.nt_cloudy", label: ""
-			state "nt_flurries", icon:"st.custom.wu1.nt_flurries", label: ""
-			state "nt_fog", icon:"st.custom.wu1.nt_fog", label: ""
-			state "nt_hazy", icon:"st.custom.wu1.nt_hazy", label: ""
-			state "nt_mostlycloudy", icon:"st.custom.wu1.nt_mostlycloudy", label: ""
-			state "nt_mostlysunny", icon:"st.custom.wu1.nt_mostlysunny", label: ""
-			state "nt_partlycloudy", icon:"st.custom.wu1.nt_partlycloudy", label: ""
-			state "nt_partlysunny", icon:"st.custom.wu1.nt_partlysunny", label: ""
-			state "nt_sleet", icon:"st.custom.wu1.nt_sleet", label: ""
-			state "nt_rain", icon:"st.custom.wu1.nt_rain", label: ""
-			state "nt_sleet", icon:"st.custom.wu1.nt_sleet", label: ""
-			state "nt_snow", icon:"st.custom.wu1.nt_snow", label: ""
-			state "nt_sunny", icon:"st.custom.wu1.nt_sunny", label: ""
-			state "nt_tstorms", icon:"st.custom.wu1.nt_tstorms", label: ""
-			state "nt_cloudy", icon:"st.custom.wu1.nt_cloudy", label: ""
-			state "nt_partlycloudy", icon:"st.custom.wu1.nt_partlycloudy", label: ""
+		valueTile("weatherIcon", "device.weatherIcon", decoration: "flat") {
+        	//날씨 아이콘 수정
+            state "00", icon:"https://smartthings-twc-icons.s3.amazonaws.com/00.png", label: ""
+            state "01", icon:"https://smartthings-twc-icons.s3.amazonaws.com/01.png", label: ""
+            state "02", icon:"https://smartthings-twc-icons.s3.amazonaws.com/02.png", label: ""
+            state "03", icon:"https://smartthings-twc-icons.s3.amazonaws.com/03.png", label: ""
+            state "04", icon:"https://smartthings-twc-icons.s3.amazonaws.com/04.png", label: ""
+            state "05", icon:"https://smartthings-twc-icons.s3.amazonaws.com/05.png", label: ""
+            state "06", icon:"https://smartthings-twc-icons.s3.amazonaws.com/06.png", label: ""
+            state "07", icon:"https://smartthings-twc-icons.s3.amazonaws.com/07.png", label: ""
+            state "08", icon:"https://smartthings-twc-icons.s3.amazonaws.com/08.png", label: ""
+            state "09", icon:"https://smartthings-twc-icons.s3.amazonaws.com/09.png", label: ""
+            state "10", icon:"https://smartthings-twc-icons.s3.amazonaws.com/10.png", label: ""
+            state "11", icon:"https://smartthings-twc-icons.s3.amazonaws.com/11.png", label: ""
+            state "12", icon:"https://smartthings-twc-icons.s3.amazonaws.com/12.png", label: ""
+            state "13", icon:"https://smartthings-twc-icons.s3.amazonaws.com/13.png", label: ""
+            state "14", icon:"https://smartthings-twc-icons.s3.amazonaws.com/14.png", label: ""
+            state "15", icon:"https://smartthings-twc-icons.s3.amazonaws.com/15.png", label: ""
+            state "16", icon:"https://smartthings-twc-icons.s3.amazonaws.com/16.png", label: ""
+            state "17", icon:"https://smartthings-twc-icons.s3.amazonaws.com/17.png", label: ""
+            state "18", icon:"https://smartthings-twc-icons.s3.amazonaws.com/18.png", label: ""
+            state "19", icon:"https://smartthings-twc-icons.s3.amazonaws.com/19.png", label: ""
+            state "20", icon:"https://smartthings-twc-icons.s3.amazonaws.com/20.png", label: ""
+            state "21", icon:"https://smartthings-twc-icons.s3.amazonaws.com/21.png", label: ""
+            state "22", icon:"https://smartthings-twc-icons.s3.amazonaws.com/22.png", label: ""
+            state "23", icon:"https://smartthings-twc-icons.s3.amazonaws.com/23.png", label: ""
+            state "24", icon:"https://smartthings-twc-icons.s3.amazonaws.com/24.png", label: ""
+            state "25", icon:"https://smartthings-twc-icons.s3.amazonaws.com/25.png", label: ""
+            state "26", icon:"https://smartthings-twc-icons.s3.amazonaws.com/26.png", label: ""
+            state "27", icon:"https://smartthings-twc-icons.s3.amazonaws.com/27.png", label: ""
+            state "28", icon:"https://smartthings-twc-icons.s3.amazonaws.com/28.png", label: ""
+            state "29", icon:"https://smartthings-twc-icons.s3.amazonaws.com/29.png", label: ""
+            state "30", icon:"https://smartthings-twc-icons.s3.amazonaws.com/30.png", label: ""
+            state "31", icon:"https://smartthings-twc-icons.s3.amazonaws.com/31.png", label: ""
+            state "32", icon:"https://smartthings-twc-icons.s3.amazonaws.com/32.png", label: ""
+            state "33", icon:"https://smartthings-twc-icons.s3.amazonaws.com/33.png", label: ""
+            state "34", icon:"https://smartthings-twc-icons.s3.amazonaws.com/34.png", label: ""
+            state "35", icon:"https://smartthings-twc-icons.s3.amazonaws.com/35.png", label: ""
+            state "36", icon:"https://smartthings-twc-icons.s3.amazonaws.com/36.png", label: ""
+            state "37", icon:"https://smartthings-twc-icons.s3.amazonaws.com/37.png", label: ""
+            state "38", icon:"https://smartthings-twc-icons.s3.amazonaws.com/38.png", label: ""
+            state "39", icon:"https://smartthings-twc-icons.s3.amazonaws.com/39.png", label: ""
+            state "40", icon:"https://smartthings-twc-icons.s3.amazonaws.com/40.png", label: ""
+            state "41", icon:"https://smartthings-twc-icons.s3.amazonaws.com/41.png", label: ""
+            state "42", icon:"https://smartthings-twc-icons.s3.amazonaws.com/42.png", label: ""
+            state "43", icon:"https://smartthings-twc-icons.s3.amazonaws.com/43.png", label: ""
+            state "44", icon:"https://smartthings-twc-icons.s3.amazonaws.com/44.png", label: ""
+            state "45", icon:"https://smartthings-twc-icons.s3.amazonaws.com/45.png", label: ""
+            state "46", icon:"https://smartthings-twc-icons.s3.amazonaws.com/46.png", label: ""
+            state "47", icon:"https://smartthings-twc-icons.s3.amazonaws.com/47.png", label: ""
+            state "na", icon:"https://smartthings-twc-icons.s3.amazonaws.com/na.png", label: ""
 		}
         
 		valueTile("feelsLike_label", "", decoration: "flat") {
@@ -449,7 +459,7 @@ metadata {
                 "pm10_label", "pm25_label", "o3_label", "no2_label", "so2_label", "co_label",
                 "pm10_value", "pm25_value", "o3_value", "no2_value", "so2_value", "co_value",
                 "wunderground_infos", "refresh_weather_value",
-                "weatherIcon_value", "temperature_label", "humidity_label", "ultravioletIndex_label", "illuminance_label", "feelsLike_label",
+                "weatherIcon", "temperature_label", "humidity_label", "ultravioletIndex_label", "illuminance_label", "feelsLike_label",
                 "weather_value", "temperature_value", "humidity_value", "ultravioletIndex_value", "illuminance_value", "feelsLike_value",
                 "wind_label", "percentPrecip_label", "rise_label", "set_label",
                 "wind_value", "percentPrecip_value", "rise_value", "set_value",
@@ -619,65 +629,69 @@ def pollWunderground() {
 	log.debug "pollAirKorea()"
 	
 	// Current conditions
-	def obs = get("conditions")?.current_observation
+
+    def obs = get()
 	if (obs) {
-		def weatherIcon = obs.icon_url.split("/")[-1].split("\\.")[0]
+		//def weatherIcon = obs.icon_url.split("/")[-1].split("\\.")[0]
 
 		if(getTemperatureScale() == "C") {
-			send(name: "temperature", value: Math.round(obs.temp_c), unit: "C")
-			send(name: "feelsLike", value: Math.round(obs.feelslike_c as Double), unit: "C")
+			send(name: "temperature", value: Math.round(obs.temperature), unit: "C")
+			send(name: "feelsLike", value: Math.round(obs.temperatureFeelsLike as Double), unit: "C")            
 		} else {
-			send(name: "temperature", value: Math.round(obs.temp_f), unit: "F")
-			send(name: "feelsLike", value: Math.round(obs.feelslike_f as Double), unit: "F")
+			send(name: "temperature", value: Math.round(obs.temperature), unit: "F")
+			send(name: "feelsLike", value: Math.round(obs.temperatureFeelsLike as Double), unit: "F") 
 		}
 		
-		send(name: "humidity", value: obs.relative_humidity[0..-2] as Integer, unit: "%")
-		send(name: "weather", value: obs.weather)
-		send(name: "weatherIcon", value: weatherIcon, displayed: false)
-        send(name: "wind", value: Math.round(obs.wind_mph) as Integer, unit: "MPH") // Changed 0.0.8 
-		//send(name: "wind", value: Math.round(obs.wind_mph) as String, unit: "MPH") // as String because of bug in determining state change of 0 numbers
+        send(name: "humidity", value: obs.relativeHumidity as Integer, unit: "%")
+        send(name: "weather", value: obs.wxPhraseShort)
+        send(name: "weatherIcon", value: obs.iconCode as String, displayed: false)
+        send(name: "wind", value: Math.round(obs.windSpeed) as Integer, unit: "MPH")
 
-		if (obs.local_tz_offset != device.currentValue("timeZoneOffset")) {
-			send(name: "timeZoneOffset", value: obs.local_tz_offset)
+		//loc
+		def loc = getTwcLocation(zipCode).location
+        
+        //timezone
+        def localTimeOffSet = "+" + obs.validTimeLocal.split("\\+")[1]
+        
+		if (localTimeOffSet != device.currentValue("timeZoneOffset")) {
+            send(name: "timeZoneOffset", value: localTimeOffSet)
 		}
         
-   		def cityValue = "${obs.display_location.city}, ${obs.display_location.state}"
+        def cityValue = "${loc.city}, ${loc.adminDistrict}, ${loc.countryCode}"
 		if (cityValue != device.currentValue("city")) {
-			send(name: "city", value: cityValue)
+            send(name: "city", value: cityValue)
 		}
 
-		send(name: "ultravioletIndex", value: Math.round(obs.UV as Double))
+        send(name: "ultravioletIndex", value: Math.round(obs.uvIndex as Double))
 
 		// Sunrise / Sunset
-		def a = get("astronomy")?.moon_phase
-		def today = localDate("GMT${obs.local_tz_offset}")
-		def ltf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
-		ltf.setTimeZone(TimeZone.getTimeZone("GMT${obs.local_tz_offset}"))
-		def utf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-		utf.setTimeZone(TimeZone.getTimeZone("GMT"))
+        def dtf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 
-		def sunriseDate = ltf.parse("${today} ${a.sunrise.hour}:${a.sunrise.minute}")
-		def sunsetDate = ltf.parse("${today} ${a.sunset.hour}:${a.sunset.minute}")
+        def sunriseDate = dtf.parse(obs.sunriseTimeLocal)
+        log.info "'${obs.sunriseTimeLocal}'"
+
+        def sunsetDate = dtf.parse(obs.sunsetTimeLocal)
 
         def tf = new java.text.SimpleDateFormat("h:mm a")
-        tf.setTimeZone(TimeZone.getTimeZone("GMT${obs.local_tz_offset}"))
+        tf.setTimeZone(TimeZone.getTimeZone(loc.ianaTimeZone))
+
         def localSunrise = "${tf.format(sunriseDate)}"
         def localSunset = "${tf.format(sunsetDate)}"
+        
         send(name: "localSunrise", value: localSunrise, descriptionText: "Sunrise today is at $localSunrise")
         send(name: "localSunset", value: localSunset, descriptionText: "Sunset today at is $localSunset")
 
-		send(name: "illuminance", value: estimateLux(sunriseDate, sunsetDate, weatherIcon))
+        send(name: "illuminance", value: estimateLux(obs, sunriseDate, sunsetDate))
 
 		// Forecast
-		def f = get("forecast")
-		def f1= f?.forecast?.simpleforecast?.forecastday
-		if (f1) {
-			def icon = f1[0].icon_url.split("/")[-1].split("\\.")[0]
-            def value = f1[0].pop as Integer // Changed 0.0.8 
-			//def value = f1[0].pop as String // as String because of bug in determining state change of 0 numbers
-			send(name: "percentPrecip", value: value, unit: "%")
-			send(name: "forecastIcon", value: icon, displayed: false)
-		}
+        def f = getTwcForecast(zipCode)
+         if (f) {
+            def icon = f.daypart[0].iconCode[0] ?: f.daypart[0].iconCode[1]
+            def value = f.daypart[0].precipChance[0] as Integer ?: f.daypart[0].precipChance[1] as Integer
+            def narrative = f.daypart[0].narrative
+            send(name: "percentPrecip", value: value, unit: "%")
+            send(name: "forecastIcon", value: icon, displayed: false)
+        }       
 		else {
 			log.warn "Forecast not found"
 		}
@@ -687,8 +701,9 @@ def pollWunderground() {
 	}
 }
 
-private get(feature) {
-	getWeatherFeature(feature, zipCode)
+// get weather data api
+private get() {
+	getTwcConditions(zipCode)
 }
 
 private localDate(timeZone) {
@@ -702,29 +717,30 @@ private send(map) {
 	sendEvent(map)
 }
 
-private estimateLux(sunriseDate, sunsetDate, weatherIcon) {
+private estimateLux(obs, sunriseDate, sunsetDate) {
 	def lux = 0
 	def now = new Date().time
-	if (now > sunriseDate.time && now < sunsetDate.time) {
+
+    if(obs.dayOrNight != 'N') {
 		//day
-		switch(weatherIcon) {
-			case 'tstorms':
-				lux = 200
-				break
-			case ['cloudy', 'fog', 'rain', 'sleet', 'snow', 'flurries',
-				'chanceflurries', 'chancerain', 'chancesleet',
-				'chancesnow', 'chancetstorms']:
-				lux = 1000
-				break
-			case 'mostlycloudy':
-				lux = 2500
-				break
-			case ['partlysunny', 'partlycloudy', 'hazy']:
-				lux = 7500
-				break
-			default:
-				//sunny, clear
-				lux = 10000
+        switch(obs.iconCode) {
+            case '04':
+                lux = 200
+                break
+            case ['05', '06', '07', '08', '09', '10',
+                  '11', '12', '13','14', '15','17','18','19','20',
+                  '21','22','23','24','25','26']:
+                lux = 1000
+                break
+            case ['27', '28']:
+                lux = 2500
+                break
+            case ['29', '30']:
+                lux = 7500
+                break
+            default:
+                //sunny, clear
+                lux = 10000
 		}
 
 		//adjust for dusk/dawn
@@ -747,3 +763,4 @@ private estimateLux(sunriseDate, sunsetDate, weatherIcon) {
 
 	lux
 }
+
