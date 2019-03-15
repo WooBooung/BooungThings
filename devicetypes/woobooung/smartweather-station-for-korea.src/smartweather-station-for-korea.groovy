@@ -51,6 +51,10 @@
  *
  *   - Version 0.0.12
  *      Changed wunderground API by dianakoh
+ *
+ *   - Version 0.0.13
+ *      Bug fix refreshRateMin default value
+ *
  */
   
 metadata {
@@ -97,11 +101,11 @@ metadata {
 		input "accessKey", "text", type: "password", title: "AirKorea API Key", description: "www.data.go.kr에서 apikey 발급 받으세요", required: true 
 		input "stationName", "text", title: "Station name", description: "측청소 이름", required: true
         input "fakeStationName", "text", title: "Fake Station name(option)", description: "Tile에 보여질 이름 입력하세요", required: false
-        input name: "refreshRateMin", title: "Update time in every hour", type: "enum", options:[0 : "0", 15 : "15", 30 : "30"], defaultValue: 0, displayDuringSetup: true
+        input name: "refreshRateMin", title: "Update time in every hour", type: "enum", options:[0 : "0", 15 : "15", 30 : "30"], defaultValue: "15", displayDuringSetup: true
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
         //input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.12", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.13", displayDuringSetup: false
 	}
 
 	simulator {
@@ -489,9 +493,16 @@ def updated() {
 def refresh() {
 	log.debug "refresh()"
 	unschedule()
-	def airKoreaHealthCheckInterval = Integer.parseInt("$settings.refreshRateMin")
-    def wunderGroundHealthCheckInterval = airKoreaHealthCheckInterval + 1
+    
+	def airKoreaHealthCheckInterval = 15
+
+    if ($settings != null && $settings.refreshRateMin != null) {
+    	airKoreaHealthCheckInterval = Integer.parseInt($settings.refreshRateMin)
+    }
+
     log.debug "airKoreaHealthCheckInterval $airKoreaHealthCheckInterval"
+    
+    def wunderGroundHealthCheckInterval = airKoreaHealthCheckInterval + 1
     schedule("0 $airKoreaHealthCheckInterval * * * ?", pollAirKorea)
     log.debug "wunderGroundHealthCheckInterval $wunderGroundHealthCheckInterval"
     schedule("0 $wunderGroundHealthCheckInterval * * * ?", pollWunderground)
