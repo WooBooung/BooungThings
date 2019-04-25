@@ -20,6 +20,7 @@ metadata {
         attribute "dayOffCheck", "string"
         attribute "holidayCheck", "string"
         attribute "tagdayCheck", "string"
+        attribute "nextTagdays", "string"
         
         attribute "lastCheckin", "Date"
         
@@ -61,6 +62,14 @@ metadata {
         valueTile("tagdayCheck", "device.tagdayCheck", decoration: "flat", width: 4, height: 1) {
             state "default", label: '${currentValue}'
         }
+        
+        valueTile("nextTagdaysLabel", "", decoration: "flat", width: 2, height: 1) {
+            state "default", label: 'Next Tag days'
+        }
+        
+        valueTile("nextTagdays", "device.nextTagdays", decoration: "flat", width: 4, height: 1) {
+            state "default", label: '${currentValue}'
+        }
 
         valueTile("refresh", "device.refresh", decoration: "flat", width: 1, height: 1) {
             state "default", label: '', action: "refresh", icon: "st.secondary.refresh"
@@ -92,6 +101,16 @@ def updateCheckData(String dayOffCheck, String holidayCheck, String tagdayCheck)
     sendEvent(name: "dayOffCheck", value: dayOffCheck)
     sendEvent(name: "holidayCheck", value: holidayCheck)
     sendEvent(name: "tagdayCheck", value: tagdayCheck)
+}
+
+def updateNextTagdays(ArrayList nextTagdays) {
+	log.trace "updateNextTagdays ${nextTagdays}"
+    def resultString = ""
+    nextTagdays.each {
+    	resultString += it + "\n"
+    }
+
+	sendEvent(name: "nextTagdays", value: resultString)
 }
 
 private initialize() {
