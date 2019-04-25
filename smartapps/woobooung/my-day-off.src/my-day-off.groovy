@@ -6,7 +6,7 @@
  */
 include 'localization'
 
-private static String version() { return "V0.0.2.20190425" }
+private static String version() { return "V0.0.3.20190425" }
 private static String appName() { return "My Day-off" }
 
 definition(
@@ -248,14 +248,13 @@ def pullData() {
     def isTagday = checkTagday()
   
     if (isDayOff || isHoliday || isTagday) {
-        device?.updateCheckData(state.dayOffCheck, state.holidayCheck, state.tagdayCheck)
         device?.on()
         log.debug "device on"
     } else {
     	device?.off()
         log.debug "device off"
     }
-    
+    device?.updateCheckData(state.dayOffCheck, state.holidayCheck, state.tagdayCheck)
     def allNextTagdays = getNextTagdays()
     device?.updateNextTagdays(allNextTagdays)
 }
@@ -271,7 +270,7 @@ boolean checkDayoff() {
 	log.debug "todayE is ${days[state.todayE]}"
 
     boolean result = false
-    state.dayOffCheck = "${days[state.todayE]}"
+    state.dayOffCheck = "N/A"
     settings.watchOffdays.each {
     	if ("${it.value}" == "${state.todayE}") {
             result = true
