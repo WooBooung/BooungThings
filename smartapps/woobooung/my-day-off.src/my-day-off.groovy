@@ -6,7 +6,7 @@
  */
 include 'localization'
 
-private static String version() { return "V0.0.1.20190425" }
+private static String version() { return "V0.0.2.20190425" }
 private static String appName() { return "My Day-off" }
 
 definition(
@@ -255,6 +255,9 @@ def pullData() {
     	device?.off()
         log.debug "device off"
     }
+    
+    def allNextTagdays = getNextTagdays()
+    device?.updateNextTagdays(allNextTagdays)
 }
 
 boolean checkDayoff() {
@@ -318,7 +321,7 @@ boolean checkHoliday() {
            	if (holidayList.contains(it.summary)) {
         		result = true
                 state.holidayCheck = "${it.summary}"
-                log.debug "checkHoliday event O : ${it.summary} ${it.start.date}"
+                log.debug "checkHoliday event O : ${it.summary} ${it.start.dateTime}"
             } 
         } 
    }
@@ -379,6 +382,61 @@ boolean checkTagday(privateCalendar) {
    }
 
    return result
+}
+
+def getNextTagdays() {
+	def nextTagdays = []
+	settings.privateCalendars.each {
+        nextTagdays.addAll(getNextTagdays(it))
+    }
+
+	return nextTagdays
+}
+
+def getNextTagdays(privateCalendar) {
+    log.debug "getNextTagdays() ${privateCalendar}"
+
+    def pathParams = [
+        timeMin: getCurrentTime(),
+        timeMax: "${state.thisYear}-12-31T23:59:59.0Z",
+        singleEvents: true,
+        maxResults: 1,
+        orderBy : "starttime",
+        q: getTagdayFilter()
+    ]
+
+	def eventListParams = [
+        uri: "https://www.googleapis.com",
+        path: "/calendar/v3/calendars/${privateCalendar}/events",
+        headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.authToken}"],
+        query: pathParams
+    ]
+
+    log.debug "getNextTagdays event params: $eventListParams"
+
+    def events = []
+    try {
+        httpGet(eventListParams) { resp ->
+            events = resp.data
+        }
+    } catch (e) {
+        log.error e.getResponse().getData()
+    }
+
+   log.debug "getNextTagdays ${privateCalendar} : ${events.items}"
+   
+   def nextTagdays = []
+   events.items.each {
+   		/*if (it.start.dateTime){
+       		def convertedDate = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(it.start.dateTime)
+       		convertedDate = new java.text.SimpleDateFormat("MM-dd EEE", Locale.ENGLISH).format(convertedDate);
+       		nextTagdays.add("${it.summary} - ${convertedDate}")
+       } else {
+       		nextTagdays.add("${it.summary} - ${it.start.date}")
+       }*/nextTagdays.add("${it.summary}")
+   }
+
+   return nextTagdays
 }
 
 String toQueryString(Map m) {
