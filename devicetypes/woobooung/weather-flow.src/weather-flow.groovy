@@ -118,7 +118,7 @@ LANGUAGE_MAP = [
 ]
 
 metadata {
-	definition (name: "Weather Flow", namespace: "WooBooung", author: "Booung", ocfDeviceType: "oic.d.thermostat") {
+	definition (name: "Weather Flow", namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.airqualitysensor") {
         capability "Water Sensor"
         capability "Temperature Measurement"
         capability "Relative Humidity Measurement"

@@ -55,10 +55,12 @@
  *   - Version 0.0.13
  *      Bug fix refreshRateMin default value
  *
+ *   - Version 0.0.14
+ *      Update link for search station
  */
   
 metadata {
-	definition (name: "SmartWeather Station For Korea", namespace: "WooBooung", author: "Booung", ocfDeviceType: "oic.d.thermostat") {
+	definition (name: "SmartWeather Station For Korea", namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.airqualitysensor") {
 		capability "Air Quality Sensor"
 		capability "Carbon Monoxide Detector" // co : clear, detected
 		capability "Dust Sensor" // fineDustLevel : PM 2.5   dustLevel : PM 10
@@ -103,9 +105,9 @@ metadata {
         input "fakeStationName", "text", title: "Fake Station name(option)", description: "Tile에 보여질 이름 입력하세요", required: false
         input name: "refreshRateMin", title: "Update time in every hour", type: "enum", options:[0 : "0", 15 : "15", 30 : "30"], defaultValue: "15", displayDuringSetup: true
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
-        //input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\nweekendproject.net:8081/api/airstation/지역명", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\n http://www.airkorea.or.kr/web/realSearch", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.13", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.14", displayDuringSetup: false
 	}
 
 	simulator {
@@ -774,4 +776,3 @@ private estimateLux(obs, sunriseDate, sunsetDate) {
 
 	lux
 }
-
