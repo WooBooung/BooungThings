@@ -98,7 +98,7 @@ def mainPage() {
                 
                 if (privateCalendars) {
                     section {                               
-                         paragraph "> How to tagging < \r\n\r\nwhen you create a schedule in Google Calendar.\r\n\r\nAdd the tag ${getTagdayFilter()} in the memo field"
+                         paragraph "> How to tagging < \r\n\r\nwhen you create a schedule in Google Calendar.\r\n\r\nAdd the tag ${getTagdayFilter()} in the memo or notes field"
                     }
                 }
 
