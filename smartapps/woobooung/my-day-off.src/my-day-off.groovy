@@ -1,12 +1,29 @@
-/**
+/*
  *  My Day-off With Google Calendar
  *
- *  Copyright 2019 My Day-off
  *
+ *  Copyright 2019 WooBooung <woobooung@gmail.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Version history
+*/
+public static String version() { return "v0.0.4.20190426" }
+/*
+ *	2019/04/26 >>> v0.0.4.20190426 - Modified checkOffday()
  */
-include 'localization'
 
-private static String version() { return "V0.0.3.20190425" }
 private static String appName() { return "My Day-off" }
 
 definition(
@@ -39,8 +56,7 @@ mappings {
 def getSecretKey()               { return appSettings.clientSecret }
 def getClientId()                { return appSettings.clientId }
 def getDayOfWeek() {
-	def days = [1 : "Sun", 2: "Mon", 3: "Tue", 4: "Wed", 5: "Thu", 6 : "Fri", 7 : "Sat"]
-	return days
+	return [1 : "Sun", 2: "Mon", 3: "Tue", 4: "Wed", 5: "Thu", 6 : "Fri", 7 : "Sat"]
 }
 
 def mainPage() {
@@ -105,6 +121,14 @@ def mainPage() {
                 section("About"){
                     paragraph "${version()}"
                 }
+                
+                /*
+				section("TEST"){
+                	def dayMap = getDayOfWeek()
+                    def saveD = dayMap[7]
+                    paragraph "${updateTodayDate()} $saveD"
+                } 
+                */
             }
         }
 }
@@ -129,6 +153,25 @@ def getTodayEndTime() {
     //RFC 3339 format
     def d = new Date().format("yyyy-MM-dd'T'23:59:59Z", location.timeZone)
     return d
+}
+
+def getTommorowStartTime() {
+//RFC 3339 format
+	def today = new Date()
+	def tommorow = today.plus(1)
+
+    return tommorow.format("yyyy-MM-dd'T'00:00:00Z", location.timeZone)
+}
+
+def updateTodayDate() {
+	state.thisYear = new Date().format("yyyy", location.timeZone)
+    state.thisMonth = new Date().format("MM", location.timeZone)
+    state.todayDay = new Date().format("dd", location.timeZone)
+    state.todayDate = "${state.thisYear}-${state.thisMonth}-${state.todayDay}"
+    state.todayDayOfWeek = new Date().format("EEE", location.timeZone)
+    log.debug "${state.todayDate} ${state.todayDayOfWeek}"
+    
+    return "${state.todayDate} ${state.todayDayOfWeek}"
 }
 
 private getCalendarList() {
@@ -187,11 +230,6 @@ private getCalendarList() {
 private getAllHolidayEvents() {
     log.debug "getAllHolidayEvents()"
     
-    def date = new Date()
-    Calendar calendar = Calendar.getInstance()
-    calendar.setTime(date)
-    state.thisYear = calendar.get(Calendar.YEAR)
-
     def pathParams = [
         timeMin : "${state.thisYear}-01-01T01:00:00.0Z",
         timeMax: "${state.thisYear}-12-31T23:59:59.0Z",
@@ -239,8 +277,8 @@ def pullData() {
     def device = getDevice()
     device?.updateLastTime()
 
-	def convertedDate = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(getCurrentTime())
-    state.todayDate = convertedDate
+	updateTodayDate()
+	
 	log.debug "${state.todayDate}"
     
     def isDayOff = checkDayoff()
@@ -261,20 +299,18 @@ def pullData() {
 
 boolean checkDayoff() {
 	log.debug "checkDayoff()"
-	def date = new Date().format("yyyy-MM-dd'T'HH:mm:ssZ", location.timeZone)
-       
-    state.todayE = Date.parse("yyyy-MM-dd'T'HH:mm:ssZ", date)[Calendar.DAY_OF_WEEK]
-    
-    //state.todayE = calendar.get(Calendar.DAY_OF_WEEK)
-    def days = getDayOfWeek()
-	log.debug "todayE is ${days[state.todayE]}"
 
+    def daysMap = getDayOfWeek()
+	log.debug "today is ${state.todayDayOfWeek}"
+    
     boolean result = false
     state.dayOffCheck = "N/A"
     settings.watchOffdays.each {
-    	if ("${it.value}" == "${state.todayE}") {
+    	def dayNum = Integer.parseInt(it)
+    	def savedDayOff = daysMap[dayNum]
+    	if ("${savedDayOff}" == "${state.todayDayOfWeek}") {
             result = true
-            state.dayOffCheck = "${days[state.todayE]} is day-off"
+            state.dayOffCheck = "${state.todayDayOfWeek} : Day-off"
             log.debug "${state.dayOffCheck}"
         }
     }
@@ -396,7 +432,7 @@ def getNextTagdays(privateCalendar) {
     log.debug "getNextTagdays() ${privateCalendar}"
 
     def pathParams = [
-        timeMin: getCurrentTime(),
+        timeMin: getTommorowStartTime(),
         timeMax: "${state.thisYear}-12-31T23:59:59.0Z",
         singleEvents: true,
         maxResults: 1,
