@@ -1,15 +1,27 @@
-/**
- *  Copyright 2019 WooBooung
+/*
+ *  My Day-off With Google Calendar
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License. You may obtain a copy of the License at:
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  Copyright 2019 WooBooung <woobooung@gmail.com>
  *
- *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
- *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
- *  for the specific language governing permissions and limitations under the License.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Version history
+*/
+public static String version() { return "v0.0.4.20190426" }
+/*
+ *	2019/04/26 >>> v0.0.4.20190426 - Added polling interval preference
  */
 metadata {
     definition (name: "My Day-off Switch", namespace: "WooBooung", author: "Booung", vid: "generic-switch") {
@@ -26,6 +38,10 @@ metadata {
         
         command "refresh"
     }
+    preferences {
+        input name: "pollingInterval", title: "Update interval", type: "enum", options:[1 : "1 Hour", 3 : "3 Hour", 6 : "6 Hour", 12 : "12 Hour"], defaultValue: 3, displayDuringSetup: true
+        input type: "paragraph", element: "paragraph", title: "Version", description: "${version()}", displayDuringSetup: false
+	}
     
     tiles(scale: 2) {
         multiAttributeTile(name: "holiday", type: "lighting", width: 6, height: 4){
@@ -130,9 +146,11 @@ def refresh() {
 }
 
 def startPoll() {
-	log.debug "startPoll"
     unschedule()
-    schedule("0 0 0/3 * * ?", poll) // "the hours 0, 3, 6..."
+    def checkInterval = "0/${settings.pollingInterval}"
+    log.debug "startPoll $checkInterval"
+    
+    schedule("0 0 $checkInterval * * ?", poll) // "the hours 0, 3, 6..."
 }
 
 def parse(description) {
