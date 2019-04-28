@@ -1,6 +1,6 @@
 /**
  *  SmartWeather Station For Korea
-  *  
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -11,52 +11,10 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  *  Based on original DH codes by SmartThings and SeungCheol Lee(slasher)
- *   - SmartWeather Station Tile by SmartThings
- *   - AirKorea DTH by SeunCheol Lee(slasher)
- *   - Tile remake by ShinJjang
- *   - Created Icon by Onaldo
- *   - Merged dth SmartWeather Station Tile and AirKorea DTH by WooBooung
- *
- *   - Version 0.0.3
- *      Refine capability Carbon Monoxide Detector / Dust Sensor 
- *      Changed unit string
- *      Added CO detect threshold in preferences
- *
- *   - Version 0.0.4
- *      Changed unit string
- *      Fixed check logic for air quality display
- *
- *   - Version 0.0.5
- *      Changed Icon by Onaldo
- *
- *   - Version 0.0.6
- *      Added Lincense by AIRKOREA
- *
- *   - Version 0.0.7
- *      Fixed current value type
- *
- *   - Version 0.0.8
- *      Changed type wind, feelsLike, percentPrecip
- *
- *   - Version 0.0.9
- *      When occured exception, do rescheduling
- *
- *   - Version 0.0.10
- *      Changed scheduling method
- *
- *   - Version 0.0.11
- *      Bug fix
- *      Modified interval option
- *      Removed isStateChange options
- *
- *   - Version 0.0.12
- *      Changed wunderground API by dianakoh
- *
- *   - Version 0.0.13
- *      Bug fix refreshRateMin default value
- *
- *   - Version 0.0.14
- *      Update link for search station
+ */
+public static String version() { return "v0.0.15.20190428" }
+/*
+ *	2019/04/28 >>> v0.0.15.20190428 - Updarte reference table
  */
   
 metadata {
@@ -107,7 +65,7 @@ metadata {
         input "coThresholdValue", "decimal", title: "CO Detect Threshold", defaultValue: 0.0, description: "몇 이상일때 Detected로 할지 적으세요 default:0.0", required: false
         input type: "paragraph", element: "paragraph", title: "측정소 조회 방법", description: "브라우저 통해 원하시는 지역을 입력하세요\n http://www.airkorea.or.kr/web/realSearch", displayDuringSetup: false
 		input type: "paragraph", element: "paragraph", title: "출처", description: "Airkorea\n데이터는 실시간 관측된 자료이며 측정소 현지 사정이나 데이터의 수신상태에 따라 미수신될 수 있습니다.", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.14", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
 	}
 
 	simulator {
@@ -118,23 +76,12 @@ metadata {
 		multiAttributeTile(name:"airQuality", type:"generic", width:6, height:4) {
             // onaldo Version
             tileAttribute("device.airQualityStatus", key: "PRIMARY_CONTROL") {
-                attributeState "매우좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMTA2/MDAxNTIxMjQ2NDcyNTg2.J8_9e2JL-r01FZHQoHYl6bQP7ueZ-WjyxPW3Qp3bWnEg.b5uV7OgbzneOob6Cub6o4TFvPDdQYLbLtPK1geLI7YQg.PNG.fuls/%EC%9D%B4%EB%A6%84_%EC%97%86%EC%9D%8C.png?type=w2", backgroundColor:"#73C1EC"
-                attributeState "좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMjYx/MDAxNTIxMjUzNjI3NDY3.buZqB49WFRlPSJejVL3v6grlgL6ElOMY7DyWR4ZHMwgg.A0Oc0Tv6PEvxGGf1wzaGxUX4YyJWMayLbXMoIx1Ulj4g.PNG.fuls/Good.png?type=w2", backgroundColor:"#6ECA8F"
-                attributeState "보통", label:'${name}', icon:"http://postfiles10.naver.net/MjAxODAzMTdfOTIg/MDAxNTIxMjUzODM2NjE3.uKxYFh-UKOU_8rVL11jRwEpXamq16Zh2j3tjep0_eaIg.RkHNjXtsLpTIpadPWlVcUYCRPc9q5gpK4XDCsb4_rccg.PNG.fuls/nomal.png?type=w2", backgroundColor:"FFDE61"
-                attributeState "나쁨", label:'${name}', icon:"http://postfiles7.naver.net/MjAxODAzMTdfMjA2/MDAxNTIxMjU0NDQyNjg1.tQqUGjj_sMgr6-5s_NI5Bs7hIE6GuAJGwMVmUiDnL-Eg.HJfx-MyfH3GIoxbBPZPNa-Jfk-oPszVXV3XPMc55rNIg.PNG.fuls/812527_fall_512x512.png?type=w2", backgroundColor:"#FF9EB2"
-                attributeState "매우나쁨", label:'${name}', icon:"http://postfiles4.naver.net/MjAxODAzMTdfMTk1/MDAxNTIxMjU0NDQyNTEy.F1no5ZbsQK4Yle3mfc3XAKMTlKVrKSS1NTpWPmY_Qzgg.oujDDUVV4nuAUfuECNpCXXfXRdTIPN-4xpigosU-jDsg.PNG.fuls/gasmask.png?type=w2", backgroundColor:"#D86450"
+                attributeState "좋음", label:'${name}', icon:"http://postfiles12.naver.net/MjAxODAzMTdfMjYx/MDAxNTIxMjUzNjI3NDY3.buZqB49WFRlPSJejVL3v6grlgL6ElOMY7DyWR4ZHMwgg.A0Oc0Tv6PEvxGGf1wzaGxUX4YyJWMayLbXMoIx1Ulj4g.PNG.fuls/Good.png?type=w2", backgroundColor:"#7EC6EE"
+                attributeState "보통", label:'${name}', icon:"http://postfiles10.naver.net/MjAxODAzMTdfOTIg/MDAxNTIxMjUzODM2NjE3.uKxYFh-UKOU_8rVL11jRwEpXamq16Zh2j3tjep0_eaIg.RkHNjXtsLpTIpadPWlVcUYCRPc9q5gpK4XDCsb4_rccg.PNG.fuls/nomal.png?type=w2", backgroundColor:"6ECA8F"
+                attributeState "나쁨", label:'${name}', icon:"http://postfiles7.naver.net/MjAxODAzMTdfMjA2/MDAxNTIxMjU0NDQyNjg1.tQqUGjj_sMgr6-5s_NI5Bs7hIE6GuAJGwMVmUiDnL-Eg.HJfx-MyfH3GIoxbBPZPNa-Jfk-oPszVXV3XPMc55rNIg.PNG.fuls/812527_fall_512x512.png?type=w2", backgroundColor:"#E5C757"
+                attributeState "매우나쁨", label:'${name}', icon:"http://postfiles4.naver.net/MjAxODAzMTdfMTk1/MDAxNTIxMjU0NDQyNTEy.F1no5ZbsQK4Yle3mfc3XAKMTlKVrKSS1NTpWPmY_Qzgg.oujDDUVV4nuAUfuECNpCXXfXRdTIPN-4xpigosU-jDsg.PNG.fuls/gasmask.png?type=w2", backgroundColor:"##E40000"
                 attributeState "알수없음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/01/23/874894_question_512x512.png", backgroundColor:"#C4BBB5"
             }
-            
-            /* slasher version
-            tileAttribute("device.airQualityStatus", key: "PRIMARY_CONTROL") {
-                attributeState "매우좋음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/07/06/105340_send_512x512.png", backgroundColor:"#73C1EC"
-                attributeState "좋음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/05/06/885720_green_512x512.png", backgroundColor:"#6ECA8F"
-                attributeState "보통", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/10/29/848792_miscellaneous_512x512.png", backgroundColor:"FFDE61"
-                attributeState "나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/08/18/812527_fall_512x512.png", backgroundColor:"#FF9EB2"
-                attributeState "매우나쁨", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2016/11/15/852865_medical_512x512.png", backgroundColor:"#D86450"
-                attributeState "알수없음", label:'${name}', icon:"https://www.shareicon.net/data/128x128/2017/01/23/874894_question_512x512.png", backgroundColor:"#C4BBB5"
-            }*/
 
 			tileAttribute("device.data_time", key: "SECONDARY_CONTROL") {
            		attributeState("default", label:'${currentValue}')
@@ -158,7 +105,7 @@ metadata {
         	state "default", label:'${currentValue}', backgroundColors:[
                 [value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 50, color: "#51B2E8"],
+            	[value: 50, color: "#6ECA8F"],
             	[value: 100, color: "#E5C757"],
             	[value: 150, color: "#E40000"],
             	[value: 200, color: "#970203"]
@@ -174,10 +121,10 @@ metadata {
         	state "default", label:'${currentValue}', unit:"㎍/㎥", backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 35, color: "#51B2E8"],
-            	[value: 85, color: "#E5C757"],
-            	[value: 150, color: "#E40000"],
-            	[value: 500, color: "#970203"]
+            	[value: 31, color: "#6ECA8F"],
+            	[value: 51, color: "#E5C757"],
+            	[value: 101, color: "#E40000"],
+            	[value: 200, color: "#970203"]
             ]
         }
 
@@ -189,10 +136,10 @@ metadata {
         	state "default", label:'${currentValue}', unit:"㎍/㎥", backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 15, color: "#51B2E8"],
-            	[value: 50, color: "#E5C757"],
-            	[value: 75, color: "#E40000"],
-            	[value: 500, color: "#970203"]
+            	[value: 16, color: "#6ECA8F"],
+            	[value: 26, color: "#E5C757"],
+            	[value: 51, color: "#E40000"],
+            	[value: 100, color: "#970203"]
             ]
         }
         
@@ -208,7 +155,7 @@ metadata {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0.001, color: "#7EC6EE"],
-            	[value: 0.03, color: "#51B2E8"],
+            	[value: 0.03, color: "#6ECA8F"],
             	[value: 0.10, color: "#E5C757"],
             	[value: 0.15, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
@@ -223,7 +170,7 @@ metadata {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 0.03, color: "#51B2E8"],
+            	[value: 0.03, color: "#6ECA8F"],
             	[value: 0.05, color: "#E5C757"],
             	[value: 0.2, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
@@ -238,7 +185,7 @@ metadata {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 0.02, color: "#51B2E8"],
+            	[value: 0.02, color: "#6ECA8F"],
             	[value: 0.04, color: "#E5C757"],
             	[value: 0.15, color: "#E40000"],
             	[value: 0.5, color: "#970203"]
@@ -253,7 +200,7 @@ metadata {
             state "default", label:'${currentValue}', backgroundColors:[
 				[value: -1, color: "#C4BBB5"],
             	[value: 0, color: "#7EC6EE"],
-            	[value: 0.2, color: "#51B2E8"],
+            	[value: 0.2, color: "#6ECA8F"],
             	[value: 0.7, color: "#E5C757"],
             	[value: 1.5, color: "#E40000"],
             	[value: 5.0, color: "#970203"]
@@ -426,30 +373,126 @@ metadata {
             state "default", label:'대기 오염 색상 정보'
         }
 
-        valueTile("color1_value", "", decoration: "flat") {
+        valueTile("cai_infos", "", decoration: "flat") {
+            state "default", label:'대기공기\nCAI'
+        }
+        
+        valueTile("cai_0_value", "", decoration: "flat") {
             state "default", label:'오류', backgroundColor: "#C4BBB5"
         }
 		
-        valueTile("color2_value", "", decoration: "flat") {
-            state "default", label:'1단계', backgroundColor: "#7EC6EE"
+        valueTile("cai_1_value", "", decoration: "flat") {
+            state "default", label:'좋음\n0~50', backgroundColor: "#7EC6EE"
         }
         
-        valueTile("color3_value", "", decoration: "flat") {
-            state "default", label:'2단계', backgroundColor: "#51B2E8"
+        valueTile("cai_2_value", "", decoration: "flat") {
+            state "default", label:'보통\n51~100', backgroundColor: "#6ECA8F"
         }
         
-        valueTile("color4_value", "", decoration: "flat") {
-            state "default", label:'3단계', backgroundColor: "#E5C757"
+        valueTile("cai_3_value", "", decoration: "flat") {
+            state "default", label:'나쁨\n101~250', backgroundColor: "#E5C757"
         }
         
-        valueTile("color5_value", "", decoration: "flat") {
-            state "default", label:'4단계', backgroundColor: "#E40000"
+        valueTile("cai_4_value", "", decoration: "flat") {
+            state "default", label:'매우나쁨\n251~', backgroundColor: "#E40000"
+        }
+                       
+        valueTile("pm10_kor_infos", "", decoration: "flat") {
+            state "default", label:'PM10'
         }
         
-        valueTile("color6_value", "", decoration: "flat") {
-            state "default", label:'5단계', backgroundColor: "#970203"
+        valueTile("pm10_kor", "", decoration: "flat") {
+            state "default", label:'한국'
         }
-                
+
+        valueTile("pm10_kor_1_value", "", decoration: "flat") {
+            state "default", label:'좋음\n0~30', backgroundColor: "#7EC6EE"
+        }
+		
+        valueTile("pm10_kor_2_value", "", decoration: "flat") {
+            state "default", label:'보통\n31~80', backgroundColor: "#6ECA8F"
+        }
+        
+        valueTile("pm10_kor_3_value", "", decoration: "flat") {
+            state "default", label:'나쁨\n81~150', backgroundColor: "#E5C757"
+        }
+        
+        valueTile("pm10_kor_4_value", "", decoration: "flat") {
+            state "default", label:'아주나쁨\n151~', backgroundColor: "#E40000"
+        }
+        
+        valueTile("pm10_who_infos", "", decoration: "flat") {
+            state "default", label:'PM10'
+        }
+        
+        valueTile("pm10_who", "", decoration: "flat") {
+            state "default", label:'who'
+        }
+
+        valueTile("pm10_who_1_value", "", decoration: "flat") {
+            state "default", label:'좋음\n0~30', backgroundColor: "#7EC6EE"
+        }
+		
+        valueTile("pm10_who_2_value", "", decoration: "flat") {
+            state "default", label:'보통\n31~50', backgroundColor: "#6ECA8F"
+        }
+        
+        valueTile("pm10_who_3_value", "", decoration: "flat") {
+            state "default", label:'나쁨\n51~100', backgroundColor: "#E5C757"
+        }
+        
+        valueTile("pm10_who_4_value", "", decoration: "flat") {
+            state "default", label:'아주나쁨\n101~', backgroundColor: "#E40000"
+        }
+        
+        valueTile("pm25_kor_infos", "", decoration: "flat") {
+            state "default", label:'PM2.5'
+        }
+        
+        valueTile("pm25_kor", "", decoration: "flat") {
+            state "default", label:'한국'
+        }
+
+        valueTile("pm25_kor_1_value", "", decoration: "flat") {
+            state "default", label:'좋음\n0~15', backgroundColor: "#7EC6EE"
+        }
+		
+        valueTile("pm25_kor_2_value", "", decoration: "flat") {
+            state "default", label:'보통\n16~35', backgroundColor: "#6ECA8F"
+        }
+        
+        valueTile("pm25_kor_3_value", "", decoration: "flat") {
+            state "default", label:'나쁨\n36~75', backgroundColor: "#E5C757"
+        }
+        
+        valueTile("pm25_kor_4_value", "", decoration: "flat") {
+            state "default", label:'매우나쁨\n76~', backgroundColor: "#E40000"
+        }
+        
+        valueTile("pm25_who_infos", "", decoration: "flat") {
+            state "default", label:'PM2.5'
+        }
+        
+        valueTile("pm25_who", "", decoration: "flat") {
+            state "default", label:'who'
+        }
+
+        valueTile("pm25_who_1_value", "", decoration: "flat") {
+            state "default", label:'좋음\n0~15', backgroundColor: "#7EC6EE"
+        }
+		
+        valueTile("pm25_who_2_value", "", decoration: "flat") {
+            state "default", label:'보통\n16~25', backgroundColor: "#6ECA8F"
+        }
+        
+        valueTile("pm25_who_3_value", "", decoration: "flat") {
+            state "default", label:'나쁨\n26~50', backgroundColor: "#E5C757"
+        }
+        
+        valueTile("pm25_who_4_value", "", decoration: "flat") {
+            state "default", label:'매우나쁨\n51~', backgroundColor: "#E40000"
+        }
+               
         /*
 		valueTile("refresh_label", "", width: 2, decoration: "flat") {
 			state "default", label:'Refresh', action: "linkStationSearch"
@@ -470,7 +513,11 @@ metadata {
                 "wind_label", "percentPrecip_label", "rise_label", "set_label",
                 "wind_value", "percentPrecip_value", "rise_value", "set_value",
                 "color_infos",
-                "color1_value", "color2_value", "color3_value", "color4_value", "color5_value", "color6_value",
+                "cai_infos", "cai_0_value", "cai_1_value", "cai_2_value", "cai_3_value", "cai_4_value", 
+                "pm10_kor_infos", "pm10_kor", "pm10_kor_1_value", "pm10_kor_2_value", "pm10_kor_3_value", "pm10_kor_4_value",
+                "pm10_who_infos", "pm10_who", "pm10_who_1_value", "pm10_who_2_value", "pm10_who_3_value", "pm10_who_4_value",
+                "pm25_kor_infos", "pm25_kor", "pm25_kor_1_value", "pm25_kor_2_value", "pm25_kor_3_value", "pm25_kor_4_value",
+                "pm25_who_infos", "pm25_who", "pm25_who_1_value", "pm25_who_2_value", "pm25_who_3_value", "pm25_who_4_value",
                 ])}
 }
 
@@ -608,11 +655,10 @@ def pollAirKorea() {
                         
                   		sendEvent(name: "airQuality", value: resp.data.list[0].khaiValue as Integer)
 
-                        if (khai > 200) khai_text="매우나쁨"
-                        else if (khai > 150) khai_text="나쁨"
-                        else if (khai > 100) khai_text="보통"
-                        else if (khai > 50) khai_text="좋음"
-                        else if (khai >= 0) khai_text="매우좋음"
+                        if (khai > 250) khai_text="매우나쁨"
+                        else if (khai > 100) khai_text="나쁨"
+                        else if (khai > 50) khai_text="보통"
+                        else if (khai >= 0) khai_text="좋음"
                         
                         sendEvent(name: "airQualityStatus", value: khai_text, unit: "")
                         
