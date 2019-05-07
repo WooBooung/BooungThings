@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
- public static String version() { return "v0.0.1.20190505" }
+ public static String version() { return "v0.0.2.20190507" }
 /*
+ *	2019/05/07 >>> v0.0.2.20190507 - Modified data type of AirQualitySensor
  *	2019/05/05 >>> v0.0.1.20190505 - Initialize
  */
 definition(
@@ -257,7 +258,7 @@ private updateChildDeviceData(UUID, airLatestData) {
 	if (airLatestData) {
         log.debug "updateChildDeviceData airData : ${airLatestData}"
 
-        childDevice?.sendEvent(name: "airQuality", value: airLatestData.score)
+        childDevice?.sendEvent(name: "airQuality", value: airLatestData.score as Integer)
 
         //log.debug "updateStatus indices : ${airLatestData.indices}"
         //log.debug "updateStatus sensors : ${airLatestData.sensors}"
