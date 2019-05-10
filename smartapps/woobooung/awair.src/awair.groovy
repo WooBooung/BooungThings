@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
- public static String version() { return "v0.0.2.20190507" }
+ public static String version() { return "v0.0.3.20190510" }
 /*
+ *	2019/05/10 >>> v0.0.3.20190510 - Modified data type of temperature (Integer -> Double)
  *	2019/05/07 >>> v0.0.2.20190507 - Modified data type of AirQualitySensor
  *	2019/05/05 >>> v0.0.1.20190505 - Initialize
  */
@@ -105,11 +106,11 @@ def mainPage() {
                     "awair-omni": ["temp", "humid", "co2", "voc", "pm25", "pm10"],
                     "awair-r2": ["temp", "humid", "co2", "voc", "pm25", "pm10"]}]*/
                 
-                    paragraph "devictType : awair-r2\nattributes : [temp, humid, co2, voc, pm25]"
-                    paragraph "devictType : awair\nattributes : [temp, humid, co2, voc, dust]"
-                    paragraph "devictType : awair-mint\nattributes : [temp, humid, voc, pm25, lux]"
-                    paragraph "devictType : awair-omni\nattributes : [temp, humid, co2, voc, pm25, lux, spl_a]"
-                    paragraph "devictType : awair-glow\nattributes : [temp, humid, co2, voc]"
+                    paragraph "deviceType : awair-r2\nattributes : [temp, humid, co2, voc, pm25]"
+                    paragraph "deviceType : awair\nattributes : [temp, humid, co2, voc, dust]"
+                    paragraph "deviceType : awair-mint\nattributes : [temp, humid, voc, pm25, lux]"
+                    paragraph "deviceType : awair-omni\nattributes : [temp, humid, co2, voc, pm25, lux, spl_a]"
+                    paragraph "deviceType : awair-glow\nattributes : [temp, humid, co2, voc]"
                 } 
 
                 section("Version :") {
@@ -265,8 +266,12 @@ private updateChildDeviceData(UUID, airLatestData) {
 
         airLatestData.sensors.each {
             switch (it.comp) {
-                case "temp" : childDevice?.sendEvent(name: "temperature", value: it.value as Integer, unit: getTemperatureScale()); break;
-                case "humid" : childDevice?.sendEvent(name: "humidity", value: it.value as Integer, unit: "%"); break;
+
+                case "temp" : 
+                    Double tempDouble = it.value
+                	childDevice?.sendEvent(name: "temperature", value: tempDouble.round(1), unit: getTemperatureScale())
+                    break
+                case "humid" : childDevice?.sendEvent(name: "humidity", value: it.value as Integer, unit: "%"); break
                 case "co2" : childDevice?.sendEvent(name: "carbonDioxide", value: it.value as Integer, unit: "ppm"); break;
                 case "voc" : childDevice?.sendEvent(name: "tvocLevel", value: it.value as Integer, unit: "ppb"); break;
                 case "pm25" : childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
