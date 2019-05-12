@@ -11,8 +11,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.4.20190513" }
+public static String version() { return "v0.0.5.20190513" }
 /*
+ *   2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *   2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
  *   2019/05/05 >>> v0.0.1.20190505 - Initialize
  */
@@ -449,7 +450,7 @@ def refresh() {
     log.debug "refresh()"
     unschedule()
 
-    sendEvent(name: "awairUUID", value: "${device.deviceNetworkId}")
+	sendEvent(name: "awairUUID", value: "${device.deviceNetworkId}")
 
     pullData()
 
@@ -457,6 +458,14 @@ def refresh() {
 
     log.debug "airHealthCheckInterval $airHealthCheckInterval"
     schedule("0 0/$airHealthCheckInterval * * * ?", pullData)
+    
+    def UUID = device.deviceNetworkId
+    def awairDeviceType = UUID.split('_')[0]
+    switch (awairDeviceType) {
+        case "awair-r2" : setDeviceType("Awair-R2"); break;
+        case "awair-mint" : setDeviceType("Awair-Mint"); break;
+        case "awair" : setDeviceType("Awair-R1"); break;
+    }
 }
 
 def command2AwairLedSleep() {
