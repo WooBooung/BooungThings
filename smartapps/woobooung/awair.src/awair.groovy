@@ -161,12 +161,10 @@ private addChildAwairDevices() {
         def existing = getChildDevice(device.deviceUUID)
         if (!existing) {
             def awairDthTypeName = "Awair"
-            def awairDeviceType = device.deviceUUID.split('_')[0]
-            
-			switch (awairDeviceType) {
-            	case "awair-r2" : awairDeviceType = "Awair-R2"; break;
-                case "awair-mint" : awairDeviceType = "Awair-Mint"; break;
-                case "awair" : awairDeviceType = "Awair-R1"; break;
+			switch (device.deviceType) {
+            	case "awair-r2" : awairDthTypeName = "Awair-R2"; break;
+                case "awair-mint" : awairDthTypeName = "Awair-Mint"; break;
+                case "awair" : awairDthTypeName = "Awair-R1"; break;
             }
 
             def childDevice = addChildDevice("woobooung", awairDthTypeName, device.deviceUUID, null, [completedSetup: true, name: device.deviceType, label: device.name])
