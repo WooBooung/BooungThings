@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.4.20190513" }
+public static String version() { return "v0.0.5.20190513" }
 /*
+ *  2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *  2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
  *	2019/05/10 >>> v0.0.3.20190510 - Modified data type of temperature (Integer -> Double)
  *	2019/05/07 >>> v0.0.2.20190507 - Modified data type of AirQualitySensor
@@ -159,7 +160,16 @@ private addChildAwairDevices() {
 
         def existing = getChildDevice(device.deviceUUID)
         if (!existing) {
-            def childDevice = addChildDevice("woobooung", "Awair", device.deviceUUID, null, [completedSetup: true, name: device.deviceType, label: device.name])
+            def awairDthTypeName = "Awair"
+            def awairDeviceType = device.deviceUUID.split('_')[0]
+            
+			switch (awairDeviceType) {
+            	case "awair-r2" : awairDeviceType = "Awair-R2"; break;
+                case "awair-mint" : awairDeviceType = "Awair-Mint"; break;
+                case "awair" : awairDeviceType = "Awair-R1"; break;
+            }
+
+            def childDevice = addChildDevice("woobooung", awairDthTypeName, device.deviceUUID, null, [completedSetup: true, name: device.deviceType, label: device.name])
         } else {
             log.debug "Device already created : ${device.deviceUUID}"
         }
