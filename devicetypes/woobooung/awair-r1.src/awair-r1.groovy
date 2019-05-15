@@ -11,8 +11,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.5.20190513" }
+public static String version() { return "v0.0.6.20190515" }
 /*
+ *   2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor
  *   2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *   2019/05/05 >>> v0.0.1.20190505 - Initialize
  */
@@ -24,7 +25,7 @@ metadata {
     definition(name: "Awair-R1", namespace: "WooBooung", author: "Booung", vid: "SmartThings-smartthings-Awair", ocfDeviceType: "x.com.st.d.airqualitysensor") {
         capability "Air Quality Sensor" // Awair Score
         capability "Carbon Dioxide Measurement" // co : clear, detected
-        capability "Dust Sensor" // fineDustLevel : PM 2.5   dustLevel : PM 10
+        capability "Fine Dust Sensor"
         capability "Temperature Measurement"
         capability "Relative Humidity Measurement"
         capability "Tvoc Measurement"
@@ -401,7 +402,7 @@ metadata {
         details(["airQuality",
                  "temperature_indices", "temperature_label", "temperature_value", "humidity_indices", "humidity_label", "humidity_value",
                  "co2_indices", "co2_label", "co2_value", "voc_indices", "voc_label", "voc_value",
-                 "pm10_indices", "pm10_label", "pm10_value", "awairUUID_label", "awairUUID",
+                 "pm25_indices", "pm25_label", "pm25_value", "awairUUID_label", "awairUUID",
                  "display_label", "mode_score", "mode_clock", "mode_temp_humi_c", "mode_temp_humi_f", "mode_default",
                  "led_label", "led_on", "led_sleep", "led_dim", "blank_tile", "blank_tile",
                  "knocking_label", "knocking_on", "knocking_off", "knocking_sleep", "blank_tile", "blank_tile",

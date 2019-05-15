@@ -11,8 +11,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.5.20190513" }
+public static String version() { return "v0.0.6.20190515" }
 /*
+ *   2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor
  *   2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *   2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
  *   2019/05/05 >>> v0.0.1.20190505 - Initialize
@@ -25,7 +26,7 @@ metadata {
     definition(name: "Awair-R2", namespace: "WooBooung", author: "Booung", vid: "SmartThings-smartthings-Awair", ocfDeviceType: "x.com.st.d.airqualitysensor") {
         capability "Air Quality Sensor" // Awair Score
         capability "Carbon Dioxide Measurement" // co : clear, detected
-        capability "Dust Sensor" // fineDustLevel : PM 2.5   dustLevel : PM 10
+        capability "Fine Dust Sensor"
         capability "Temperature Measurement"
         capability "Relative Humidity Measurement"
         capability "Tvoc Measurement"
