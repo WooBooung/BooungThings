@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.5.20190513" }
+public static String version() { return "v0.0.6.20190515" }
 /*
+ *  2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor(Only for Awair-R1)
  *  2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *  2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
  *	2019/05/10 >>> v0.0.3.20190510 - Modified data type of temperature (Integer -> Double)
@@ -297,7 +298,6 @@ private updateChildDeviceAirData(UUID, airLatestData) {
 
         airLatestData.sensors.each {
             switch (it.comp) {
-
                 case "temp":
                     Double tempDouble = it.value
                     childDevice?.sendEvent(name: "temperature", value: tempDouble.round(1), unit: getTemperatureScale())
@@ -307,7 +307,7 @@ private updateChildDeviceAirData(UUID, airLatestData) {
                 case "voc": childDevice?.sendEvent(name: "tvocLevel", value: it.value as Integer, unit: "ppb"); break;
                 case "pm25": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
                 case "pm10": childDevice?.sendEvent(name: "dustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
-                case "dust": childDevice?.sendEvent(name: "dustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
+                case "dust": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
                 case "lux": childDevice?.sendEvent(name: "illuminance", value: it.value as Integer); break;
                 case "spl_a": childDevice?.sendEvent(name: "soundPressureLevel", value: it.value as Integer, unit: "db"); break;
             }
@@ -321,7 +321,7 @@ private updateChildDeviceAirData(UUID, airLatestData) {
                 case "voc": childDevice?.sendEvent(name: "vocIndices", value: Math.abs(it.value as Integer)); break;
                 case "pm25": childDevice?.sendEvent(name: "pm25Indices", value: Math.abs(it.value as Integer)); break;
                 case "pm10": childDevice?.sendEvent(name: "pm10Indices", value: Math.abs(it.value as Integer)); break;
-                case "dust": childDevice?.sendEvent(name: "pm10Indices", value: Math.abs(it.value as Integer)); break;
+                case "dust": childDevice?.sendEvent(name: "pm25Indices", value: Math.abs(it.value as Integer)); break;
             //case "lux" : childDevice?.sendEvent(name: "luxIndices", value: Math.abs(it.value as Integer)); break;
             //case "spl_a" : childDevice?.sendEvent(name: "splIndices", value: Math.abs(it.value as Integer)); break;
             }
