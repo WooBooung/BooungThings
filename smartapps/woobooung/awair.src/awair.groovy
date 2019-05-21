@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.6.20190515" }
+public static String version() { return "v0.0.7.20190521" }
 /*
+ *  2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
  *  2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor(Only for Awair-R1)
  *  2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *  2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
@@ -304,9 +305,9 @@ private updateChildDeviceAirData(UUID, airLatestData) {
                     break
                 case "humid": childDevice?.sendEvent(name: "humidity", value: it.value as Integer, unit: "%"); break
                 case "co2": 
-                	def co2ppm = it.value as int
-                    child.co2homekitNotice(co2ppm)     
-                	childDevice?.sendEvent(name: "carbonDioxide", value: it.value as Integer, unit: "ppm"); break;
+                	def co2ppm = it.value as Integer
+                    childDevice?.co2homekitNotice(co2ppm)
+                	childDevice?.sendEvent(name: "carbonDioxide", value: co2ppm, unit: "ppm"); break;
                 case "voc": childDevice?.sendEvent(name: "tvocLevel", value: it.value as Integer, unit: "ppb"); break;
                 case "pm25": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
                 case "pm10": childDevice?.sendEvent(name: "dustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
@@ -377,7 +378,6 @@ private updateChildDeviceKnockingMode(UUID, responseData) {
         childDevice?.sendEvent(name: "knockingMode", value: responseData.mode)
     }
 }
-
 
 def pullPowerStatus(UUID) {
     def responseData = getResponseData(UUID, "power-status")
