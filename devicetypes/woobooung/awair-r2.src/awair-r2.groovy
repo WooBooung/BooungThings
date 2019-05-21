@@ -33,6 +33,7 @@ metadata {
         capability "Refresh"
         capability "Sensor"
 
+        attribute "co2notice", "enum", ["notice", "unnotice"] 
         attribute "tempIndices", "number"
         attribute "humidIndices", "number"
         attribute "co2Indices", "number"
@@ -58,10 +59,12 @@ metadata {
         command "command2AwairKnockingOn"
         command "command2AwairKnockingOff"
         command "command2AwairKnockingSleep"
+        command "co2homekitNotice"
     }
 
     preferences {
         input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
+  		input "co2homekit", "number", title:"CO2 Notice for Homekit", defaultValue: 1500, description:"홈킷 CO2농도 경고 최저값 설정", range: "*..*"
     }
 
     simulator {
@@ -574,6 +577,16 @@ def command2awair(def commandType) {
     }
 
     parent.command2awair(device.deviceNetworkId, endpoint, jsonData)
+}
+
+def co2homekitNotice(co2ppm) {
+	def awairCO2 = co2ppm
+    log.debug "Notice CO2 : ${awairCO2}"
+    if( awairCO2 > co2homekit ) {
+    	sendEvent(name: "co2notice", value: "notice")
+    } else {
+    	sendEvent(name: "co2notice", value: "unnotice")
+    }
 }
 
 def ledLevel(level) {
