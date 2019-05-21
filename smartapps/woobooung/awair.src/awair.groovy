@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.7.20190521" }
+public static String version() { return "v0.0.8.20190522" }
 /*
+ *  2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking
  *  2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
  *  2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor(Only for Awair-R1)
  *  2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
@@ -23,6 +24,10 @@ public static String version() { return "v0.0.7.20190521" }
  *	2019/05/07 >>> v0.0.2.20190507 - Modified data type of AirQualitySensor
  *	2019/05/05 >>> v0.0.1.20190505 - Initialize
  */
+ 
+import groovy.json.*
+import groovy.json.JsonSlurper
+
 definition(
         name: "Awair",
         namespace: "WooBooung",
@@ -241,6 +246,18 @@ def command2awair(UUID, endpoint, commandData) {
     try {
         httpPut(params) { resp ->
             log.debug "command2awair>> resp: ${resp.data}"
+            def mapData = new JsonSlurper().parseText(jsonBody)
+            switch (endpoint) {
+                case "display":
+                    updateChildDeviceDisplayMode(UUID, mapData)
+                    break
+                case "led":
+                    updateChildDeviceLedMode(UUID, mapData)
+                    break
+                case "knocking":
+                    updateChildDeviceKnockingMode(UUID, mapData)
+                    break
+            }
         }
     } catch (groovyx.net.http.HttpResponseException e) {
         log.error "command2awair>> HTTP Post Error : ${e}"
@@ -361,7 +378,10 @@ private updateChildDeviceLedMode(UUID, responseData) {
 
     if (responseData) {
         log.debug "updateChildDeviceLedMode : ${responseData}"
-        childDevice?.sendEvent(name: "ledMode", value: responseData.mode)
+        childDevice?.sendEvent(name: "ledMode", value: responseData.mode.toUpperCase())
+        if (responseData.mode == "MANUAL") {
+        	childDevice?.sendEvent(name: "ledLevel", value: responseData.brightness as Integer)
+        }
     }
 }
 
@@ -375,7 +395,7 @@ private updateChildDeviceKnockingMode(UUID, responseData) {
 
     if (responseData) {
         log.debug "updateChildDeviceKnockingMode : ${responseData}"
-        childDevice?.sendEvent(name: "knockingMode", value: responseData.mode)
+        childDevice?.sendEvent(name: "knockingMode", value: responseData.mode.toUpperCase())
     }
 }
 
@@ -412,11 +432,11 @@ private getResponseData(UUID, endpoint) {
     try {
         httpGet(params) { resp ->
             log.debug "${resp.data}"
-            responseData = resp.data.data
+            responseData = resp.data
         }
     } catch (e) {
         log.error e
     }
 
-    return responseData[0]
+    return responseData
 }
