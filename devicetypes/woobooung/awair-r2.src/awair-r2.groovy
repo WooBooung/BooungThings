@@ -11,8 +11,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.7.20190521" }
+public static String version() { return "v0.0.8.20190522" }
 /*
+ *   2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking (Need to Update SmartApp and DTH)
  *   2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
  *   2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor
  *   2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
@@ -34,7 +35,31 @@ metadata {
         capability "Refresh"
         capability "Sensor"
 
-        attribute "co2notice", "enum", ["notice", "unnotice"] 
+/*
+Led mode. Available values:
+
+Awair: on, dim ,sleep
+Awair-r2, Mint, Omni: auto, manual, sleep
+*/
+		attribute "ledMode", "enum", ["AUTO", "MANUAL", "SLEEP"] 
+        
+/*
+Display mode to be set. Available values:
+
+awair: default, score, clock, temp_humid_celsius, temp_humid_fahrenheit
+glow: status, nightlight, off
+omni, awair-r2: score, temp, humid, co2, voc, pm25, clock
+mint: score, temp, humid, voc, pm25, clock
+*/
+        attribute "displayMode", "enum", ["score", "temp", "humid", "co2", "voc", "pm25", "clock"]
+/*
+Knocking mode to be set. Allowable values:
+
+Awair,Awair-r2 : on, off, sleep
+*/
+        attribute "knockingMode", "enum", ["ON", "OFF", "SLEEP"]
+
+        attribute "co2notice", "enum", ["notice", "unnotice"]
         attribute "tempIndices", "number"
         attribute "humidIndices", "number"
         attribute "co2Indices", "number"
@@ -211,11 +236,11 @@ metadata {
             state "default", label: '', icon: "st.quirky.spotter.quirky-spotter-sound-on"
         }
 
-        valueTile("display_label", "", width: 5, height: 1, decoration: "flat") {
+        valueTile("display_label", "", width: 4, height: 1, decoration: "flat") {
             state "default", label: 'Display'
         }
 
-        valueTile("display_value", "device.displayMode", width: 3, height: 1, decoration: "flat") {
+        valueTile("display_value", "device.displayMode", width: 1, height: 1, decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
@@ -408,10 +433,10 @@ metadata {
                  "temperature_indices", "temperature_label", "temperature_value", "humidity_indices", "humidity_label", "humidity_value",
                  "co2_indices", "co2_label", "co2_value", "voc_indices", "voc_label", "voc_value",
                  "pm25_indices", "pm25_label", "pm25_value", "awairUUID_label", "awairUUID",
-                 "display_label", "mode_score",
+                 "display_label", "display_value", "mode_score",
                  "mode_temp", "mode_humi", "mode_co2", "mode_voc", "mode_pm25", "mode_clock",
-                 "led_label", "led_off", "led_sleep", "led_auto", "led_manual", "led_level",
-                 "knocking_label", "knocking_on", "knocking_off", "knocking_sleep", "blank_tile", "blank_tile",
+                 "led_label", "led_value", "led_off", "led_sleep", "led_auto", "led_level",
+                 "knocking_label", "knocking_value", "knocking_on", "knocking_off", "knocking_sleep", "blank_tile",
                  "color_infos", "refresh_air_value",
                  "cai_infos", "cai_0_value", "cai_1_value", "cai_2_value", "cai_3_value", "cai_4_value",
                  "pm25_who_infos", "pm25_who", "pm25_who_1_value", "pm25_who_2_value", "pm25_who_3_value", "pm25_who_4_value",
@@ -525,7 +550,7 @@ def command2awair(def commandType) {
             break
         case "ledAuto":
             endpoint = "led"
-            jsonData = new JsonBuilder("mode": "auto", "brightness": 20)
+            jsonData = new JsonBuilder("mode": "auto")
             break
         case "ledOff":
             endpoint = "led"
@@ -599,8 +624,8 @@ def ledLevel(level) {
 def pullData() {
     log.debug "pullData() : ${device.deviceNetworkId}"
     parent.pullAirData(device.deviceNetworkId)
-    //parent.pullDisplayMode(device.deviceNetworkId)
-    //parent.pullLedMode(device.deviceNetworkId)
-    //parent.pullKnockingMode(device.deviceNetworkId)
+    parent.pullDisplayMode(device.deviceNetworkId)
+    parent.pullLedMode(device.deviceNetworkId)
+    parent.pullKnockingMode(device.deviceNetworkId)
     //parent.pullPowerStatus(device.deviceNetworkId)
 }
