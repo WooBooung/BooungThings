@@ -11,8 +11,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.6.20190515" }
+public static String version() { return "v0.0.7.20190521" }
 /*
+ *   2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
  *   2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor
  *   2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *   2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
@@ -64,7 +65,7 @@ metadata {
 
     preferences {
         input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
-  		input "co2homekit", "number", title:"CO2 Notice for Homekit", defaultValue: 1500, description:"홈킷 CO2농도 경고 최저값 설정", range: "*..*"
+        input "co2homekit", "number", title:"CO2 Notice for Homekit", defaultValue: 1500, description:"Enter CO2 minimum value(Default 1500)", range: "*..*"
     }
 
     simulator {
@@ -580,9 +581,8 @@ def command2awair(def commandType) {
 }
 
 def co2homekitNotice(co2ppm) {
-	def awairCO2 = co2ppm
-    log.debug "Notice CO2 : ${awairCO2}"
-    if( awairCO2 > co2homekit ) {
+    log.debug "Notice CO2 : ${co2ppm}"
+    if (co2ppm > co2homekit) {
     	sendEvent(name: "co2notice", value: "notice")
     } else {
     	sendEvent(name: "co2notice", value: "unnotice")
