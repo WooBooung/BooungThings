@@ -32,7 +32,6 @@ metadata {
         capability "Temperature Measurement"
         capability "Relative Humidity Measurement"
         capability "Tvoc Measurement"
-        capability "Refresh"
         capability "Sensor"
 
 /*
@@ -65,7 +64,6 @@ Awair,Awair-r2 : on, off, sleep
         attribute "co2Indices", "number"
         attribute "vocIndices", "number"
         attribute "pm25Indices", "number"
-        attribute "pm10Indices", "number"
 
         attribute "awairUUID", "string"
 

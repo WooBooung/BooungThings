@@ -14,6 +14,9 @@
 public static String version() { return "v0.0.9.20190606" }
 /*
  *   2019/06/06 >>> v0.0.9.20190606 - Added Awair-Omni
+ *   2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking (Need to Update SmartApp and DTH)
+ *   2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
+ *   2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor
  *   2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
  *   2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
  *   2019/05/05 >>> v0.0.1.20190505 - Initialize
@@ -23,27 +26,47 @@ import java.text.SimpleDateFormat
 import groovy.json.JsonSlurper
 
 metadata {
-    definition(name: "Awair", namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.airqualitysensor") {
+    definition(name: "Awair-Omni", namespace: "WooBooung", author: "Booung", vid: "SmartThings-smartthings-Awair", ocfDeviceType: "x.com.st.d.airqualitysensor") {
         capability "Air Quality Sensor" // Awair Score
         capability "Carbon Dioxide Measurement" // co : clear, detected
-        capability "Dust Sensor" // fineDustLevel : PM 2.5   dustLevel : PM 10
+        capability "Fine Dust Sensor"
         capability "Temperature Measurement"
         capability "Relative Humidity Measurement"
         capability "Tvoc Measurement"
         capability "Illuminance Measurement"
         capability "Sound Pressure Level"
+        capability "Battery"
+        capability "Power Source"
         capability "Sensor"
 
+/*
+Led mode. Available values:
+
+Awair: on, dim ,sleep
+Awair-r2, Mint, Omni: auto, manual, sleep
+*/
+		attribute "ledMode", "enum", ["AUTO", "MANUAL", "SLEEP"] 
+        
+/*
+Display mode to be set. Available values:
+
+awair: default, score, clock, temp_humid_celsius, temp_humid_fahrenheit
+glow: status, nightlight, off
+omni, awair-r2: score, temp, humid, co2, voc, pm25, clock
+mint: score, temp, humid, voc, pm25, clock
+*/
+        attribute "displayMode", "enum", ["score", "temp", "humid", "co2", "voc", "pm25", "clock"]
+/*
+Knocking mode to be set. Allowable values:
+
+Awair,Awair-r2 : on, off, sleep
+*/
+        attribute "co2notice", "enum", ["notice", "unnotice"]
         attribute "tempIndices", "number"
         attribute "humidIndices", "number"
         attribute "co2Indices", "number"
         attribute "vocIndices", "number"
         attribute "pm25Indices", "number"
-        attribute "pm10Indices", "number"
-
-        attribute "displayMode", "string"
-        attribute "ledMode", "string"
-        attribute "knockingMode", "string"
 
         attribute "awairUUID", "string"
 
@@ -63,10 +86,12 @@ metadata {
         command "command2AwairKnockingOn"
         command "command2AwairKnockingOff"
         command "command2AwairKnockingSleep"
+        command "co2homekitNotice"
     }
 
     preferences {
         input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
+        input "co2homekit", "number", title:"CO2 Notice for Homekit", defaultValue: 1500, description:"Enter CO2 minimum value(Default 1500)", range: "*..*"
     }
 
     simulator {
@@ -84,11 +109,11 @@ metadata {
             }
         }
 
-        valueTile("awairUUID_label", "", width: 2, height: 1, decoration: "flat") {
+        valueTile("awairUUID_label", "", width: 1, height: 1, decoration: "flat") {
             state "default", label: 'UUID'
         }
 
-        valueTile("awairUUID", "device.awairUUID", width: 4, height: 1, decoration: "flat") {
+        valueTile("awairUUID", "device.awairUUID", width: 2, height: 1, decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
@@ -211,12 +236,25 @@ metadata {
         valueTile("spl_indices", "device.splIndices", decoration: "flat") {
             state "default", label: '', icon: "st.quirky.spotter.quirky-spotter-sound-on"
         }
+        
+        valueTile("power_label", "", decoration: "flat") {
+            state "default", label: 'POWER'
+        }
+        
+        valueTile("battery", "device.battery", decoration: "flat") {
+			state "default", label: '${currentValue}%'
+		}
+        
+        valueTile("powerSource", "device.powerSource", decoration: "flat") {
+			state "dc", label: "Plugged"
+            state "battery", label: "Battery"
+		}
 
-        valueTile("display_label", "", width: 5, height: 1, decoration: "flat") {
+        valueTile("display_label", "", width: 1, height: 1, decoration: "flat") {
             state "default", label: 'Display'
         }
 
-        valueTile("display_value", "device.displayMode", width: 3, height: 1, decoration: "flat") {
+        valueTile("display_value", "device.displayMode", width: 1, height: 1, decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
@@ -406,15 +444,13 @@ metadata {
 
         main(["airQuality"])
         details(["airQuality",
-                 "awairUUID_label", "awairUUID",
                  "temperature_indices", "temperature_label", "temperature_value", "humidity_indices", "humidity_label", "humidity_value",
                  "co2_indices", "co2_label", "co2_value", "voc_indices", "voc_label", "voc_value",
-                 "pm25_indices", "pm25_label", "pm25_value", "pm10_indices", "pm10_label", "pm10_value",
-                 "lux_indices", "lux_label", "lux_value", "spl_indices", "spl_label", "spl_value",
-                 "display_label", "mode_score",
+                 "pm25_indices", "pm25_label", "pm25_value", "lux_indices", "lux_label", "lux_value", 
+                 "spl_indices", "spl_label", "spl_value", "power_label", "powerSource", "battery",
+                 "display_label", "display_value", "awairUUID_label", "awairUUID", "mode_score",
                  "mode_temp", "mode_humi", "mode_co2", "mode_voc", "mode_pm25", "mode_clock",
-                 "led_label", "led_off", "led_sleep", "led_auto", "led_manual", "led_level",
-                 "knocking_label", "knocking_on", "knocking_off", "knocking_sleep", "blank_tile", "blank_tile",
+                 "led_label", "led_value", "led_off", "led_sleep", "led_auto", "led_level",
                  "color_infos", "refresh_air_value",
                  "cai_infos", "cai_0_value", "cai_1_value", "cai_2_value", "cai_3_value", "cai_4_value",
                  "pm25_who_infos", "pm25_who", "pm25_who_1_value", "pm25_who_2_value", "pm25_who_3_value", "pm25_who_4_value",
@@ -450,7 +486,7 @@ def refresh() {
     log.debug "refresh()"
     unschedule()
 
-	sendEvent(name: "awairUUID", value: "${device.deviceNetworkId}")
+    sendEvent(name: "awairUUID", value: "${device.deviceNetworkId}")
 
     pullData()
 
@@ -458,15 +494,6 @@ def refresh() {
 
     log.debug "airHealthCheckInterval $airHealthCheckInterval"
     schedule("0 0/$airHealthCheckInterval * * * ?", pullData)
-    
-    def UUID = device.deviceNetworkId
-    def awairDeviceType = UUID.split('_')[0]
-    switch (awairDeviceType) {
-        case "awair-r2" : setDeviceType("Awair-R2"); break;
-        case "awair-mint" : setDeviceType("Awair-Mint"); break;
-        case "awair-omni" : setDeviceType("Awair-Omni"); break;
-        case "awair" : setDeviceType("Awair-R1"); break;
-    }
 }
 
 def command2AwairLedSleep() {
@@ -537,7 +564,7 @@ def command2awair(def commandType) {
             break
         case "ledAuto":
             endpoint = "led"
-            jsonData = new JsonBuilder("mode": "auto", "brightness": 20)
+            jsonData = new JsonBuilder("mode": "auto")
             break
         case "ledOff":
             endpoint = "led"
@@ -592,6 +619,15 @@ def command2awair(def commandType) {
     parent.command2awair(device.deviceNetworkId, endpoint, jsonData)
 }
 
+def co2homekitNotice(co2ppm) {
+    log.debug "Notice CO2 : ${co2ppm}"
+    if (co2ppm > co2homekit) {
+    	sendEvent(name: "co2notice", value: "notice")
+    } else {
+    	sendEvent(name: "co2notice", value: "unnotice")
+    }
+}
+
 def ledLevel(level) {
     log.debug "ledLevel() : ${level}"
     state.ledLevel = level
@@ -602,8 +638,8 @@ def ledLevel(level) {
 def pullData() {
     log.debug "pullData() : ${device.deviceNetworkId}"
     parent.pullAirData(device.deviceNetworkId)
-    //parent.pullDisplayMode(device.deviceNetworkId)
-    //parent.pullLedMode(device.deviceNetworkId)
+    parent.pullDisplayMode(device.deviceNetworkId)
+    parent.pullLedMode(device.deviceNetworkId)
     //parent.pullKnockingMode(device.deviceNetworkId)
-    //parent.pullPowerStatus(device.deviceNetworkId)
+    parent.pullPowerStatus(device.deviceNetworkId)
 }
