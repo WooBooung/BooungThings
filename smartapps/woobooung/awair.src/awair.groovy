@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.8.20190522" }
+public static String version() { return "v0.0.9.20190606" }
 /*
+ *  2019/06/06 >>> v0.0.9.20190606 - Added Awair-Omni
  *  2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking
  *  2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
  *  2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor(Only for Awair-R1)
@@ -348,7 +349,7 @@ private updateChildDeviceAirData(UUID, airLatestData) {
             }
         }
 
-        childDevice?.sendEvent(name: "data_time", value: now)
+        childDevice?.sendEvent(name: "data_time", value: now,  displayed: false)
     } else {
         childDevice?.sendEvent(name: "data_time", value: "$now\n!!! Error - Data is empty !!!")
     }
@@ -412,7 +413,7 @@ private updateChildDevicePowerData(UUID, responseData) {
         log.debug "updateChildDevicePowerData : ${responseData}"
 
         childDevice?.sendEvent(name: "battery", value: responseData.percentage as Integer, unit: "%")
-        childDevice?.sendEvent(name: "powerSource", value: responseData.plugged ? "db" : "battery")
+        childDevice?.sendEvent(name: "powerSource", value: responseData.plugged ? "dc" : "battery")
     }
 }
 
