@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.9.20190606" }
+public static String version() { return "v0.0.10.20190606" }
 /*
+ *  2019/06/06 >>> v0.0.10.20190606 - Added API Call Count in Awair SmartApp Page
  *  2019/06/06 >>> v0.0.9.20190606 - Added Awair-Omni
  *  2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking
  *  2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
@@ -44,6 +45,7 @@ preferences {
     page(name: "mainPage")
     page(name: "installPage")
     page(name: "userInfoPage")
+    page(name: "apiCallInfoPage")
 }
 
 def installed() {
@@ -104,8 +106,11 @@ def mainPage() {
 
                 section("Devices :") {
                     state.devices.each { device ->
-                        paragraph "name : ${device.name}\ndeviceType: ${device.deviceType}\ndeviceId: ${device.deviceId}\ndeviceUUID: ${device.deviceUUID}\nlocationName: ${device.locationName}"
+                        //paragraph "deviceName : ${device.name}\ndeviceType: ${device.deviceType}\ndeviceId: ${device.deviceId}\ndeviceUUID: ${device.deviceUUID}\nlocationName: ${device.locationName}"
+                        paragraph "name : ${device.name}\ndeviceUUID: ${device.deviceUUID}"
                     }
+                    
+                    href "apiCallInfoPage", title: "API Call Info", description: "Show detail API Call info"
                 }
 
                 section("Available attributes", hideable: true, hidden: true) {
@@ -144,10 +149,24 @@ def userInfoPage() {
             paragraph "Tier : ${state.userInfos.tier}"
             paragraph "Polling Interval : ${getRefreshIntervalTime()} Min"
         }
+    }
+}
 
-        section("API Call limit count", hideable: true, hidden: true) {
+def apiCallInfoPage() {
+	log.debug "apiCallInfoPage"
+    dynamicPage(name: "userInfoPage", title: "", uninstall: false, install: false) {
+    	section("API Call Limit Info", hideable: true, hidden: true) {
             state.userInfos?.permissions.each { permission ->
                 paragraph "${permission.scope} : ${permission.quota}"
+            }
+        }
+
+        state.devices.each { device ->
+            section("API USAGES - ${device.name}") {
+                def usagesData = getApiUsages(device.deviceUUID)
+                usagesData?.usages.each { usage ->
+                    paragraph "${usage.scope} : ${usage.usage}"
+                }
             }
         }
     }
@@ -223,6 +242,30 @@ private getDevices() {
     } catch (e) {
         log.error e.getResponse().getData()
     }
+}
+
+private getApiUsages(UUID) {
+    log.debug "getApiUsages()"
+    def awairDeviceType = UUID.split('_')[0]
+    def awairDeviceId = UUID.split('_')[1]
+
+    def params = [
+            uri    : "https://developer-apis.awair.is",
+            path   : "/v1/users/self/devices/${awairDeviceType}/${awairDeviceId}/api-usages",
+            headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
+    ]
+
+	def usageData
+    try {
+        httpGet(params) { resp ->
+            //log.debug "${resp.data}"
+            usageData = resp.data
+        }
+    } catch (e) {
+        log.error e.getResponse().getData()
+    }
+    
+    return usageData
 }
 
 def getRefreshIntervalTime() {
@@ -349,7 +392,7 @@ private updateChildDeviceAirData(UUID, airLatestData) {
             }
         }
 
-        childDevice?.sendEvent(name: "data_time", value: now,  displayed: false)
+        childDevice?.sendEvent(name: "data_time", value: now, displayed: false)
     } else {
         childDevice?.sendEvent(name: "data_time", value: "$now\n!!! Error - Data is empty !!!")
     }
