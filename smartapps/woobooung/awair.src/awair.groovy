@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.10.20190606" }
+public static String version() { return "v0.0.11.20190612" }
 /*
+ *  2019/06/12 >>> v0.0.11.20190612 - Prevent duplication post command
  *  2019/06/06 >>> v0.0.10.20190606 - Added API Call Count in Awair SmartApp Page
  *  2019/06/06 >>> v0.0.9.20190606 - Added Awair-Omni
  *  2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking
@@ -274,12 +275,53 @@ def getRefreshIntervalTime() {
 }
 
 def command2awair(UUID, endpoint, commandData) {
+	def childDevice = getChildDevice(UUID)
+	
     def awairDeviceType = UUID.split('_')[0]
     def awairDeviceId = UUID.split('_')[1]
 
     def jsonBody = commandData.toString()
-    log.debug "${UUID} Http Put endpoint: ${endpoint} body: ${jsonBody}"
+    def mapData = new JsonSlurper().parseText(jsonBody)
+	if (mapData) {
+    	def isNeedPost = true
+        def mode = mapData.mode
+        
+        switch (endpoint) {
+            case "display":
+				if (childDevice?.currentState("displayMode").value == mode) {
+					isNeedPost = false
+				}
+            	break
+            case "led":
+                if (mode.toUpperCase() == "MANUAL") {
+                    def ledLevel = mapData.brightness as Integer
+                    def currentLedLevel = childDevice?.currentState("ledLevel").value
+                    def currentMode = childDevice?.currentState("ledMode").value
+                    if ((currentMode == "MANUAL") && ("${ledLevel}" == "0") && ("${currentLedLevel}" == "0")) {
+                        isNeedPost = false
+                    }
+                } else {
+                    if (childDevice?.currentState("ledMode").value == mode.toUpperCase()) {
+                        isNeedPost = false
+                    }
+                }
+                break
+            case "knocking":
+            	if (childDevice?.currentState("knockingMode").value == mode.toUpperCase()) {
+					isNeedPost = false
+				}
+            	break
+        }
+        
+        if (!isNeedPost) {
+        	log.trace "[Skip] command2awair ${endpoint}: Need not PUT request - ${mapData}"
+        	return
+        }
+    }
+
+	log.debug "${UUID} Http Put endpoint: ${endpoint} body: ${jsonBody}"
     log.debug "https://developer-apis.awair.is/v1/devices/${awairDeviceType}/${awairDeviceId}/${endpoint}"
+
 
     def params = [
             uri    : "https://developer-apis.awair.is/v1/devices/${awairDeviceType}/${awairDeviceId}/${endpoint}",
@@ -290,7 +332,7 @@ def command2awair(UUID, endpoint, commandData) {
     try {
         httpPut(params) { resp ->
             log.debug "command2awair>> resp: ${resp.data}"
-            def mapData = new JsonSlurper().parseText(jsonBody)
+            
             switch (endpoint) {
                 case "display":
                     updateChildDeviceDisplayMode(UUID, mapData)
@@ -423,7 +465,7 @@ private updateChildDeviceLedMode(UUID, responseData) {
     if (responseData) {
         log.debug "updateChildDeviceLedMode : ${responseData}"
         childDevice?.sendEvent(name: "ledMode", value: responseData.mode.toUpperCase())
-        if (responseData.mode == "MANUAL") {
+        if (responseData.mode.toUpperCase() == "MANUAL") {
         	childDevice?.sendEvent(name: "ledLevel", value: responseData.brightness as Integer)
         }
     }
@@ -455,8 +497,8 @@ private updateChildDevicePowerData(UUID, responseData) {
     if (responseData) {
         log.debug "updateChildDevicePowerData : ${responseData}"
 
-        childDevice?.sendEvent(name: "battery", value: responseData.percentage as Integer, unit: "%")
         childDevice?.sendEvent(name: "powerSource", value: responseData.plugged ? "dc" : "battery")
+        childDevice?.sendEvent(name: "battery", value: responseData.plugged ? 100 : responseData.percentage as Integer, unit: "%")
     }
 }
 
