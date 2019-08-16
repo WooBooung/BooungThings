@@ -19,8 +19,9 @@
  *
  *  Version history
 */
-public static String version() { return "v0.0.4.20190426" }
+public static String version() { return "v0.0.5.20190816" }
 /*
+ *	2019/08/16 >>> v0.0.5.20190816 - fixed bug updateTodayDate() oobe case
  *	2019/04/26 >>> v0.0.4.20190426 - Modified checkOffday()
  */
 
@@ -90,6 +91,7 @@ def mainPage() {
         }
     } else {
         def days = getDayOfWeek()
+		updateTodayDate()
 
 		return dynamicPage(name: "mainPage", uninstall: true) {
                     log.debug "authToken ${state.authToken} found."
