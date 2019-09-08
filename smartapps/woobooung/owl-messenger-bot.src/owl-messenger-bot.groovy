@@ -53,7 +53,7 @@ def mainPage() {
 		}
 		def anythingSet = anythingSet()
 		if (anythingSet) {
-			section("Play message when"){
+			section("Send message when"){
 				ifSet "motion", "capability.motionSensor", title: "Motion Here", required: false, multiple: true
 				ifSet "contact", "capability.contactSensor", title: "Contact Opens", required: false, multiple: true
 				ifSet "contactClosed", "capability.contactSensor", title: "Contact Closes", required: false, multiple: true
