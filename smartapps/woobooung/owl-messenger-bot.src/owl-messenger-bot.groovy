@@ -29,8 +29,8 @@ definition(
 	author: "Booung",
 	description: "Send a message through your messenger bot when the mode changes or other events occur.",
 	category: "Convenience",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/mail_contact.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/mail_contact@2x.png"
+    iconUrl: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/tobotowl.jpg",
+    iconX2Url: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/tobotowl.jpg"
 )
 
 preferences {
