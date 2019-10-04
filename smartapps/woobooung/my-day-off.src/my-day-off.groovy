@@ -19,9 +19,10 @@
  *
  *  Version history
 */
-public static String version() { return "v0.0.5.20190816" }
+public static String version() { return "v0.0.6.20191005" }
 /*
- *	2019/08/16 >>> v0.0.5.20190816 - fixed bug updateTodayDate() oobe case
+ *	2019/10/05 >>> v0.0.6.20191005 - Added tag #workday (feat. Naver cafe 럽2유3)
+ *	2019/08/16 >>> v0.0.5.20190816 - Fixed bug updateTodayDate() OOBE case
  *	2019/04/26 >>> v0.0.4.20190426 - Modified checkOffday()
  */
 
@@ -38,7 +39,7 @@ definition(
         iconX3Url: "https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-512.png",
         oauth: true,
         singleInstance: true,
-        usesThirdPartyAuthentication: true,
+        usesThirdPartyAuthentication: false,
         pausable: false
 ) {
     appSetting "clientId"
@@ -116,7 +117,9 @@ def mainPage() {
                 
                 if (privateCalendars) {
                     section {                               
-                         paragraph "> How to tagging < \r\n\r\nwhen you create a schedule in Google Calendar.\r\n\r\nAdd the tag ${getTagdayFilter()} in the memo or notes field"
+                         paragraph "> How to tagging for Dayoff < \r\n\r\nwhen you create a schedule in Google Calendar.\r\n\r\nAdd the tag ${getTagDayOffFilter()} in the memo or notes field"
+                         paragraph "> How to tagging for Workday < \r\n\r\nAdd the tag ${getTagWorkDayFilter()} in the memo or notes field"
+                         paragraph "> Example < \r\n\r\nToday holyday, but you must go to work today..... \r\n\r\nAdd the tag ${getTagWorkDayFilter()} in the memo or notes field\r\n\r\nThis case ignored Holydays or dayoffs"
                     }
                 }
 
@@ -135,8 +138,12 @@ def mainPage() {
         }
 }
 
-def getTagdayFilter() {
+def getTagDayOffFilter() {
 	return "#dayoff"
+}
+
+def getTagWorkDayFilter() {
+	return "#workday"
 }
 
 def getCurrentTime() {
@@ -285,16 +292,18 @@ def pullData() {
     
     def isDayOff = checkDayoff()
     def isHoliday = checkHoliday()
-    def isTagday = checkTagday()
+    checkTagDay()
+    def isTagDayOff = (state.tagDayOffCheck != "N/A")
+    def isTagWorkDay = (state.tagWorkDayCheck != "N/A")
   
-    if (isDayOff || isHoliday || isTagday) {
+    if ((isDayOff || isHoliday || isTagDayOff) && !isTagWorkDay) {
         device?.on()
         log.debug "device on"
     } else {
     	device?.off()
         log.debug "device off"
     }
-    device?.updateCheckData(state.dayOffCheck, state.holidayCheck, state.tagdayCheck)
+    device?.updateCheckData(state.dayOffCheck, state.holidayCheck, state.tagDayOffCheck, state.tagWorkDayCheck)
     def allNextTagdays = getNextTagdays()
     device?.updateNextTagdays(allNextTagdays)
 }
@@ -366,20 +375,17 @@ boolean checkHoliday() {
    return result
 }
 
-boolean checkTagday() {
+def checkTagDay() {
 	boolean result = false
-    state.tagdayCheck = "N/A"
+    state.tagDayOffCheck = "N/A"
+    state.tagWorkDayCheck = "N/A"
 	settings.privateCalendars.each {
-        if (checkTagday(it)) {
-        	result = true
-        }
+       	checkTagDay(it)
     }
-
-	return result
 }
 
-boolean checkTagday(privateCalendar) {
-    log.debug "checkTagday() ${privateCalendar}"
+def checkTagDay(privateCalendar) {
+    log.debug "checkTagDay() ${privateCalendar}"
 
     def pathParams = [
         timeMin: getTodayStartTime(),
@@ -393,7 +399,7 @@ boolean checkTagday(privateCalendar) {
         query: pathParams
     ]
 
-    log.debug "checkTagday event params: $eventListParams"
+    log.debug "checkTagDay event params: $eventListParams"
 
     def events = []
     try {
@@ -404,21 +410,20 @@ boolean checkTagday(privateCalendar) {
         log.error e.getResponse().getData()
     }
 
-   log.debug "checkTagday ${privateCalendar} : ${events.items}"
+   log.debug "checkTagDay ${privateCalendar} : ${events.items}"
    
-   boolean result = false
    events.items.each {
-   		if (it.description?.contains(getTagdayFilter())) {
-        	result = true
-            state.tagdayCheck = "${it.summary}"
-	   		log.debug "checkTagday event O : ${it.summary} ${it.start.date}"
+   		log.debug "checkTagDay event : ${it.summary} ${it.description}"
+   		if (it.description?.contains(getTagDayOffFilter())) {
+            state.tagDayOffCheck = "${it.summary}"
+	   		log.debug "checkTagDayOff event O : ${it.summary} ${it.start.date}"
         } 
-        else {
-	        log.debug "checkTagday event X: ${it.summary} ${it.description}"
-        }
+        
+        if (it.description?.contains(getTagWorkDayFilter())) {
+            state.tagWorkDayCheck = "${it.summary}"
+	   		log.debug "checkTagWorkDay event O : ${it.summary} ${it.start.date}"
+        } 
    }
-
-   return result
 }
 
 def getNextTagdays() {
@@ -439,7 +444,7 @@ def getNextTagdays(privateCalendar) {
         singleEvents: true,
         maxResults: 1,
         orderBy : "starttime",
-        q: getTagdayFilter()
+        q: getTagDayOffFilter()
     ]
 
 	def eventListParams = [
