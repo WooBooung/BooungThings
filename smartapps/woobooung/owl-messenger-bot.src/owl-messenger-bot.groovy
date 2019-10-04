@@ -19,10 +19,11 @@
  *
  *  Version history
 */
-public static String version() { return "v0.0.1.20190908" }
+public static String version() { return "v0.0.2.20191004" }
 /*
+ *	2019/10/04 >>> v0.0.2.20191004 - Add lock, unlock
  *	2019/09/08 >>> v0.0.1.20190908 - Init App
-  */
+ */
 definition(
 	name: "Owl Messenger Bot",
 	namespace: "WooBooung",
@@ -64,6 +65,8 @@ def mainPage() {
 				ifSet "departurePresence", "capability.presenceSensor", title: "Departure Of", required: false, multiple: true
 				ifSet "smoke", "capability.smokeDetector", title: "Smoke Detected", required: false, multiple: true
 				ifSet "water", "capability.waterSensor", title: "Water Sensor Wet", required: false, multiple: true
+                ifSet "lock", "capability.lock", title: "Locked", required: false, multiple: true
+                ifSet "unlock", "capability.lock", title: "Unlocked", required: false, multiple: true
 				ifSet "button1", "capability.button", title: "Button Press", required:false, multiple:true 
 				ifSet "triggerModes", "mode", title: "System Changes Mode", required: false, multiple: true
 				ifSet "timeOfDay", "time", title: "At a Scheduled Time", required: false
@@ -82,6 +85,8 @@ def mainPage() {
 			ifUnset "departurePresence", "capability.presenceSensor", title: "Departure Of", required: false, multiple: true
 			ifUnset "smoke", "capability.smokeDetector", title: "Smoke Detected", required: false, multiple: true
 			ifUnset "water", "capability.waterSensor", title: "Water Sensor Wet", required: false, multiple: true
+			ifUnset "lock", "capability.lock", title: "Locked", required: false, multiple: true
+			ifUnset "unlock", "capability.lock", title: "Unlocked", required: false, multiple: true
 			ifUnset "button1", "capability.button", title: "Button Press", required:false, multiple:true //remove from production
 			ifUnset "triggerModes", "mode", title: "System Changes Mode", description: "Select mode(s)", required: false, multiple: true
 			ifUnset "timeOfDay", "time", title: "At a Scheduled Time", required: false
@@ -108,7 +113,7 @@ def mainPage() {
 }
 
 private anythingSet() {
-	for (name in ["motion","contact","contactClosed","acceleration","mySwitch","mySwitchOff","arrivalPresence","departurePresence","smoke","water","button1","timeOfDay","triggerModes","timeOfDay"]) {
+	for (name in ["motion","contact","contactClosed","acceleration","mySwitch","mySwitchOff","arrivalPresence","departurePresence","smoke","water","lock","unlock","button1","timeOfDay","triggerModes","timeOfDay"]) {
 		if (settings[name]) {
 			return true
 		}
@@ -160,6 +165,8 @@ def subscribeToEvents() {
 	subscribe(smoke, "smoke.tested", eventHandler)
 	subscribe(smoke, "carbonMonoxide.detected", eventHandler)
 	subscribe(water, "water.wet", eventHandler)
+	subscribe(lock, "lock.locked", eventHandler)
+	subscribe(unlock, "lock.unlocked", eventHandler)
 	subscribe(button1, "button.pushed", eventHandler)
 
 	if (triggerModes) {
