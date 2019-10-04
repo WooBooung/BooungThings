@@ -19,8 +19,9 @@
  *
  *  Version history
 */
-public static String version() { return "v0.0.4.20190426" }
+public static String version() { return "v0.0.6.20191005" }
 /*
+ *	2019/10/05 >>> v0.0.6.20191005 - Added tag #workday (feat. Naver cafe 럽2유3)
  *	2019/04/26 >>> v0.0.4.20190426 - Added polling interval preference
  */
 metadata {
@@ -31,7 +32,8 @@ metadata {
 
         attribute "dayOffCheck", "string"
         attribute "holidayCheck", "string"
-        attribute "tagdayCheck", "string"
+        attribute "tagDayOffCheck", "string"
+        attribute "tagWorkDayCheck", "string"
         attribute "nextTagdays", "string"
         
         attribute "lastCheckin", "Date"
@@ -71,16 +73,24 @@ metadata {
             state "default", label: '${currentValue}'
         }
         
-		valueTile("tagdayCheckLabel", "", decoration: "flat", width: 2, height: 1) {
-            state "default", label: 'Tagday Check'
+        valueTile("tagDayOffCheckLabel", "", decoration: "flat", width: 2, height: 1) {
+            state "default", label: 'TagDayOff Check'
         }
         
-        valueTile("tagdayCheck", "device.tagdayCheck", decoration: "flat", width: 4, height: 1) {
+        valueTile("tagDayOffCheck", "device.tagDayOffCheck", decoration: "flat", width: 4, height: 1) {
+            state "default", label: '${currentValue}'
+        }
+        
+        valueTile("tagWorkDayCheckLabel", "", decoration: "flat", width: 2, height: 1) {
+            state "default", label: 'TagWorkDay Check'
+        }
+        
+        valueTile("tagWorkDayCheck", "device.tagWorkDayCheck", decoration: "flat", width: 4, height: 1) {
             state "default", label: '${currentValue}'
         }
         
         valueTile("nextTagdaysLabel", "", decoration: "flat", width: 2, height: 1) {
-            state "default", label: 'Next Tag days'
+            state "default", label: 'Next #dayoff'
         }
         
         valueTile("nextTagdays", "device.nextTagdays", decoration: "flat", width: 4, height: 1) {
@@ -109,14 +119,15 @@ def updated() {
 
 def updateLastTime(){
 	def now = new Date().format("yyyy-MM-dd HH:mm:ss EEE", location.timeZone)
-    sendEvent(name: "lastCheckin", value: now)
+    sendEvent(name: "lastCheckin", value: now, displayed: false)
 }
 
-def updateCheckData(String dayOffCheck, String holidayCheck, String tagdayCheck){
+def updateCheckData(String dayOffCheck, String holidayCheck, String tagDayOffCheck, String tagWorkDayCheck){
     log.trace "updated check datas"
     sendEvent(name: "dayOffCheck", value: dayOffCheck)
     sendEvent(name: "holidayCheck", value: holidayCheck)
-    sendEvent(name: "tagdayCheck", value: tagdayCheck)
+    sendEvent(name: "tagDayOffCheck", value: tagDayOffCheck)
+    sendEvent(name: "tagWorkDayCheck", value: tagWorkDayCheck)
 }
 
 def updateNextTagdays(ArrayList nextTagdays) {
