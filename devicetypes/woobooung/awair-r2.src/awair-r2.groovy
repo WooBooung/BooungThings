@@ -41,7 +41,6 @@ Awair: on, dim ,sleep
 Awair-r2, Mint, Omni: auto, manual, sleep
 */
 		attribute "ledMode", "enum", ["AUTO", "MANUAL", "SLEEP"] 
-        
 /*
 Display mode to be set. Available values:
 
@@ -278,7 +277,7 @@ Awair,Awair-r2 : on, off, sleep
             state "default", label: "manual", action: "command2AwairLedManual", icon: "st.illuminance.illuminance.bright", backgroundColor: "#ff93ac"
         }
 
-        controlTile("led_level", "device.ledLevel", "slider", width: 1, height: 1, range: "(1..100)") {
+        controlTile("led_level", "device.ledLevel", "slider", width: 1, height: 1, range: "(0..100)") {
             state "ledLevel", action: "ledLevel", icon: "st.illuminance.illuminance.bright"
         }
 
@@ -604,7 +603,6 @@ def command2awair(def commandType) {
 }
 
 def co2homekitNotice(co2ppm) {
-    log.debug "Notice CO2 : ${co2ppm}"
     if (co2ppm > co2homekit) {
     	sendEvent(name: "co2notice", value: "notice")
     } else {

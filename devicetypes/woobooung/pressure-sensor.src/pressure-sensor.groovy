@@ -24,6 +24,7 @@ metadata {
 		capability "Battery"
         capability "Presence Sensor"
 		capability "Temperature Measurement"
+        capability "Refresh"
 		capability "Health Check"
 		capability "Sensor"
 
@@ -50,6 +51,9 @@ metadata {
 					"http://cdn.device-gse.smartthings.com/Moisture/Moisture3.png"
 			])
 		}
+        section {
+			input "presentStayTime", "number", title: "not present interval (in seconds).", description: "default 30 sec", value:30, displayDuringSetup: false
+        }
 		section {
 			input title: "Temperature Offset", description: "This feature allows you to correct any temperature variations by selecting an offset. Ex: If your sensor consistently reports a temp that's 5 degrees too warm, you'd enter '-5'. If 3 degrees too cold, enter '+3'.", displayDuringSetup: false, type: "paragraph", element: "paragraph"
 			input "tempOffset", "number", title: "Degrees", description: "Adjust temperature by this many degrees", range: "*..*", displayDuringSetup: false
@@ -85,6 +89,11 @@ metadata {
 		main(["presence", "temperature"])
 		details(["presence", "temperature", "battery", "refresh"])
 	}
+}
+
+def delayPost(){
+  log.debug "------delay Post NotPresent------"
+   // sendEvent(name : 'presence', value : 'not present')
 }
 
 private List<Map> collectAttributes(Map descMap) {
@@ -148,7 +157,7 @@ def parse(String description) {
 		map.translatable = true
 	}
 
-	log.debug "Parse returned $map"
+	
 	def result = map ? createEvent(map) : [:]
 
 	if (description?.startsWith('enroll request')) {
@@ -156,6 +165,9 @@ def parse(String description) {
 		log.debug "enroll response: ${cmds}"
 		result = cmds?.collect { new physicalgraph.device.HubAction(it) }
 	}
+    
+    log.debug "Parse returned $result"
+    
 	return result
 }
 
@@ -166,6 +178,11 @@ private Map parseIasMessage(String description) {
 }
 
 private Map translateZoneStatus(ZoneStatus zs) {
+          if (zs.isAlarm1Set())  {  
+          log.debug "========runIn=============="
+          runIn(30, 'delayPost', [overwrite: true])
+          
+          }
 	return zs.isAlarm1Set() ? getMoistureResult('present') : getMoistureResult('not present')
 }
 
@@ -223,19 +240,50 @@ private Map getBatteryPercentageResult(rawValue) {
 	return result
 }
 
+
+
 private Map getMoistureResult(value) {
-	log.debug "presence"
-	def descriptionText
-	if (value == "present")
-		descriptionText = '{{ device.displayName }} is present'
-	else
-		descriptionText = '{{ device.displayName }} is not present'
+	log.debug "${value}"
+    
+    def map = [:]
+    
+    def descriptionText
+    long presentStayTimeMs = settings.presentStayTime * 1000
+    
+	if (value == "present") {
+        //unschedule()
+		//descriptionText = '{{ device.displayName }} is present'
+        //state.lastTime = now()
+        //runIn(60, delayPostNotPresent, [overwrite: true])
+	} 
+    
+    //else {
+    
+    	//descriptionText = '{{ device.displayName }} is not present'
+    	
+        /*
+        long nowUnixTime = now()
+        
+        long diffTimeMs = nowUnixTime - state.lastTime
+        log.trace "last time : ${state.lastTime} now : ${nowUnixTime} diff : ${diffTimeMs} presentStayTimeMs: ${presentStayTimeMs}"
+        if (diffTimeMs < presentStayTimeMs) {
+        	Date nowDate = new Date(nowUnixTime)
+        	Date nextDate = new Date(nowUnixTime + presentStayTimeMs)
+        	log.trace "${nowDate.toString()} not yet over time ${nextDate.toString()}"
+            runIn(presentStayTimeMs, delayPostNotPresent, [overwrite: true])
+        	return [:]
+        }
+        */
+        
+    //}
+
 	return [
 			name           : 'presence',
 			value          : value,
-			descriptionText: descriptionText
-	]
+			descriptionText: "{{ device.displayName }} is ${value}"
+		]
 }
+
 
 /**
  * PING is used by Device-Watch in attempt to reach the Device

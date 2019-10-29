@@ -13,6 +13,7 @@
  */
 
 /*
+ *    2019/10/29 >>> v0.0.2.20191029 - Modified motion
  *    2019/10/29 >>> v0.0.1.20191029 - Initialize Super Virtual Device
  */
 metadata {
@@ -34,8 +35,6 @@ metadata {
 
         command "sound_detected"
         command "sound_clear"
-        command "motion_active"
-        command "motion_inactive"
         command "human1"
         command "human2"
         command "smoke_detected"
