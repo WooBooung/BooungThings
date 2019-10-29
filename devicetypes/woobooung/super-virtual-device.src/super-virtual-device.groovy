@@ -13,6 +13,7 @@
  */
 
 /*
+ *    2019/10/29 >>> v0.0.3.20191029 - Add capability power, temperature, humidity
  *    2019/10/29 >>> v0.0.2.20191029 - Modified motion
  *    2019/10/29 >>> v0.0.1.20191029 - Initialize Super Virtual Device
  */
@@ -22,16 +23,22 @@ metadata {
         capability "Presence Sensor"
         capability "Occupancy Sensor"
         capability "Carbon Monoxide Detector"
+        capability "Temperature Measurement"
+        capability "Relative Humidity Measurement"
+        capability "Power Meter"
         capability "Sound Sensor"
         capability "Object Detection"
         capability "Motion Sensor"
         capability "Contact Sensor"
         capability "Smoke Detector"
         capability "Water Sensor"
+
+        capability "Actuator"
         capability "Sensor"
         capability "Health Check"
 
         attribute "humanqty", "number"
+        attribute "temp_unit", "string"
 
         command "sound_detected"
         command "sound_clear"
@@ -53,6 +60,15 @@ metadata {
         command "off"
         command "active"
         command "inactive"
+
+        command "temp_up"
+        command "temp_down"
+        command "unitC"
+        command "unitF"
+        command "humi_up"
+        command "humi_down"
+        command "watt_up"
+        command "watt_down"
     }
 
     simulator {
@@ -123,7 +139,7 @@ metadata {
             state("not present", label:'not present', backgroundColor:"#e86d13", action: "not_present")
         }
 
-        standardTile("occupancy", "device.occupancy", canChangeBackground: true) {
+        standardTile("occupancy", "device.occupancy", canChangeBackground: true, decoration: "flat") {
             state("occupied", label:'${currentValue}', icon:"st.presence.tile.present", backgroundColor:"#00A0DC")
             state("unoccupied", label:'${currentValue}', icon:"st.presence.tile.not-present", backgroundColor:"#ffffff")
         }
@@ -134,6 +150,54 @@ metadata {
 
         standardTile("unoccupied", "device.occupancy", inactiveLabel: false, decoration: "flat") {
             state("unoccupied", label:'unoccupied', backgroundColor:"#e86d13", action: "unoccupied")
+        }
+
+        standardTile("power", "device.power") {
+            state("default", label:'${currentValue}W', icon:"st.Transportation.transportation6")
+        }
+
+        standardTile("watt_up", "device.power", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'+10 watt',  backgroundColor:"#00A0DC", action: "watt_up")
+        }
+
+        standardTile("watt_down", "device.power", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'-10 watt', backgroundColor:"#e86d13", action: "watt_down")
+        }
+
+        standardTile("humidity", "device.humidity") {
+            state("default", label:'${currentValue}%', icon:"st.Weather.weather12")
+        }
+
+        standardTile("humi_up", "device.humidity", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'+1%',  backgroundColor:"#00A0DC", action: "humi_up")
+        }
+
+        standardTile("humi_down", "device.humidity", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'-1%', backgroundColor:"#e86d13", action: "humi_down")
+        }
+
+        standardTile("temperature", "device.temperature") {
+            state("default", label:'${currentValue}°', icon:"st.Weather.weather2")
+        }
+
+        standardTile("temp_up", "device.temperature", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'+1°',  backgroundColor:"#00A0DC", action: "temp_up")
+        }
+
+        standardTile("temp_down", "device.temperature", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'-1°', backgroundColor:"#e86d13", action: "temp_down")
+        }
+
+        standardTile("tempUnit", "device.temp_unit") {
+            state("default", label:'°${currentValue}')
+        }
+
+        standardTile("unitC", "device.temperature", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'Unit C',  backgroundColor:"#00A0DC", action: "unitC")
+        }
+
+        standardTile("unitF", "device.temperature", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'Unit F', backgroundColor:"#e86d13", action: "unitF")
         }
     }
 }
@@ -150,6 +214,8 @@ def updated() {
 
 private initialize() {
     log.trace "Executing 'initialize'"
+
+    sendEvent(name: "temp_unit", value: "C")
     sendEvent(name: "supportedValues", value: "{\"value\": [\"human\"]}", displayed: false)
     sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
     sendEvent(name: "healthStatus", value: "online")
@@ -258,9 +324,67 @@ def unoccupied() {
 def on() {
     log.debug "switch_on()"
     sendEvent(name: "switch", value: "on")
+    sendEvent(name:"power", value: 100)
 }
 
 def off() {
     log.debug "switch_off()"
     sendEvent(name: "switch", value: "off")
+    sendEvent(name:"power", value: 0 )
+}
+
+def watt_up() {
+    def ts = device.currentState("power")
+    def value = ts ? ts.integerValue + 10 : 100 
+
+    sendEvent(name:"power", value: value )
+}
+
+def watt_down() {
+    def ts = device.currentState("power")
+    def value = ts ? ts.integerValue - 10 : 0 
+
+    if (value < 0) value = 0
+
+    sendEvent(name:"power", value: value)
+}
+
+def humi_up() {
+    def ts = device.currentState("humidity")
+    def value = ts ? ts.integerValue + 1 : 40 
+
+    sendEvent(name:"humidity", value: value )
+}
+
+def humi_down() {
+    def ts = device.currentState("humidity")
+    def value = ts ? ts.integerValue - 1 : 0 
+
+    if (value < 0) value = 0
+
+    sendEvent(name:"humidity", value: value)
+}
+
+def unitC() {
+    sendEvent(name: "temp_unit", value: "C")
+}
+
+def unitF() {
+    sendEvent(name: "temp_unit", value: "F")
+}
+
+def temp_up() {
+    def ts = device.currentState("temperature")
+    def value = ts ? ts.integerValue + 1 : 40 
+
+    def unit = device.currentState("temp_unit")
+    sendEvent(name:"temperature", value: value, unit: unit.stringValue)
+}
+
+def temp_down() {
+    def ts = device.currentState("temperature")
+    def value = ts ? ts.integerValue - 1 : 0 
+
+    def unit = device.currentState("temp_unit")
+    sendEvent(name:"temperature", value: value, unit: unit.stringValue)
 }
