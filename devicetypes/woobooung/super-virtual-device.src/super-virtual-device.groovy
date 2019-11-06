@@ -13,6 +13,7 @@
  */
 
 /*
+ *    2019/11/06 >>> v0.0.4.20191106 - Add capability Battery
  *    2019/10/29 >>> v0.0.3.20191029 - Add capability power, temperature, humidity
  *    2019/10/29 >>> v0.0.2.20191029 - Modified motion
  *    2019/10/29 >>> v0.0.1.20191029 - Initialize Super Virtual Device
@@ -32,6 +33,7 @@ metadata {
         capability "Contact Sensor"
         capability "Smoke Detector"
         capability "Water Sensor"
+        capability "Battery"
 
         capability "Actuator"
         capability "Sensor"
@@ -69,9 +71,19 @@ metadata {
         command "humi_down"
         command "watt_up"
         command "watt_down"
+        command "batt_up"
+        command "batt_down"
     }
 
     simulator {
+        status "open": "contact:open"
+        status "close": "contact:closed"
+        status "motion detected": "motion:active"
+        status "motion inactive": "motion:inactive"
+        status "present": "presence:present"
+        status "not present": "presence:not present"
+        status "occupied": "occupancy:occupied"
+        status "unoccupied": "occupancy:unoccupied"
     }
 
     tiles {
@@ -199,6 +211,18 @@ metadata {
         standardTile("unitF", "device.temperature", inactiveLabel: false, decoration: "flat") {
             state("default", label:'Unit F', backgroundColor:"#e86d13", action: "unitF")
         }
+
+        standardTile("battery", "device.battery") {
+            state("default", label:'${currentValue}% battery')
+        }
+
+        standardTile("batt_up", "device.battery", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'+5%',  backgroundColor:"#00A0DC", action: "batt_up")
+        }
+
+        standardTile("batt_down", "device.battery", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'-5%', backgroundColor:"#e86d13", action: "batt_down")
+        }
     }
 }
 
@@ -215,14 +239,19 @@ def updated() {
 private initialize() {
     log.trace "Executing 'initialize'"
 
+    sendEvent(name: "battery", value: 100, unit: "%")
     sendEvent(name: "temp_unit", value: "C")
     sendEvent(name: "supportedValues", value: "{\"value\": [\"human\"]}", displayed: false)
+
     sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
     sendEvent(name: "healthStatus", value: "online")
     sendEvent(name: "DeviceWatch-Enroll", value: [protocol: "cloud", scheme:"untracked"].encodeAsJson(), displayed: false)
 }
 
 def parse(String description) {
+    log.debug "parse() $description"
+    def pair = description.split(":")
+    createEvent(name: pair[0].trim(), value: pair[1].trim())
 }
 
 def smoke_detected() {
@@ -241,7 +270,7 @@ def sound_detected() {
 }
 
 def sound_clear() {
-    log.debug "not sound_clear()"
+    log.debug "sound_clear()"
     sendEvent(name: "sound", value: "not detected", descriptionText: "$device.displayName sound not detected")
 }
 
@@ -387,4 +416,22 @@ def temp_down() {
 
     def unit = device.currentState("temp_unit")
     sendEvent(name:"temperature", value: value, unit: unit.stringValue)
+}
+
+def batt_up() {
+    def ts = device.currentState("battery")
+    def value = ts ? ts.integerValue + 5 : 100 
+
+    if (value > 100) value = 100
+
+    sendEvent(name:"battery", value: value, unit: "%")
+}
+
+def batt_down() {
+    def ts = device.currentState("battery")
+    def value = ts ? ts.integerValue - 5 : 0 
+
+    if (value < 0) value = 0
+
+    sendEvent(name:"battery", value: value, unit: "%")
 }
