@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.11.20190612" }
+public static String version() { return "v0.0.12.20191224" }
 /*
+ *  2019/12/24 >>> v0.0.12.20191224 - Explicit pausable, and Fixed error in GetUserInfos
  *  2019/06/12 >>> v0.0.11.20190612 - Prevent duplication post command
  *  2019/06/06 >>> v0.0.10.20190606 - Added API Call Count in Awair SmartApp Page
  *  2019/06/06 >>> v0.0.9.20190606 - Added Awair-Omni
@@ -27,20 +28,21 @@ public static String version() { return "v0.0.11.20190612" }
  *	2019/05/07 >>> v0.0.2.20190507 - Modified data type of AirQualitySensor
  *	2019/05/05 >>> v0.0.1.20190505 - Initialize
  */
- 
+
 import groovy.json.*
-import groovy.json.JsonSlurper
+    import groovy.json.JsonSlurper
 
 definition(
-        name: "Awair",
-        namespace: "WooBooung",
-        author: "Booung",
-        description: "Awair for SmartThings",
-        category: "Health & Wellness",
-        singleInstance: true,
-        iconUrl: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/awair_large.png",
-        iconX2Url: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/awair_large.png",
-        iconX3Url: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/awair_large.png")
+    name: "Awair",
+    namespace: "WooBooung",
+    author: "Booung",
+    description: "Awair for SmartThings",
+    category: "Health & Wellness",
+    singleInstance: true,
+    pausable: false,
+    iconUrl: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/awair_large.png",
+    iconX2Url: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/awair_large.png",
+    iconX3Url: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/awair_large.png")
 
 preferences {
     page(name: "mainPage")
@@ -110,7 +112,7 @@ def mainPage() {
                         //paragraph "deviceName : ${device.name}\ndeviceType: ${device.deviceType}\ndeviceId: ${device.deviceId}\ndeviceUUID: ${device.deviceUUID}\nlocationName: ${device.locationName}"
                         paragraph "name : ${device.name}\ndeviceUUID: ${device.deviceUUID}"
                     }
-                    
+
                     href "apiCallInfoPage", title: "API Call Info", description: "Show detail API Call info"
                 }
 
@@ -154,9 +156,9 @@ def userInfoPage() {
 }
 
 def apiCallInfoPage() {
-	log.debug "apiCallInfoPage"
+    log.debug "apiCallInfoPage"
     dynamicPage(name: "userInfoPage", title: "", uninstall: false, install: false) {
-    	section("API Call Limit Info", hideable: true, hidden: true) {
+        section("API Call Limit Info", hideable: true, hidden: true) {
             state.userInfos?.permissions.each { permission ->
                 paragraph "${permission.scope} : ${permission.quota}"
             }
@@ -189,8 +191,8 @@ private addChildAwairDevices() {
         def existing = getChildDevice(device.deviceUUID)
         if (!existing) {
             def awairDthTypeName = "Awair"
-			switch (device.deviceType) {
-            	case "awair-r2" : awairDthTypeName = "Awair-R2"; break;
+            switch (device.deviceType) {
+                case "awair-r2" : awairDthTypeName = "Awair-R2"; break;
                 case "awair-mint" : awairDthTypeName = "Awair-Mint"; break;
                 case "awair" : awairDthTypeName = "Awair-R1"; break;
             }
@@ -206,20 +208,20 @@ private getUserInfo() {
     log.debug "getUserInfo()"
 
     def params = [
-            uri    : "https://developer-apis.awair.is",
-            path   : "/v1/users/self",
-            headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
+        uri    : "https://developer-apis.awair.is",
+        path   : "/v1/users/self",
+        headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
     ]
 
     try {
         httpGet(params) { resp ->
             //log.debug "${resp.data}"
             state.userInfos = resp.data
-        }
 
-        switch (state.userInfos?.tier.toLowerCase()) {
-            case "hobbyist": state.refreshInterval = 5; break;
-            default: state.refreshInterval = 1
+            switch (state.userInfos?.tier.toLowerCase()) {
+                case "hobbyist": state.refreshInterval = 5; break;
+                default: state.refreshInterval = 1
+            }
         }
     } catch (e) {
         log.error e.getResponse().getData()
@@ -230,9 +232,9 @@ private getDevices() {
     log.debug "getDevices()"
 
     def params = [
-            uri    : "https://developer-apis.awair.is",
-            path   : "/v1/users/self/devices",
-            headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
+        uri    : "https://developer-apis.awair.is",
+        path   : "/v1/users/self/devices",
+        headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
     ]
 
     try {
@@ -251,12 +253,12 @@ private getApiUsages(UUID) {
     def awairDeviceId = UUID.split('_')[1]
 
     def params = [
-            uri    : "https://developer-apis.awair.is",
-            path   : "/v1/users/self/devices/${awairDeviceType}/${awairDeviceId}/api-usages",
-            headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
+        uri    : "https://developer-apis.awair.is",
+        path   : "/v1/users/self/devices/${awairDeviceType}/${awairDeviceId}/api-usages",
+        headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
     ]
 
-	def usageData
+    def usageData
     try {
         httpGet(params) { resp ->
             //log.debug "${resp.data}"
@@ -265,7 +267,7 @@ private getApiUsages(UUID) {
     } catch (e) {
         log.error e.getResponse().getData()
     }
-    
+
     return usageData
 }
 
@@ -275,74 +277,74 @@ def getRefreshIntervalTime() {
 }
 
 def command2awair(UUID, endpoint, commandData) {
-	def childDevice = getChildDevice(UUID)
-	
+    def childDevice = getChildDevice(UUID)
+
     def awairDeviceType = UUID.split('_')[0]
     def awairDeviceId = UUID.split('_')[1]
 
     def jsonBody = commandData.toString()
     def mapData = new JsonSlurper().parseText(jsonBody)
-	if (mapData) {
-    	def isNeedPost = true
+    if (mapData) {
+        def isNeedPost = true
         def mode = mapData.mode
-        
+
         switch (endpoint) {
             case "display":
-				if (childDevice?.currentState("displayMode").value == mode) {
-					isNeedPost = false
-				}
-            	break
+            if (childDevice?.currentState("displayMode").value == mode) {
+                isNeedPost = false
+            }
+            break
             case "led":
-                if (mode.toUpperCase() == "MANUAL") {
-                    def ledLevel = mapData.brightness as Integer
-                    def currentLedLevel = childDevice?.currentState("ledLevel").value
-                    def currentMode = childDevice?.currentState("ledMode").value
-                    if ((currentMode == "MANUAL") && ("${ledLevel}" == "0") && ("${currentLedLevel}" == "0")) {
-                        isNeedPost = false
-                    }
-                } else {
-                    if (childDevice?.currentState("ledMode").value == mode.toUpperCase()) {
-                        isNeedPost = false
-                    }
+            if (mode.toUpperCase() == "MANUAL") {
+                def ledLevel = mapData.brightness as Integer
+                def currentLedLevel = childDevice?.currentState("ledLevel").value
+                def currentMode = childDevice?.currentState("ledMode").value
+                if ((currentMode == "MANUAL") && ("${ledLevel}" == "0") && ("${currentLedLevel}" == "0")) {
+                    isNeedPost = false
                 }
-                break
+            } else {
+                if (childDevice?.currentState("ledMode").value == mode.toUpperCase()) {
+                    isNeedPost = false
+                }
+            }
+            break
             case "knocking":
-            	if (childDevice?.currentState("knockingMode").value == mode.toUpperCase()) {
-					isNeedPost = false
-				}
-            	break
+            if (childDevice?.currentState("knockingMode").value == mode.toUpperCase()) {
+                isNeedPost = false
+            }
+            break
         }
-        
+
         if (!isNeedPost) {
-        	log.trace "[Skip] command2awair ${endpoint}: Need not PUT request - ${mapData}"
-        	return
+            log.trace "[Skip] command2awair ${endpoint}: Need not PUT request - ${mapData}"
+            return
         }
     }
 
-	log.debug "${UUID} Http Put endpoint: ${endpoint} body: ${jsonBody}"
+    log.debug "${UUID} Http Put endpoint: ${endpoint} body: ${jsonBody}"
     log.debug "https://developer-apis.awair.is/v1/devices/${awairDeviceType}/${awairDeviceId}/${endpoint}"
 
 
     def params = [
-            uri    : "https://developer-apis.awair.is/v1/devices/${awairDeviceType}/${awairDeviceId}/${endpoint}",
-            headers: ["Authorization": "Bearer ${state.awairToken}", "Content-Type": "application/json"],
-            body   : jsonBody
+        uri    : "https://developer-apis.awair.is/v1/devices/${awairDeviceType}/${awairDeviceId}/${endpoint}",
+        headers: ["Authorization": "Bearer ${state.awairToken}", "Content-Type": "application/json"],
+        body   : jsonBody
     ]
 
     try {
         httpPut(params) { resp ->
             log.debug "command2awair>> resp: ${resp.data}"
-            
+
             switch (endpoint) {
                 case "display":
-                    updateChildDeviceDisplayMode(UUID, mapData)
-                    break
+                updateChildDeviceDisplayMode(UUID, mapData)
+                break
                 case "led":
-                    updateChildDeviceLedMode(UUID, mapData)
-                    break
+                updateChildDeviceLedMode(UUID, mapData)
+                break
                 case "knocking":
-                    updateChildDeviceKnockingMode(UUID, mapData)
-                    break
+                updateChildDeviceKnockingMode(UUID, mapData)
+                break
             }
         }
     } catch (groovyx.net.http.HttpResponseException e) {
@@ -357,9 +359,9 @@ def pullAirData(UUID) {
     log.debug "pullData() awairDeviceType : ${awairDeviceType}   awairDeviceId : ${awairDeviceId}"
 
     def params = [
-            uri    : "https://developer-apis.awair.is",
-            path   : "/v1/users/self/devices/${awairDeviceType}/${awairDeviceId}/air-data/latest",
-            headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
+        uri    : "https://developer-apis.awair.is",
+        path   : "/v1/users/self/devices/${awairDeviceType}/${awairDeviceId}/air-data/latest",
+        headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
     ]
 
     def responseData = null
@@ -403,14 +405,14 @@ private updateChildDeviceAirData(UUID, airLatestData) {
         airLatestData.sensors.each {
             switch (it.comp) {
                 case "temp":
-                    Double tempDouble = it.value
-                    childDevice?.sendEvent(name: "temperature", value: tempDouble.round(1), unit: getTemperatureScale())
-                    break
+                Double tempDouble = it.value
+                childDevice?.sendEvent(name: "temperature", value: tempDouble.round(1), unit: getTemperatureScale())
+                break
                 case "humid": childDevice?.sendEvent(name: "humidity", value: it.value as Integer, unit: "%"); break
                 case "co2": 
-                	def co2ppm = it.value as Integer
-                    childDevice?.co2homekitNotice(co2ppm)
-                	childDevice?.sendEvent(name: "carbonDioxide", value: co2ppm, unit: "ppm"); break;
+                def co2ppm = it.value as Integer
+                childDevice?.co2homekitNotice(co2ppm)
+                childDevice?.sendEvent(name: "carbonDioxide", value: co2ppm, unit: "ppm"); break;
                 case "voc": childDevice?.sendEvent(name: "tvocLevel", value: it.value as Integer, unit: "ppb"); break;
                 case "pm25": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
                 case "pm10": childDevice?.sendEvent(name: "dustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
@@ -429,8 +431,8 @@ private updateChildDeviceAirData(UUID, airLatestData) {
                 case "pm25": childDevice?.sendEvent(name: "pm25Indices", value: Math.abs(it.value as Integer)); break;
                 case "pm10": childDevice?.sendEvent(name: "pm10Indices", value: Math.abs(it.value as Integer)); break;
                 case "dust": childDevice?.sendEvent(name: "pm25Indices", value: Math.abs(it.value as Integer)); break;
-            //case "lux" : childDevice?.sendEvent(name: "luxIndices", value: Math.abs(it.value as Integer)); break;
-            //case "spl_a" : childDevice?.sendEvent(name: "splIndices", value: Math.abs(it.value as Integer)); break;
+                //case "lux" : childDevice?.sendEvent(name: "luxIndices", value: Math.abs(it.value as Integer)); break;
+                //case "spl_a" : childDevice?.sendEvent(name: "splIndices", value: Math.abs(it.value as Integer)); break;
             }
         }
 
@@ -466,7 +468,7 @@ private updateChildDeviceLedMode(UUID, responseData) {
         log.debug "updateChildDeviceLedMode : ${responseData}"
         childDevice?.sendEvent(name: "ledMode", value: responseData.mode.toUpperCase())
         if (responseData.mode.toUpperCase() == "MANUAL") {
-        	childDevice?.sendEvent(name: "ledLevel", value: responseData.brightness as Integer)
+            childDevice?.sendEvent(name: "ledLevel", value: responseData.brightness as Integer)
         }
     }
 }
@@ -509,9 +511,9 @@ private getResponseData(UUID, endpoint) {
     log.debug "getResponseData() awairDeviceType : ${awairDeviceType}   awairDeviceId : ${awairDeviceId} endpoint: ${endpoint}"
 
     def params = [
-            uri    : "https://developer-apis.awair.is",
-            path   : "/v1/devices/${awairDeviceType}/${awairDeviceId}/${endpoint}",
-            headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
+        uri    : "https://developer-apis.awair.is",
+        path   : "/v1/devices/${awairDeviceType}/${awairDeviceId}/${endpoint}",
+        headers: ["Content-Type": "text/json", "Authorization": "Bearer ${state.awairToken}"]
     ]
 
     def responseData = null
