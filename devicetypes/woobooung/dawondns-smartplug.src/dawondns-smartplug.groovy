@@ -47,7 +47,7 @@ metadata {
         standardTile("refresh", "device.refresh", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
             state "default", label:'refresh', action:"refresh.refresh", icon:"st.secondary.refresh"
         }
-        
+
         /*
         standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
                 state "default", label:'reset kWh', action:"reset"
@@ -129,21 +129,21 @@ def installed() {
     refresh()
 }
 
+// Reference - https://community.smartthings.com/t/zigbee-something-commands-reference/110615/5
 def refresh() {
     log.debug "refresh"
-    zigbee.onOffRefresh() +
-    zigbee.electricMeasurementPowerRefresh() +
-    zigbee.readAttribute(zigbee.SIMPLE_METERING_CLUSTER, ATTRIBUTE_READING_INFO_SET)
+    def cmds = zigbee.onOffRefresh() + zigbee.electricMeasurementPowerRefresh() + zigbee.simpleMeteringPowerRefresh()
+    cmds + 
+        zigbee.onOffConfig() +
+        zigbee.simpleMeteringPowerConfig(1, 600, 0x01) +
+        zigbee.electricMeasurementPowerConfig(1, 600, 0x0001) 
 }
 
 def configure() {
     // this device will send instantaneous demand and current summation delivered every 1 minute
     sendEvent(name: "checkInterval", value: 2 * 60 + 10 * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
     log.debug "Configuring Reporting"
-    return refresh() +
-    	   zigbee.onOffConfig() +
-           zigbee.configureReporting(zigbee.SIMPLE_METERING_CLUSTER, ATTRIBUTE_READING_INFO_SET, DataType.UINT48, 1, 600, 1) +
-           zigbee.electricMeasurementPowerConfig(1, 600, 1) 
+    return refresh()
 }
 
 def updated() {
