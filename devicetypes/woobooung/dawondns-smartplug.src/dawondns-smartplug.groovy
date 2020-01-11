@@ -13,16 +13,18 @@
  *
  */
 
+import physicalgraph.zigbee.zcl.DataType
+
 metadata {
-    definition (name: "DawonDNS SmartPlug", namespace: "WooBooung", author: "Booung", ocfDeviceType: "oic.d.smartplug", mnmn: "SmartThings",  vid: "generic-switch-power-energy") {
+    definition (name: "DawonDNS SmartPlug", namespace: "WooBooung", author: "Booung", ocfDeviceType: "oic.d.smartplug", mnmn: "DawonDNS", vid: "generic-switch-power-energy") {
         capability "Actuator"
         capability "Configuration"
         capability "Refresh"
+        capability "Energy Meter"
         capability "Power Meter"
         capability "Sensor"
         capability "Switch"
         capability "Health Check"
-        capability "Light"
 
         fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0002, 0003, 0004, 0006, 0019, 0702, 0B04, 0008, 0009", outClusters: "0000, 0002, 0003, 0004, 0006, 0019, 0702, 0B04, 0008, 0009", manufacturer: "DAWON_DNS", model: "PM-B530-ZB", deviceJoinName: "DAWON SmartPlug 16A" 
         fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0003, 0006, 0019, 0702, 0B04", outClusters: "0000, 0004, 0003, 0006, 0019, 0702, 0B04", manufacturer: "DAWON_DNS", model: "PM-B430-ZB", deviceJoinName: "DAWON SmartPlug 10A" 
@@ -39,37 +41,81 @@ metadata {
         valueTile("power", "device.power", decoration: "flat", width: 2, height: 2) {
             state "default", label:'${currentValue} W'
         }
-        standardTile("refresh", "device.refresh", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
-            state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh"
+        valueTile("energy", "device.energy", decoration: "flat", width: 2, height: 2) {
+            state "default", label:'${currentValue} kWh'
         }
-        main "switch"
-        details(["switch", "power"])
+        standardTile("refresh", "device.refresh", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
+            state "default", label:'refresh', action:"refresh.refresh", icon:"st.secondary.refresh"
+        }
+        
+        /*
+        standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
+                state "default", label:'reset kWh', action:"reset"
+        } 
+        */
+
+        main(["switch"])
+        details(["switch","power","energy","refresh"])
     }
 }
+
+def getATTRIBUTE_READING_INFO_SET() { 0x0000 }
+def getATTRIBUTE_HISTORICAL_CONSUMPTION() { 0x0400 }
 
 // Parse incoming device messages to generate events
 def parse(String description) {
     log.debug "description is $description"
     def event = zigbee.getEvent(description)
+    def powerDiv = 1
+    def energyDiv = 1000
+
     if (event) {
-        if (event.name == "power") {
-            def powerValue
-            def div = device.getDataValue("divisor")
-            div = div ? (div as int) : 10
-            powerValue = (event.value as Integer) / div
-            sendEvent(name: "power", value: powerValue)
+        log.info "event enter:$event"
+        if (event.name== "power") {
+            event.value = event.value/powerDiv
+            event.unit = "W"
+        } else if (event.name== "energy") {
+            event.value = event.value/energyDiv
+            event.unit = "kWh"
         }
-        else {
-            sendEvent(event)
+        log.info "event outer:$event"
+        sendEvent(event)
+    } else {
+        List result = []
+        def descMap = zigbee.parseDescriptionAsMap(description)
+        log.debug "Desc Map: $descMap"
+
+        List attrData = [[clusterInt: descMap.clusterInt ,attrInt: descMap.attrInt, value: descMap.value]]
+        descMap.additionalAttrs.each {
+            attrData << [clusterInt: descMap.clusterInt, attrInt: it.attrInt, value: it.value]
         }
-    }
-    else {
-        log.warn "DID NOT PARSE MESSAGE for description : $description"
-        log.debug zigbee.parseDescriptionAsMap(description)
+
+        attrData.each {
+            def map = [:]
+            if (it.value && it.clusterInt == zigbee.SIMPLE_METERING_CLUSTER && it.attrInt == ATTRIBUTE_HISTORICAL_CONSUMPTION) {
+                log.debug "power"
+                map.name = "power"
+                map.value = zigbee.convertHexToInt(it.value)/powerDiv
+                map.unit = "W"
+            }
+            else if (it.value && it.clusterInt == zigbee.SIMPLE_METERING_CLUSTER && it.attrInt == ATTRIBUTE_READING_INFO_SET) {
+                log.debug "energy"
+                map.name = "energy"
+                map.value = zigbee.convertHexToInt(it.value)/energyDiv
+                map.unit = "kWh"
+            }
+
+            if (map) {
+                result << createEvent(map)
+            }
+            log.debug "Parse returned $map"
+        }
+        return result
     }
 }
 
 def off() {
+    sendEvent(name: "power", value: 0, unit: "W")
     zigbee.off()
 }
 
@@ -84,30 +130,30 @@ def installed() {
 }
 
 def refresh() {
-    Integer reportIntervalMinutes = 5
-    def cmds = zigbee.onOffRefresh() + zigbee.simpleMeteringPowerRefresh() + zigbee.electricMeasurementPowerRefresh()
-    cmds + zigbee.onOffConfig(0, reportIntervalMinutes * 60) + zigbee.simpleMeteringPowerConfig() + zigbee.electricMeasurementPowerConfig()
+    log.debug "refresh"
+    zigbee.onOffRefresh() +
+    zigbee.electricMeasurementPowerRefresh() +
+    zigbee.readAttribute(zigbee.SIMPLE_METERING_CLUSTER, ATTRIBUTE_READING_INFO_SET)
 }
 
 def configure() {
-    log.debug "in configure()"
-    return configureHealthCheck()
-}
-
-def configureHealthCheck() {
-    Integer hcIntervalMinutes = 12
-    sendEvent(name: "checkInterval", value: hcIntervalMinutes * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
-    return refresh()
+    // this device will send instantaneous demand and current summation delivered every 1 minute
+    sendEvent(name: "checkInterval", value: 2 * 60 + 10 * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
+    log.debug "Configuring Reporting"
+    return refresh() +
+    	   zigbee.onOffConfig() +
+           zigbee.configureReporting(zigbee.SIMPLE_METERING_CLUSTER, ATTRIBUTE_READING_INFO_SET, DataType.UINT48, 1, 600, 1) +
+           zigbee.electricMeasurementPowerConfig(1, 600, 1) 
 }
 
 def updated() {
     log.debug "in updated()"
     // updated() doesn't have it's return value processed as hub commands, so we have to send them explicitly
     device.updateDataValue("divisor", "1")
-    def cmds = configureHealthCheck()
+    def cmds = configure()
     cmds.each{ sendHubCommand(new physicalgraph.device.HubAction(it)) }
 }
 
 def ping() {
-    return zigbee.onOffRefresh()
+    return refresh()
 }
