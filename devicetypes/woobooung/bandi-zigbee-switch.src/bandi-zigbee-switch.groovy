@@ -15,8 +15,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.1.20200405" }
+public static String version() { return "v0.0.2.20200405" }
 /*
+ *   2020/04/05 >>> v0.0.2.20200405 - Update 2 multi switch info
  *   2020/04/05 >>> v0.0.1.20200405 - Initialize
  */
 metadata {
@@ -32,7 +33,7 @@ metadata {
 
         // Bandi ZigBee Multi Switch
         fingerprint profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_pdevogdj", model: "TS0003", deviceJoinName: "Bandi Zigbee Switch 1"
-        fingerprint profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_pdevogdj", model: "TS0002", deviceJoinName: "Bandi Zigbee Switch 1"
+        fingerprint profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_tas0zemd", model: "TS0002", deviceJoinName: "Bandi Zigbee Switch 1"
         fingerprint profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_ddg0cycp", model: "TS0001", deviceJoinName: "Bandi Zigbee Switch"
 
     }
