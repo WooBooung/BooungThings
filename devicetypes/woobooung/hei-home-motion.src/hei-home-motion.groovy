@@ -63,7 +63,15 @@ private getBATTERY_VOLTAGE_VALUE_ATTRIBUTE() { 0x0020 }
 def installed() {
 	log.debug "installed"
     sendEvent(name: "motion", value: "inactive", displayed: false,)
-    sendEvent(name: "checkInterval", value: 12 * 60 * 60 + 12 * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID])
+    // These devices don't report regularly so they should only go OFFLINE when Hub is OFFLINE
+	sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zigbee", scheme:"untracked"]), displayed: false)
+}
+
+def updated() {
+	log.debug "updated"
+    refresh()
+    // These devices don't report regularly so they should only go OFFLINE when Hub is OFFLINE
+	sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zigbee", scheme:"untracked"]), displayed: false) 
 }
 
 def parse(String description) {
@@ -161,7 +169,7 @@ private Map getMotionResult(value) {
  * */
 def ping() {
     log.debug "ping()"
-    zigbee.readAttribute(zigbee.IAS_ZONE_CLUSTER, zigbee.ATTRIBUTE_IAS_ZONE_STATUS)
+    refresh()
 }
 
 def refresh() {
@@ -173,12 +181,7 @@ def refresh() {
 
 def configure() {
     log.debug "configure()"
-    // Device-Watch allows 2 check-in misses from device + ping (plus 1 min lag time)
-    // enrolls with default periodic reporting until newer 5 min interval is confirmed
-    // Sets up low battery threshold reporting
-    sendEvent(name: "DeviceWatch-Enroll", displayed: false, value: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID, scheme: "TRACKED", checkInterval: 2 * 60 * 60 + 1 * 60, lowBatteryThresholds: [15, 7, 3], offlinePingable: "1"].encodeAsJSON())
-
     log.debug "Configuring Reporting"
 
-    return refresh() + zigbee.batteryConfig()
+    return zigbee.configureReporting(zigbee.POWER_CONFIGURATION_CLUSTER, BATTERY_VOLTAGE_VALUE_ATTRIBUTE, DataType.UINT8, 30, 21600, 0x01) + refresh() + zigbee.batteryConfig()
 }
