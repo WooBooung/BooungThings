@@ -15,11 +15,13 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.1.20200415" }
+public static String version() { return "v0.0.2.20200415" }
 /*
+ *   2020/04/15 >>> v0.0.2.20200415 - Modified Device Watch
  *   2020/04/15 >>> v0.0.1.20200415 - Initialize
  */
 
+import groovy.json.JsonOutput
 import physicalgraph.zigbee.clusters.iaszone.ZoneStatus
 import physicalgraph.zigbee.zcl.DataType
 
