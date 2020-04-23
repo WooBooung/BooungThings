@@ -13,8 +13,9 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.12.20191224" }
+public static String version() { return "v0.0.13.20200423" }
 /*
+ *  2020/04/23 >>> v0.0.13.20200423 - Support Awair-element
  *  2019/12/24 >>> v0.0.12.20191224 - Explicit pausable, and Fixed error in GetUserInfos
  *  2019/06/12 >>> v0.0.11.20190612 - Prevent duplication post command
  *  2019/06/06 >>> v0.0.10.20190606 - Added API Call Count in Awair SmartApp Page
@@ -121,9 +122,11 @@ def mainPage() {
                     "awair-glow": ["temp", "humid", "co2", "voc"],
                     "awair-mint": ["temp", "humid", "voc", "pm25", "pm10"],
                     "awair-omni": ["temp", "humid", "co2", "voc", "pm25", "pm10"],
-                    "awair-r2": ["temp", "humid", "co2", "voc", "pm25", "pm10"]}]*/
+                    "awair-r2": ["temp", "humid", "co2", "voc", "pm25", "pm10"]}],
+                    "awair-element": ["temp", "humid", "co2", "voc", "pm25", "pm10"]}]*/
 
-                    paragraph "deviceType : awair-r2\nattributes : [temp, humid, co2, voc, pm25]"
+					paragraph "deviceType : awair-r2\nattributes : [temp, humid, co2, voc, pm25]"
+                    paragraph "deviceType : awair-element\nattributes : [temp, humid, co2, voc, pm25]"
                     paragraph "deviceType : awair\nattributes : [temp, humid, co2, voc, dust]"
                     paragraph "deviceType : awair-mint\nattributes : [temp, humid, voc, pm25, lux]"
                     paragraph "deviceType : awair-omni\nattributes : [temp, humid, co2, voc, pm25, lux, spl_a]"
@@ -193,6 +196,7 @@ private addChildAwairDevices() {
             def awairDthTypeName = "Awair"
             switch (device.deviceType) {
                 case "awair-r2" : awairDthTypeName = "Awair-R2"; break;
+                case "awair-element" : awairDthTypeName = "Awair-R2"; break;
                 case "awair-mint" : awairDthTypeName = "Awair-Mint"; break;
                 case "awair" : awairDthTypeName = "Awair-R1"; break;
             }
@@ -382,7 +386,8 @@ def pullAirData(UUID) {
 "awair-glow": ["temp", "humid", "co2", "voc"],
 "awair-mint": ["temp", "humid", "voc", "pm25", "pm10"],
 "awair-omni": ["temp", "humid", "co2", "voc", "pm25", "pm10"],
-"awair-r2": ["temp", "humid", "co2", "voc", "pm25", "pm10"]}]
+"awair-r2": ["temp", "humid", "co2", "voc", "pm25", "pm10"]}],
+"awair-element": ["temp", "humid", "co2", "voc", "pm25", "pm10"]}]
 
 https://developer.getawair.com/console/data-docs
 
