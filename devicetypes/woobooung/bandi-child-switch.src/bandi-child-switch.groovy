@@ -11,44 +11,38 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
+
+
+
+// @Deprecated don't use this
+
+
+
 metadata {
-	definition(name: "Bandi Child Switch", namespace: "WooBooung", author: "Booung", vid: "generic-switch") {
-		capability "Switch"
-		capability "Actuator"
-		capability "Sensor"
-		capability "Health Check"
-	}
-
-	tiles(scale: 2) {
-		multiAttributeTile(name: "switch", width: 6, height: 4, canChangeIcon: false) {
-			tileAttribute("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label: '${name}', action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#00a0dc"
-				attributeState "off", label: '${name}', action: "switch.on", icon: "st.switches.light.off", backgroundColor: "#ffffff"
-			}
-		}
-
-		main "switch"
-		details(["switch"])
-	}
+    definition(name: "Bandi Child Switch", namespace: "WooBooung", author: "Booung", vid: "generic-switch") {
+        capability "Switch"
+        capability "Actuator"
+        capability "Sensor"
+        capability "Health Check"
+    }
 }
 
 def installed() {
-	// This is set to a default value, but it is the responsibility of the parent to set it to a more appropriate number
-	sendEvent(name: "checkInterval", value: 30 * 60, displayed: false, data: [protocol: "zigbee"])
+    // Auto replace to "Child Switch Health" 
+    setDeviceType("Child Switch Health")
 }
 
-void on() {
-	parent.childOn(device.deviceNetworkId)
+def updated() {
+    // Auto replace to "Child Switch Health" 
+    setDeviceType("Child Switch Health")
 }
 
-void off() {
-	parent.childOff(device.deviceNetworkId)
+def on() {
+    // Auto replace to "Child Switch Health" 
+    setDeviceType("Child Switch Health")
 }
 
-def ping() {
-	// Intentionally left blank as parent should handle this
-}
-
-def uninstalled() {
-	parent.delete()
+def off() {
+    // Auto replace to "Child Switch Health" 
+    setDeviceType("Child Switch Health")
 }

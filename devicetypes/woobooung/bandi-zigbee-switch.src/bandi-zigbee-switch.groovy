@@ -15,8 +15,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.2.20200405" }
+public static String version() { return "v0.0.3.20200424" }
 /*
+ *   2020/04/24 >>> v0.0.3.20200424 - only one dth for bandi multi switch - remove Bandi Child Device dth
  *   2020/04/05 >>> v0.0.2.20200405 - Update 2 multi switch info
  *   2020/04/05 >>> v0.0.1.20200405 - Initialize
  */
@@ -74,13 +75,18 @@ metadata {
 }
 
 def installed() {
-    if (device.getDataValue("model") == "TS0001") {
-        setDeviceType("ZigBee Switch")
+    log.debug "installed()"
+    if (parent) {
+        setDeviceType("Child Switch Health")
     } else {
-        createChildDevices()
+        if (device.getDataValue("model") == "TS0001") {
+            setDeviceType("ZigBee Switch")
+        } else {
+            createChildDevices()
+        }
+        updateDataValue("onOff", "catchall")
+        refresh()
     }
-    updateDataValue("onOff", "catchall")
-    refresh()
 }
 
 def updated() {
@@ -122,7 +128,7 @@ private void createChildDevices() {
     if (x > 0) {
         for (i in 2..x) {
             log.debug("dni: $device.deviceNetworkId:0${i}")
-            addChildDevice("Bandi Child Switch", "$device.deviceNetworkId:0${i}", device.hubId,
+            addChildDevice("Bandi ZigBee Switch", "$device.deviceNetworkId:0${i}", device.hubId,
                            [completedSetup: true, label: "Bandi ZigBee Switch ${i}", isComponent: false])
         }
     }
