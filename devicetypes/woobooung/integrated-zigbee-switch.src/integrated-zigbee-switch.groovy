@@ -149,7 +149,7 @@ private getChildCount() {
 }
 
 private void createChildDevices() {
-    log.debug("dni: $device.deviceNetworkId")
+    log.debug("createChildDevices of $device.deviceNetworkId")
     def x = getChildCount()
     def model = device.getDataValue("model")
     def endpointId = device.getDataValue("endpointId")
@@ -157,8 +157,16 @@ private void createChildDevices() {
 
     for (i in 1..x - 1) {
         def endpointHexString = zigbee.convertToHexString(endpointInt + i, 2).toUpperCase()
-        addChildDevice("$device.type", "$device.deviceNetworkId:${endpointHexString}", device.hubId,
-                       [completedSetup: true, label: "${device.displayName[0..-2]}${i + 1}", isComponent: false])
+
+        def childDevice = childDevices.find {
+            it.deviceNetworkId == "$device.deviceNetworkId:${endpointHexString}"
+        }
+        if (!childDevice) {
+            addChildDevice("$device.type", "$device.deviceNetworkId:${endpointHexString}", device.hubId,
+                           [completedSetup: true, label: "${device.displayName[0..-2]}${i + 1}", isComponent: false])
+        } else {
+        	log.debug("createChildDevices: skip - $device.deviceNetworkId:${endpointHexString}")
+        }
     }
 }
 
