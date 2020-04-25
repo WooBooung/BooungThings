@@ -152,8 +152,8 @@ def parse(String description) {
                 def parentEndpointInt = zigbee.convertHexToInt(endpointId)
                 def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
                 def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
-                def deviceLabel = "${device.displayName[0..-1]}"
-                createChildDevice("$deviceLabel${childEndpointInt - parentEndpointInt}", childEndpointHexString)
+                def deviceLabel = "${device.displayName[0..-2]}"
+                createChildDevice("$deviceLabel${childEndpointInt - parentEndpointInt + 1}", childEndpointHexString)
             }
         }
     }
