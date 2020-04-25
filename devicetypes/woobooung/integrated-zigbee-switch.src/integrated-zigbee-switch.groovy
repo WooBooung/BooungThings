@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.2.20200425" }
+public static String version() { return "v0.0.3.20200425" }
 /*
+ *   2020/04/25 >>> v0.0.3.20200425 - Added Goqual Multi Switch & Modified refresh() function
  *   2020/04/25 >>> v0.0.2.20200425 - Added : DAWON DNS ZigBee Multi Switch 1 2 3 gang,  eZex ZigBee Multi Switch 6 gang, old Zigbee OnOff Swtich
  *   2020/04/25 >>> v0.0.1.20200425 - Initialize : Bandi ZigBee Switch, Zemi ZigBee Switch
  */
@@ -56,6 +57,9 @@ metadata {
 
         // Zigbee OnOff Swtich
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
+
+        // Unclear devices without model, meanufacturer
+        fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch 1"
     }
 
     preferences {
@@ -93,12 +97,13 @@ metadata {
 def installed() {
     log.debug "installed()"
     if (parent) {
-        setDeviceType("Child Switch Health")
+        setDeviceType("Child Switch Health For delete")
     } else {
-        if (getChildCount() == 1) {
+        def endpointCount = getEndpointCount()
+        if (endpointCount == 1) {
             // for 1 gang switch - ST Official local dth
             setDeviceType("ZigBee Switch")
-        } else {
+        } else if (endpointCount > 1){
             // for multi switch, cloud device
             createChildDevices()
         }
@@ -126,28 +131,36 @@ def parse(String description) {
     }
 
     if (eventMap) {
-        log.debug "eventMap $eventMap"
-        log.debug "eventDescMap $eventDescMap"
         def endpointId = device.getDataValue("endpointId")
 
-        if (eventDescMap?.sourceEndpoint == endpointId) {
-            log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
-            sendEvent(eventMap)
-        } else {
-            log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
-            def childDevice = childDevices.find {
-                it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
-            }
-            if (childDevice) {
-                childDevice.sendEvent(eventMap)
+        if (eventDescMap?.isValidForDataType) {
+            log.debug "eventMap $eventMap | eventDescMap $eventDescMap"
+
+            if (eventDescMap?.sourceEndpoint == endpointId) {
+                log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
+                sendEvent(eventMap)
             } else {
-                log.debug "Child device: $device.deviceNetworkId:${eventDescMap.sourceEndpoint} was not found"
+                log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
+                def childDevice = childDevices.find {
+                    it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
+                }
+                if (childDevice) {
+                    childDevice.sendEvent(eventMap)
+                } else {
+                    log.debug "Child device: $device.deviceNetworkId:${eventDescMap.sourceEndpoint} was not found"
+                }
             }
+        } else if (eventDescMap?.sourceEndpoint != endpointId) {
+            log.debug "eventDescMap $eventDescMap"
+            def parentEndpointInt = zigbee.convertHexToInt(endpointId)
+            def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
+            def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
+            createChildDevice("Integrated ZigBee Child Switch $childEndpointHexString", childEndpointHexString)
         }
     }
 }
 
-private getChildCount() {
+private getEndpointCount() {
     def model = device.getDataValue("model")
 
     switch (model) {
@@ -162,29 +175,33 @@ private getChildCount() {
         case 'FB56+ZSW1GKJ2.7' : return 1
         case 'E220-KR6N0Z1-HA' : return 6
         case 'Lamp_01' : return 1
-        default : return 2
+        default : return 0
     }
 }
 
 private void createChildDevices() {
     log.debug("createChildDevices of $device.deviceNetworkId")
-    def x = getChildCount()
-    def model = device.getDataValue("model")
+    def endpointCount = getEndpointCount()
     def endpointId = device.getDataValue("endpointId")
     def endpointInt = zigbee.convertHexToInt(endpointId)
+    def deviceLabel = "${device.displayName[0..-1]}"
 
-    for (i in 1..x - 1) {
+    for (i in 1..endpointCount - 1) {
         def endpointHexString = zigbee.convertToHexString(endpointInt + i, 2).toUpperCase()
+        createChildDevice("$deviceLabel${i + 1}", endpointHexString)
+    }
+}
 
-        def childDevice = childDevices.find {
-            it.deviceNetworkId == "$device.deviceNetworkId:${endpointHexString}"
-        }
-        if (!childDevice) {
-            addChildDevice("$device.type", "$device.deviceNetworkId:${endpointHexString}", device.hubId,
-                           [completedSetup: true, label: "${device.displayName[0..-2]}${i + 1}", isComponent: false])
-        } else {
-            log.debug("createChildDevices: skip - $device.deviceNetworkId:${endpointHexString}")
-        }
+private void createChildDevice(String deviceLabel, String endpointHexString) {
+    def childDevice = childDevices.find {
+        it.deviceNetworkId == "$device.deviceNetworkId:$endpointHexString"
+    }
+    if (!childDevice) {
+    	log.debug("Need to createChildDevice: $device.deviceNetworkId:$endpointHexString")
+        addChildDevice("Integrated ZigBee Switch", "$device.deviceNetworkId:$endpointHexString", device.hubId,
+                       [completedSetup: true, label: deviceLabel, isComponent: false])
+    } else {
+        log.debug("createChildDevice: SKIP - $device.deviceNetworkId:${endpointHexString}")
     }
 }
 
@@ -223,14 +240,18 @@ def ping() {
 
 def refresh() {
     def cmds = zigbee.onOffRefresh()
-    def x = getChildCount()
-    def model = device.getDataValue("model")
-    def endpointId = device.getDataValue("endpointId")
-    def endpointInt = zigbee.convertHexToInt(endpointId)
+    def endpointCount = getEndpointCount()
 
-    for (i in 1..x - 1) {
-        def endpointValue = endpointInt + i
-        cmds += zigbee.readAttribute(zigbee.ONOFF_CLUSTER, 0x0000, [destEndpoint: endpointValue])
+    if (endpointCount > 1) {
+        def endpointId = device.getDataValue("endpointId")
+        def endpointInt = zigbee.convertHexToInt(endpointId)
+
+        for (i in 1..endpointCount - 1) {
+            def endpointValue = endpointInt + i
+            cmds += zigbee.readAttribute(zigbee.ONOFF_CLUSTER, 0x0000, [destEndpoint: endpointValue])
+        }
+    } else {
+        cmds += zigbee.readAttribute(zigbee.ONOFF_CLUSTER, 0x0000, [destEndpoint: 0xFF])
     }
 
     return cmds
@@ -268,14 +289,18 @@ def configure() {
 
     //other devices supported by this DTH in the future
     def cmds = zigbee.onOffConfig(0, 120)
-    def x = getChildCount()
-    def model = device.getDataValue("model")
-    def endpointId = device.getDataValue("endpointId")
-    def endpointInt = zigbee.convertHexToInt(endpointId)
+    def endpointCount = getEndpointCount()
 
-    for (i in 1..x - 1) {
-        def endpointValue = endpointInt + i
-        cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: endpointValue])
+    if (endpointCount > 1) {
+        def endpointId = device.getDataValue("endpointId")
+        def endpointInt = zigbee.convertHexToInt(endpointId)
+
+        for (i in 1..endpointCount - 1) {
+            def endpointValue = endpointInt + i
+            cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: endpointValue])
+        }
+    } else {
+        cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: 0xFF])
     }
     cmds += refresh()
     return cmds
