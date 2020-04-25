@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.3.20200425" }
+public static String version() { return "v0.0.4.20200425" }
 /*
+ *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor bugs
  *   2020/04/25 >>> v0.0.3.20200425 - Added Goqual Multi Switch & Modified refresh() function
  *   2020/04/25 >>> v0.0.2.20200425 - Added : DAWON DNS ZigBee Multi Switch 1 2 3 gang,  eZex ZigBee Multi Switch 6 gang, old Zigbee OnOff Swtich
  *   2020/04/25 >>> v0.0.1.20200425 - Initialize : Bandi ZigBee Switch, Zemi ZigBee Switch
