@@ -62,7 +62,7 @@ metadata {
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
 
         // Unclear devices without model, meanufacturer
-        fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch"
+        fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch 1"
     }
 
     preferences {
@@ -152,7 +152,8 @@ def parse(String description) {
                 def parentEndpointInt = zigbee.convertHexToInt(endpointId)
                 def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
                 def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
-                createChildDevice("$device.displayName $childEndpointHexString", childEndpointHexString)
+                def deviceLabel = "${device.displayName[0..-1]}"
+                createChildDevice("$deviceLabel${childEndpointInt - parentEndpointInt}", childEndpointHexString)
             }
         }
     }
