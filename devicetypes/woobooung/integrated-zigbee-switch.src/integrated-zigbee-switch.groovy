@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.1.20200425" }
+public static String version() { return "v0.0.2.20200425" }
 /*
+ *   2020/04/25 >>> v0.0.2.20200425 - Added : DAWON DNS ZigBee Multi Switch 1 2 3 gang,  eZex ZigBee Multi Switch 6 gang, old Zigbee OnOff Swtich
  *   2020/04/25 >>> v0.0.1.20200425 - Initialize : Bandi ZigBee Switch, Zemi ZigBee Switch
  */
 metadata {
@@ -40,10 +41,21 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_tas0zemd", model: "TS0002", deviceJoinName: "Bandi Zigbee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_ddg0cycp", model: "TS0001", deviceJoinName: "Bandi Zigbee Switch"
 
+        // DAWON DNS ZigBee Multi Switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S140-ZB", deviceJoinName: "DAWON Zigbee Switch"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S240-ZB", deviceJoinName: "DAWON Zigbee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S340-ZB", deviceJoinName: "DAWON Zigbee Switch 1"
+
         // Zemi ZigBee Multi Switch
         fingerprint endpointId: "10", profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1GKJ2.7", deviceJoinName: "Zemi Zigbee Switch"
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
         fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
+
+        // eZex ZigBee Multi Switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex Zigbee Switch 1"
+
+        // Zigbee OnOff Swtich
+        fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
     }
 
     preferences {
@@ -83,8 +95,7 @@ def installed() {
     if (parent) {
         setDeviceType("Child Switch Health")
     } else {
-        def model = device.getDataValue("model")
-        if (model == "TS0001" || model == "FB56+ZSW1GKJ2.7") {
+        if (getChildCount() == 1) {
             // for 1 gang switch - ST Official local dth
             setDeviceType("ZigBee Switch")
         } else {
@@ -120,10 +131,10 @@ def parse(String description) {
         def endpointId = device.getDataValue("endpointId")
 
         if (eventDescMap?.sourceEndpoint == endpointId) {
-            log.debug "parse- sendEvent parent $eventDescMap.sourceEndpoint"
+            log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
             sendEvent(eventMap)
         } else {
-            log.debug "parse- sendEvent child  $eventDescMap.sourceEndpoint"
+            log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
             def childDevice = childDevices.find {
                 it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
             }
@@ -142,8 +153,15 @@ private getChildCount() {
     switch (model) {
         case 'TS0003' : return 3
         case 'TS0002' : return 2
+        case 'TS0001' : return 1
+        case 'PM-S340-ZB' : return 3
+        case 'PM-S240-ZB' : return 2
+        case 'PM-S140-ZB' : return 1
         case 'FNB56-ZSW03LX2.0' : return 3
         case 'FNB56-ZSW02LX2.0' : return 2
+        case 'FB56+ZSW1GKJ2.7' : return 1
+        case 'E220-KR6N0Z1-HA' : return 6
+        case 'Lamp_01' : return 1
         default : return 2
     }
 }
@@ -165,7 +183,7 @@ private void createChildDevices() {
             addChildDevice("$device.type", "$device.deviceNetworkId:${endpointHexString}", device.hubId,
                            [completedSetup: true, label: "${device.displayName[0..-2]}${i + 1}", isComponent: false])
         } else {
-        	log.debug("createChildDevices: skip - $device.deviceNetworkId:${endpointHexString}")
+            log.debug("createChildDevices: skip - $device.deviceNetworkId:${endpointHexString}")
         }
     }
 }
