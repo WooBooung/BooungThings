@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.4.20200425" }
+public static String version() { return "v0.0.5.20200425" }
 /*
+ *   2020/04/25 >>> v0.0.5.20200425 - Fixed minor issue - child device lebel
  *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor issue
  *   2020/04/25 >>> v0.0.4.20200425 - Modified Child Device Lebel
  *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor bugs
@@ -183,7 +184,7 @@ private void createChildDevices() {
     def endpointCount = getEndpointCount()
     def endpointId = device.getDataValue("endpointId")
     def endpointInt = zigbee.convertHexToInt(endpointId)
-    def deviceLabel = "${device.displayName[0..-1]}"
+    def deviceLabel = "${device.displayName[0..-2]}"
 
     for (i in 1..endpointCount - 1) {
         def endpointHexString = zigbee.convertToHexString(endpointInt + i, 2).toUpperCase()
