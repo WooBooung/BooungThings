@@ -19,6 +19,7 @@
  */
 public static String version() { return "v0.0.4.20200425" }
 /*
+ *   2020/04/25 >>> v0.0.4.20200425 - Modified Child Device Lebel
  *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor bugs
  *   2020/04/25 >>> v0.0.3.20200425 - Added Goqual Multi Switch & Modified refresh() function
  *   2020/04/25 >>> v0.0.2.20200425 - Added : DAWON DNS ZigBee Multi Switch 1 2 3 gang,  eZex ZigBee Multi Switch 6 gang, old Zigbee OnOff Swtich
@@ -60,7 +61,7 @@ metadata {
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
 
         // Unclear devices without model, meanufacturer
-        fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch 1"
+        fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch"
     }
 
     preferences {
@@ -156,7 +157,7 @@ def parse(String description) {
             def parentEndpointInt = zigbee.convertHexToInt(endpointId)
             def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
             def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
-            createChildDevice("Integrated ZigBee Child Switch $childEndpointHexString", childEndpointHexString)
+            createChildDevice("$device.displayName $childEndpointHexString", childEndpointHexString)
         }
     }
 }
