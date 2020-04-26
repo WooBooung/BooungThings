@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.6.20200426" }
+public static String version() { return "v0.0.7.20200426" }
 /*
+ *   2020/04/26 >>> v0.0.7.20200426 - Support to old Jemi swtich version
  *   2020/04/26 >>> v0.0.6.20200426 - Added Zemi swtich, and modified child device type name
  *   2020/04/25 >>> v0.0.5.20200425 - Fixed minor issue - child device lebel
  *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor issue
@@ -28,6 +29,9 @@ public static String version() { return "v0.0.6.20200426" }
  *   2020/04/25 >>> v0.0.2.20200425 - Added : DAWON DNS ZigBee Multi Switch 1 2 3 gang,  eZex ZigBee Multi Switch 6 gang, old Zigbee OnOff Swtich
  *   2020/04/25 >>> v0.0.1.20200425 - Initialize : Bandi ZigBee Switch, Zemi ZigBee Switch
  */
+
+import java.lang.Math
+
 metadata {
     definition(name: "Integrated ZigBee Switch", namespace: "WooBooung", author: "Booung", ocfDeviceType: "oic.d.switch", vid: "generic-switch") {
         capability "Actuator"
@@ -54,8 +58,8 @@ metadata {
 
         // Zemi ZigBee Multi Switch
         fingerprint endpointId: "10", profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1GKJ2.7", deviceJoinName: "Zemi Zigbee Switch"
-        fingerprint endpointId: "11", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", outClusters: "0000", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1HKJ2.5", deviceJoinName: "Zemi Zigbee Switch 1"
-        fingerprint endpointId: "12", profileId: "0104", deviceId: "0002", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.7", deviceJoinName: "Zemi Zigbee Switch 1"
+        fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", outClusters: "0000", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1HKJ2.5", deviceJoinName: "Zemi Zigbee Switch 1"
+        fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.7", deviceJoinName: "Zemi Zigbee Switch 1"
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
         fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
 
@@ -108,6 +112,10 @@ def installed() {
         // for 1 gang switch - ST Official local dth
         setDeviceType("ZigBee Switch")
     } else if (endpointCount > 1){
+        def model = device.getDataValue("model")
+        if (model == 'FB56+ZSW1HKJ2.5' || model == 'FB56+ZSW1IKJ2.7') {
+            device.updateDataValue("endpointId", "10")
+        }
         // for multi switch, cloud device
         createChildDevices()
     }
@@ -153,7 +161,8 @@ def parse(String description) {
                 def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
                 def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
                 def deviceLabel = "${device.displayName[0..-2]}"
-                createChildDevice("$deviceLabel${childEndpointInt - parentEndpointInt + 1}", childEndpointHexString)
+                def deviceIndex = Math.abs(childEndpointInt - parentEndpointInt) + 1
+                createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
             }
         }
     }
@@ -223,13 +232,15 @@ def off() {
 def childOn(String dni) {
     log.debug("child on ${dni}")
     def childEndpoint = getChildEndpoint(dni)
-    zigbee.command(zigbee.ONOFF_CLUSTER, 0x01, "", [destEndpoint: childEndpoint])
+    def endpointInt = zigbee.convertHexToInt(childEndpoint)
+    zigbee.command(zigbee.ONOFF_CLUSTER, 0x01, "", [destEndpoint: endpointInt])
 }
 
 def childOff(String dni) {
     log.debug("child off ${dni}")
     def childEndpoint = getChildEndpoint(dni)
-    zigbee.command(zigbee.ONOFF_CLUSTER, 0x00, "", [destEndpoint: childEndpoint])
+    def endpointInt = zigbee.convertHexToInt(childEndpoint)
+    zigbee.command(zigbee.ONOFF_CLUSTER, 0x00, "", [destEndpoint: endpointInt])
 }
 
 /**
