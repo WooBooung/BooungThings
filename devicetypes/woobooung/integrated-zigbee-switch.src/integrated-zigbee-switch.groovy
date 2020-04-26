@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.5.20200425" }
+public static String version() { return "v0.0.6.20200426" }
 /*
+ *   2020/04/26 >>> v0.0.6.20200426 - Added Zemi swtich, and modified child device type name
  *   2020/04/25 >>> v0.0.5.20200425 - Fixed minor issue - child device lebel
  *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor issue
  *   2020/04/25 >>> v0.0.4.20200425 - Modified Child Device Lebel
@@ -53,6 +54,8 @@ metadata {
 
         // Zemi ZigBee Multi Switch
         fingerprint endpointId: "10", profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1GKJ2.7", deviceJoinName: "Zemi Zigbee Switch"
+        fingerprint endpointId: "11", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", outClusters: "0000", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1HKJ2.5", deviceJoinName: "Zemi Zigbee Switch 1"
+        fingerprint endpointId: "12", profileId: "0104", deviceId: "0002", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.7", deviceJoinName: "Zemi Zigbee Switch 1"
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
         fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
 
@@ -63,7 +66,7 @@ metadata {
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
 
         // Unclear devices without model, meanufacturer
-        fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch 1"
     }
 
     preferences {
@@ -100,20 +103,16 @@ metadata {
 
 def installed() {
     log.debug "installed()"
-    if (parent) {
-        setDeviceType("Child Switch Health")
-    } else {
-        def endpointCount = getEndpointCount()
-        if (endpointCount == 1) {
-            // for 1 gang switch - ST Official local dth
-            setDeviceType("ZigBee Switch")
-        } else if (endpointCount > 1){
-            // for multi switch, cloud device
-            createChildDevices()
-        }
-        updateDataValue("onOff", "catchall")
-        refresh()
+    def endpointCount = getEndpointCount()
+    if (endpointCount == 1) {
+        // for 1 gang switch - ST Official local dth
+        setDeviceType("ZigBee Switch")
+    } else if (endpointCount > 1){
+        // for multi switch, cloud device
+        createChildDevices()
     }
+    updateDataValue("onOff", "catchall")
+    refresh()
 }
 
 def updated() {
@@ -173,6 +172,8 @@ private getEndpointCount() {
         case 'FNB56-ZSW03LX2.0' : return 3
         case 'FNB56-ZSW02LX2.0' : return 2
         case 'FB56+ZSW1GKJ2.7' : return 1
+        case 'FB56+ZSW1HKJ2.5' : return 2
+        case 'FB56+ZSW1IKJ2.7' : return 3
         case 'E220-KR6N0Z1-HA' : return 6
         case 'Lamp_01' : return 1
         default : return 0
@@ -198,7 +199,7 @@ private void createChildDevice(String deviceLabel, String endpointHexString) {
     }
     if (!childDevice) {
         log.debug("Need to createChildDevice: $device.deviceNetworkId:$endpointHexString")
-        addChildDevice("Integrated ZigBee Switch", "$device.deviceNetworkId:$endpointHexString", device.hubId,
+        addChildDevice("smartthings", "Child Switch Health", "$device.deviceNetworkId:$endpointHexString", device.hubId,
                        [completedSetup: true, label: deviceLabel, isComponent: false])
     } else {
         log.debug("createChildDevice: SKIP - $device.deviceNetworkId:${endpointHexString}")
