@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.7.20200426" }
+public static String version() { return "v0.0.8.20200427" }
 /*
+ *   2020/04/27 >>> v0.0.8.20200427 - Added Usage
  *   2020/04/26 >>> v0.0.7.20200426 - Support to old Jemi swtich version
  *   2020/04/26 >>> v0.0.6.20200426 - Added Zemi swtich, and modified child device type name
  *   2020/04/25 >>> v0.0.5.20200425 - Fixed minor issue - child device lebel
@@ -31,6 +32,53 @@ public static String version() { return "v0.0.7.20200426" }
  */
 
 import java.lang.Math
+
+/*
+    > Usage <
+
+    Example) Bandi 3gang switch model
+    IDE Device Data	
+      manufacturer: _TYZB01_pdevogdj
+      model: TS0003
+
+      Raw Description	01 0104 0100 00 05 0000 000A 0004 0005 0006 01 0019
+    	Analysis -> '01'(endpointId) '0104'(profileId) '0100'(deviceId) 00(skip) 05(skip) '0000 000A 0004 0005 0006'(inClusters) 01(skil) '0019'(outClusters)
+
+    > Step1 - Add fingerprint
+    fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_pdevogdj", model: "TS0003", deviceJoinName: "Bandi Zigbee Switch 1"
+
+    > Step 2 - Add MODEL_MAP
+    private getMODEL_MAP() { 
+        [
+            'TS0003' : 3,
+            ....
+            ...
+            ..
+        ]
+    }
+    
+    > Step 3 - paring device and test
+    
+    > Step 4 - request add device infos to woobooung@gmail.com
+*/
+
+private getMODEL_MAP() { 
+    [
+        'TS0003' : 3,
+        'TS0002' : 2,
+        'TS0001' : 1,
+        'PM-S340-ZB' : 3,
+        'PM-S240-ZB' : 2,
+        'PM-S140-ZB' : 1,
+        'FNB56-ZSW03LX2.0' : 3,
+        'FNB56-ZSW02LX2.0' : 2,
+        'FB56+ZSW1GKJ2.7' : 1,
+        'FB56+ZSW1HKJ2.5' : 2,
+        'FB56+ZSW1IKJ2.7' : 3,
+        'E220-KR6N0Z1-HA' : 6,
+        'Lamp_01' : 1
+    ]
+}
 
 metadata {
     definition(name: "Integrated ZigBee Switch", namespace: "WooBooung", author: "Booung", ocfDeviceType: "oic.d.switch", vid: "generic-switch") {
@@ -146,15 +194,19 @@ def parse(String description) {
         log.debug "eventMap $eventMap | eventDescMap $eventDescMap"
 
         if (eventDescMap?.sourceEndpoint == endpointId) {
-            log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
-            sendEvent(eventMap)
+            if (eventDescMap.isValidForDataType) {
+                log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
+                sendEvent(eventMap)
+            }
         } else {
-            log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
             def childDevice = childDevices.find {
                 it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
             }
             if (childDevice) {
-                childDevice.sendEvent(eventMap)
+                if (eventDescMap.isValidForDataType) {
+                    log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
+                    childDevice.sendEvent(eventMap)
+                }
             } else {
                 log.debug "Child device: $device.deviceNetworkId:${eventDescMap.sourceEndpoint} was not found"
                 def parentEndpointInt = zigbee.convertHexToInt(endpointId)
@@ -170,23 +222,10 @@ def parse(String description) {
 
 private getEndpointCount() {
     def model = device.getDataValue("model")
+    def count = MODEL_MAP[model] ?: 0
 
-    switch (model) {
-        case 'TS0003' : return 3
-        case 'TS0002' : return 2
-        case 'TS0001' : return 1
-        case 'PM-S340-ZB' : return 3
-        case 'PM-S240-ZB' : return 2
-        case 'PM-S140-ZB' : return 1
-        case 'FNB56-ZSW03LX2.0' : return 3
-        case 'FNB56-ZSW02LX2.0' : return 2
-        case 'FB56+ZSW1GKJ2.7' : return 1
-        case 'FB56+ZSW1HKJ2.5' : return 2
-        case 'FB56+ZSW1IKJ2.7' : return 3
-        case 'E220-KR6N0Z1-HA' : return 6
-        case 'Lamp_01' : return 1
-        default : return 0
-    }
+    log.debug("getEndpointCount[$model] : $count")
+    return count
 }
 
 private void createChildDevices() {
