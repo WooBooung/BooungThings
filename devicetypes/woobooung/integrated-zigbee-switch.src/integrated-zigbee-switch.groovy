@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.8.20200427" }
+public static String version() { return "v0.0.9.20200508" }
 /*
+ *   2020/05/08 >>> v0.0.9.20200508 - Modified for Jemi 2gang switch
  *   2020/04/27 >>> v0.0.8.20200427 - Added Usage
  *   2020/04/26 >>> v0.0.7.20200426 - Support to old Jemi swtich version
  *   2020/04/26 >>> v0.0.6.20200426 - Added Zemi swtich, and modified child device type name
@@ -203,10 +204,10 @@ def parse(String description) {
                 it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
             }
             if (childDevice) {
-                if (eventDescMap.isValidForDataType) {
+                //if (eventDescMap.isValidForDataType) {
                     log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
                     childDevice.sendEvent(eventMap)
-                }
+                //}
             } else {
                 log.debug "Child device: $device.deviceNetworkId:${eventDescMap.sourceEndpoint} was not found"
                 def parentEndpointInt = zigbee.convertHexToInt(endpointId)
