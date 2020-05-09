@@ -1,5 +1,5 @@
 /**
- *  Hei Home Contact
+ *  Hej Home Contact
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License. You may obtain a copy
@@ -15,8 +15,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.2.20200415" }
+public static String version() { return "v0.0.3.20200510" }
 /*
+ *   2020/05/10 >>> v0.0.2.20200510 - Fixed name
  *   2020/04/15 >>> v0.0.2.20200415 - Modified Device Watch
  *   2020/04/15 >>> v0.0.1.20200415 - Initialize
  */
@@ -26,7 +27,7 @@ import physicalgraph.zigbee.clusters.iaszone.ZoneStatus
 import physicalgraph.zigbee.zcl.DataType
 
 metadata {
-    definition(name: "Hei Home Contact",namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.sensor.contact", vid:"generic-contact-3") {
+    definition(name: "Hej Home Contact",namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.sensor.contact", vid:"generic-contact-3") {
         capability "Contact Sensor"
         capability "Battery"
         capability "Configuration"
@@ -34,7 +35,7 @@ metadata {
         capability "Health Check"
         capability "Sensor"
 
-        fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000, 0001, 0003, 0500", outClusters: "0003", manufacturer: "TUYATEC-ktge2vqt", model: "RH3001", deviceJoinName: "Hei Home Contact"
+        fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000, 0001, 0003, 0500", outClusters: "0003", manufacturer: "TUYATEC-ktge2vqt", model: "RH3001", deviceJoinName: "Hej Home Contact"
     }
 
     preferences {
