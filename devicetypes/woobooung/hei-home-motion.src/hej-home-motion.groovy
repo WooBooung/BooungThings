@@ -15,8 +15,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.2.20200415" }
+public static String version() { return "v0.0.3.20200510" }
 /*
+ *   2020/05/10 >>> v0.0.2.20200510 - Fixed name
  *   2020/04/15 >>> v0.0.2.20200415 - Modified Device Watch
  *   2020/04/15 >>> v0.0.1.20200415 - Initialize
  */
@@ -26,7 +27,7 @@ import physicalgraph.zigbee.clusters.iaszone.ZoneStatus
 import physicalgraph.zigbee.zcl.DataType
 
 metadata {
-    definition (name: "Hei Home Motion",namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.sensor.motion", vid: "generic-motion-2") {
+    definition (name: "Hej Home Motion",namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.sensor.motion", vid: "generic-motion-2") {
         capability "Motion Sensor"
         capability "Battery"
         capability "Configuration"
@@ -34,7 +35,7 @@ metadata {
         capability "Health Check"
         capability "Sensor"
 
-        fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000, 0001, 0003, 0500", manufacturer: "TUYATEC-smmlguju", model: "RH3040", deviceJoinName: "Hei Home Motion"
+        fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000, 0001, 0003, 0500", manufacturer: "TUYATEC-smmlguju", model: "RH3040", deviceJoinName: "Hej Home Motion"
     }
 
     preferences {
