@@ -17,19 +17,20 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.9.20200508" }
+public static String version() { return "v0.0.10.20200514" }
 /*
- *   2020/05/08 >>> v0.0.9.20200508 - Modified for Jemi 2gang switch
- *   2020/04/27 >>> v0.0.8.20200427 - Added Usage
- *   2020/04/26 >>> v0.0.7.20200426 - Support to old Jemi swtich version
- *   2020/04/26 >>> v0.0.6.20200426 - Added Zemi swtich, and modified child device type name
- *   2020/04/25 >>> v0.0.5.20200425 - Fixed minor issue - child device lebel
- *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor issue
- *   2020/04/25 >>> v0.0.4.20200425 - Modified Child Device Lebel
- *   2020/04/25 >>> v0.0.4.20200425 - Fixed minor bugs
- *   2020/04/25 >>> v0.0.3.20200425 - Added Goqual Multi Switch & Modified refresh() function
- *   2020/04/25 >>> v0.0.2.20200425 - Added : DAWON DNS ZigBee Multi Switch 1 2 3 gang,  eZex ZigBee Multi Switch 6 gang, old Zigbee OnOff Swtich
- *   2020/04/25 >>> v0.0.1.20200425 - Initialize : Bandi ZigBee Switch, Zemi ZigBee Switch
+ *   2020/05/14 >>> v0.0.10 - Added Zemi1gang switch
+ *   2020/05/08 >>> v0.0.9  - Modified for Zemi 2gang switch
+ *   2020/04/27 >>> v0.0.8  - Added Usage
+ *   2020/04/26 >>> v0.0.7  - Support to old Zemi swtich version
+ *   2020/04/26 >>> v0.0.6  - Added Zemi swtich, and modified child device type name
+ *   2020/04/25 >>> v0.0.5  - Fixed minor issue - child device lebel
+ *   2020/04/25 >>> v0.0.4  - Fixed minor issue
+ *   2020/04/25 >>> v0.0.4  - Modified Child Device Lebel
+ *   2020/04/25 >>> v0.0.4  - Fixed minor bugs
+ *   2020/04/25 >>> v0.0.3  - Added Goqual Multi Switch & Modified refresh() function
+ *   2020/04/25 >>> v0.0.2  - Added : DAWON DNS ZigBee Multi Switch 1 2 3 gang,  eZex ZigBee Multi Switch 6 gang, old Zigbee OnOff Swtich
+ *   2020/04/25 >>> v0.0.1  - Initialize : Bandi ZigBee Switch, Zemi ZigBee Switch
  */
 
 import java.lang.Math
@@ -73,6 +74,7 @@ private getMODEL_MAP() {
         'PM-S140-ZB' : 1,
         'FNB56-ZSW03LX2.0' : 3,
         'FNB56-ZSW02LX2.0' : 2,
+        'FNB56-ZSW01LX2.0' :1,
         'FB56+ZSW1GKJ2.7' : 1,
         'FB56+ZSW1HKJ2.5' : 2,
         'FB56+ZSW1IKJ2.7' : 3,
@@ -109,6 +111,7 @@ metadata {
         fingerprint endpointId: "10", profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1GKJ2.7", deviceJoinName: "Zemi Zigbee Switch"
         fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", outClusters: "0000", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1HKJ2.5", deviceJoinName: "Zemi Zigbee Switch 1"
         fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.7", deviceJoinName: "Zemi Zigbee Switch 1"
+        fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW01LX2.0", deviceJoinName: "Zemi Zigbee Switch"
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
         fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
 
