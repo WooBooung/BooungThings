@@ -13,6 +13,12 @@
  *
  */
 
+public static String version() { return "v0.0.2.20200522" }
+/*
+ *	2020/05/22 >>> v0.0.2 - Explicit displayed flag
+ *  2020/01/11 >>> v0.0.1 - Initialize
+ */
+
 import physicalgraph.zigbee.zcl.DataType
 
 metadata {
@@ -29,6 +35,11 @@ metadata {
         fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0002, 0003, 0004, 0006, 0019, 0702, 0B04, 0008, 0009", outClusters: "0000, 0002, 0003, 0004, 0006, 0019, 0702, 0B04, 0008, 0009", manufacturer: "DAWON_DNS", model: "PM-B530-ZB", deviceJoinName: "DAWON SmartPlug 16A" 
         fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0003, 0006, 0019, 0702, 0B04", outClusters: "0000, 0004, 0003, 0006, 0019, 0702, 0B04", manufacturer: "DAWON_DNS", model: "PM-B430-ZB", deviceJoinName: "DAWON SmartPlug 10A" 
         fingerprint endpointId: "0x01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0002, 0003, 0004, 0006, 0019, 0702, 0B04, 0008, 0009", outClusters: "0000, 0002, 0003, 0004, 0006, 0019, 0702, 0B04, 0008, 0009", manufacturer: "DAWON_DNS", model: "PM-C140-ZB", deviceJoinName: "DAWON Embeded Plug" 
+    }
+
+    preferences {
+        input name: "reportableChange", title: "ReportableChange Value", type: "enum", options:[0x01 : "1W", 0x02 : "2W", 0x05 : "5W", 0x0a : "10W"], defaultValue: 0x01, displayDuringSetup: true
+        input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
     }
 
     tiles(scale: 2) {
@@ -64,7 +75,6 @@ def getATTRIBUTE_HISTORICAL_CONSUMPTION() { 0x0400 }
 
 // Parse incoming device messages to generate events
 def parse(String description) {
-    log.debug "description is $description"
     def event = zigbee.getEvent(description)
     def powerDiv = 1
     def energyDiv = 1000
@@ -78,6 +88,7 @@ def parse(String description) {
             event.value = event.value/energyDiv
             event.unit = "kWh"
         }
+        event.displayed = true
         log.info "event outer:$event"
         sendEvent(event)
     } else {
@@ -106,6 +117,7 @@ def parse(String description) {
             }
 
             if (map) {
+                map.displayed = true
                 result << createEvent(map)
             }
             log.debug "Parse returned $map"
@@ -131,12 +143,13 @@ def installed() {
 
 // Reference - https://community.smartthings.com/t/zigbee-something-commands-reference/110615/5
 def refresh() {
-    log.debug "refresh"
+    log.debug "refresh reportableChange: $reportableChange}"
+
     def cmds = zigbee.onOffRefresh() + zigbee.electricMeasurementPowerRefresh() + zigbee.simpleMeteringPowerRefresh()
     cmds + 
         zigbee.onOffConfig() +
-        zigbee.simpleMeteringPowerConfig(1, 600, 0x01) +
-        zigbee.electricMeasurementPowerConfig(1, 600, 0x0001) 
+        zigbee.simpleMeteringPowerConfig(1, 600, 0x03) +
+        zigbee.electricMeasurementPowerConfig(1, 600, 0x000a)
 }
 
 def configure() {

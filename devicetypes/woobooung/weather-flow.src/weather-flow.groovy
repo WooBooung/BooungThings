@@ -29,6 +29,11 @@
  *   - Version 0.0.1 (2018-09-15)
  *      Base code
  */
+ 
+ public static String version() { return "v0.0.5.20200522" }
+/*
+ *	2020/05/22 >>> v0.0.5 - Explicit displayed flag
+ */
 
 import groovy.json.JsonSlurper
 import groovy.transform.Field
@@ -180,7 +185,7 @@ metadata {
         input name: "selected_lang", title:"Select a language", type: "enum", options: ["English", "Korean"], defaultValue: "English", displayDuringSetup: true
         input type: "paragraph", element: "paragraph", title: "How to get station Id", description: "Weather Flow app -> Settings's Manage -> Stations -> Status click", displayDuringSetup: false
         input type: "paragraph", element: "paragraph", title: "Rain detect option", description: "Every time : (Default value)\nif (precip > 0) then Rain detected\nif (precip == 0) then Rain not detected\n\nFirst time :\nif (precip_accum_last_1hr == 0 && precip > 0) then Rain detected\nif (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected", displayDuringSetup: false
-        input type: "paragraph", element: "paragraph", title: "Version", description: "0.0.4", displayDuringSetup: false
+        input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
 	}
 
 	simulator {
@@ -623,7 +628,7 @@ def pollWeatherFlow() {
 
                     if (air_temperature != "") {
                         debugLog("air_temperature: ${air_temperature}°${units_temp}")
-                        sendEvent(name: "temperature", value: air_temperature, unit: units_temp)
+                        sendEvent(name: "temperature", value: air_temperature, unit: units_temp, displayed: true)
                     } else {
                         log.error "air_temperature error: ${air_temperature}"
                         sendEvent(name: "temperature", value: -100, isStateChange: false, displayed: false)
@@ -631,7 +636,7 @@ def pollWeatherFlow() {
 
                     if (relative_humidity != "") {
                         debugLog("relative_humidity: ${relative_humidity}°${units_temp}")
-                        sendEvent(name: "humidity", value: relative_humidity, unit: '%')
+                        sendEvent(name: "humidity", value: relative_humidity, unit: '%', displayed: true)
                     } else {
                         log.error "relative_humidity error: ${relative_humidity}"
                         sendEvent(name: "humidity", value: -100, isStateChange: false, displayed: false)
@@ -703,9 +708,9 @@ def pollWeatherFlow() {
 
                         if (rain_detected_option == "First time") {
                          	if (precip_accum_last_1hr == 0) {
-                        		sendEvent(name:"water", value: "dry")
+                        		sendEvent(name:"water", value: "dry", displayed: true)
                             } else if (precip_accum_last_1hr > 0 || precip > 0){
-								sendEvent(name:"water", value: "wet")                             	
+								sendEvent(name:"water", value: "wet", displayed: true)                  	
                             }
                         } else {
                         	sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"))
@@ -761,7 +766,7 @@ def pollWeatherFlow() {
                     
                     if (brightness != "") {
                         debugLog("brightness: ${brightness}")
-                        sendEvent(name: "illuminance", value: brightness, unit: "lux")
+                        sendEvent(name: "illuminance", value: brightness, unit: "lux", displayed: true)
                     } else {
                         log.error "brightness error: ${brightness}"
                         sendEvent(name: "illuminance", value: 0, isStateChange: false, displayed: false)

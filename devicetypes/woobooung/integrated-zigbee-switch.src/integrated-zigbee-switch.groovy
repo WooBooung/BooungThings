@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.10.20200514" }
+public static String version() { return "v0.0.11.20200522" }
 /*
+ *   2020/05/22 >>> v0.0.11 - Added Aqara switch 1gang
  *   2020/05/14 >>> v0.0.10 - Added Zemi1gang switch
  *   2020/05/08 >>> v0.0.9  - Modified for Zemi 2gang switch
  *   2020/04/27 >>> v0.0.8  - Added Usage
@@ -58,9 +59,9 @@ import java.lang.Math
             ..
         ]
     }
-    
+
     > Step 3 - paring device and test
-    
+
     > Step 4 - request add device infos to woobooung@gmail.com
 */
 
@@ -79,7 +80,9 @@ private getMODEL_MAP() {
         'FB56+ZSW1HKJ2.5' : 2,
         'FB56+ZSW1IKJ2.7' : 3,
         'E220-KR6N0Z1-HA' : 6,
-        'Lamp_01' : 1
+        'Lamp_01' : 1,
+        'lumi.switch.b1naus01': 1,
+        'lumi.ctrl_neutral1' : 1
     ]
 }
 
@@ -118,6 +121,10 @@ metadata {
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex Zigbee Switch 1"
 
+		// Aqara Switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b1naus01", deviceJoinName: "Aqara Switch"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0006", inClusters: "0000, 0003, 0001, 0002, 0019, 000A", outClusters: "0000, 000A, 0019", manufacturer: "LUMI", model: "lumi.ctrl_neutral1", deviceJoinName: "Aqara Switch"
+        
         // Zigbee OnOff Swtich
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
 
@@ -196,21 +203,17 @@ def parse(String description) {
     if (eventMap) {
         def endpointId = device.getDataValue("endpointId")
         log.debug "eventMap $eventMap | eventDescMap $eventDescMap"
-
+		eventMap[displayed] = true
         if (eventDescMap?.sourceEndpoint == endpointId) {
-            if (eventDescMap.isValidForDataType) {
-                log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
-                sendEvent(eventMap)
-            }
+            log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
+            sendEvent(eventMap)
         } else {
             def childDevice = childDevices.find {
                 it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
             }
             if (childDevice) {
-                //if (eventDescMap.isValidForDataType) {
-                    log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
-                    childDevice.sendEvent(eventMap)
-                //}
+                log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
+                childDevice.sendEvent(eventMap)
             } else {
                 log.debug "Child device: $device.deviceNetworkId:${eventDescMap.sourceEndpoint} was not found"
                 def parentEndpointInt = zigbee.convertHexToInt(endpointId)

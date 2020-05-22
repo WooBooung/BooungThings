@@ -19,10 +19,11 @@
  *
  *  Version history
 */
-public static String version() { return "v0.0.6.20191005" }
+public static String version() { return "v0.0.7.20200522" }
 /*
- *	2019/10/05 >>> v0.0.6.20191005 - Added tag #workday (feat. Naver cafe 럽2유3)
- *	2019/04/26 >>> v0.0.4.20190426 - Added polling interval preference
+ *	2020/05/22 >>> v0.0.7 - Explicit displayed flag
+ *	2019/10/05 >>> v0.0.6 - Added tag #workday (feat. Naver cafe 럽2유3)
+ *	2019/04/26 >>> v0.0.4 - Added polling interval preference
  */
 metadata {
     definition (name: "My Day-off Switch", namespace: "WooBooung", author: "Booung", vid: "generic-switch") {
@@ -169,10 +170,10 @@ def parse(description) {
 
 def on() {
     log.debug "on()"
-    sendEvent(name: "switch", value: "on")
+    sendEvent(name: "switch", value: "on", displayed: true)
 }
 
 def off() {
     log.debug "off()"
-    sendEvent(name: "switch", value: "off")
+    sendEvent(name: "switch", value: "off", displayed: true)
 }

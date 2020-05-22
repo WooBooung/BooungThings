@@ -15,10 +15,11 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.2.20200415" }
+public static String version() { return "v0.0.3.20200522" }
 /*
- *   2020/04/15 >>> v0.0.2.20200415 - Modified Device Watch
- *   2020/04/15 >>> v0.0.1.20200415 - Initialize
+ *   2020/05/22 >>> v0.0.3 - Explicit displayed flag
+ *   2020/04/15 >>> v0.0.2 - Modified Device Watch
+ *   2020/04/15 >>> v0.0.1 - Initialize
  */
 
 import groovy.json.JsonOutput
@@ -66,7 +67,7 @@ private getBATTERY_VOLTAGE_VALUE_ATTRIBUTE() { 0x0020 }
 
 def installed() {
     log.debug "installed"
-    sendEvent(name: "contact", value: "closed", displayed: false,)
+    sendEvent(name: "contact", value: "closed", displayed: false)
     // These devices don't report regularly so they should only go OFFLINE when Hub is OFFLINE
 	sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zigbee", scheme:"untracked"]), displayed: false)
 }
@@ -152,6 +153,7 @@ private Map getBatteryResult(rawValue) {
             volts = maxVolts
         def pct = batteryMap[volts]
         result.value = pct
+        result.displayed = true
     }
 
     return result
@@ -165,7 +167,8 @@ private Map getContactResult(value) {
         name           : 'contact',
         value          : value,
         descriptionText: descriptionText,
-        translatable   : true
+        translatable   : true,
+        displayed      : true
     ]
 }
 

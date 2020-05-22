@@ -12,9 +12,10 @@
  *
  *  Based on original DH codes by SmartThings and SeungCheol Lee(slasher)
  */
-public static String version() { return "v0.0.15.20190428" }
+public static String version() { return "v0.0.16.20200522" }
 /*
- *	2019/04/28 >>> v0.0.15.20190428 - Updarte reference table
+ *	2020/05/22 >>> v0.0.16 - Explicit displayed flag
+ *	2019/04/28 >>> v0.0.15 - Updarte reference table
  */
   
 metadata {
@@ -589,7 +590,7 @@ def pollAirKorea() {
                     if( resp.data.list[0].pm10Value != "-" ) {
                         log.debug "PM10 value: ${resp.data.list[0].pm10Value}"
                         sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥")
-                        sendEvent(name: "dustLevel", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥")
+                        sendEvent(name: "dustLevel", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥", displayed: true)
                     } else {
                     	sendEvent(name: "pm10_value", value: "--", unit: "㎍/㎥")
                         sendEvent(name: "dustLevel", value: "--", unit: "㎍/㎥")
@@ -598,7 +599,7 @@ def pollAirKorea() {
                     if( resp.data.list[0].pm25Value != "-" ) { 
                         log.debug "PM25 value: ${resp.data.list[0].pm25Value}"
                         sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥")
-                        sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥")
+                        sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥", displayed: true)
                     } else {
                     	sendEvent(name: "pm25_value", value: "--", unit: "㎍/㎥")
                         sendEvent(name: "fineDustLevel", value: "--", unit: "㎍/㎥")
@@ -636,7 +637,7 @@ def pollAirKorea() {
                         	carbonMonoxide_value = "detected"
                         }
                         
-                        sendEvent(name: "carbonMonoxide", value: carbonMonoxide_value)
+                        sendEvent(name: "carbonMonoxide", value: carbonMonoxide_value, displayed: true)
                         sendEvent(name: "co_value", value: display_value as String, unit: "ppm")
                     } else
                     	sendEvent(name: "co_value", value: "--", unit: "ppm")
@@ -653,7 +654,7 @@ def pollAirKorea() {
                         
 	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.list[0].dataTime + "\nVersion: " + dthVersion)
                         
-                  		sendEvent(name: "airQuality", value: resp.data.list[0].khaiValue as Integer)
+                  		sendEvent(name: "airQuality", value: resp.data.list[0].khaiValue as Integer, displayed: true)
 
                         if (khai > 250) khai_text="매우나쁨"
                         else if (khai > 100) khai_text="나쁨"
@@ -694,14 +695,14 @@ def pollWunderground() {
 		//def weatherIcon = obs.icon_url.split("/")[-1].split("\\.")[0]
 
 		if(getTemperatureScale() == "C") {
-			send(name: "temperature", value: Math.round(obs.temperature), unit: "C")
+			send(name: "temperature", value: Math.round(obs.temperature), unit: "C", displayed: true)
 			send(name: "feelsLike", value: Math.round(obs.temperatureFeelsLike as Double), unit: "C")            
 		} else {
-			send(name: "temperature", value: Math.round(obs.temperature), unit: "F")
+			send(name: "temperature", value: Math.round(obs.temperature), unit: "F", displayed: true)
 			send(name: "feelsLike", value: Math.round(obs.temperatureFeelsLike as Double), unit: "F") 
 		}
 		
-        send(name: "humidity", value: obs.relativeHumidity as Integer, unit: "%")
+        send(name: "humidity", value: obs.relativeHumidity as Integer, unit: "%", displayed: true)
         send(name: "weather", value: obs.wxPhraseShort)
         send(name: "weatherIcon", value: obs.iconCode as String, displayed: false)
         send(name: "wind", value: Math.round(obs.windSpeed) as Integer, unit: "MPH")
@@ -740,7 +741,7 @@ def pollWunderground() {
         send(name: "localSunrise", value: localSunrise, descriptionText: "Sunrise today is at $localSunrise")
         send(name: "localSunset", value: localSunset, descriptionText: "Sunset today at is $localSunset")
 
-        send(name: "illuminance", value: estimateLux(obs, sunriseDate, sunsetDate))
+        send(name: "illuminance", value: estimateLux(obs, sunriseDate, sunsetDate), displayed: true)
 
 		// Forecast
         def f = getTwcForecast(zipCode)

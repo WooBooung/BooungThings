@@ -13,10 +13,11 @@
  */
 
 /*
- *    2019/11/06 >>> v0.0.4.20191106 - Add capability Battery
- *    2019/10/29 >>> v0.0.3.20191029 - Add capability power, temperature, humidity
- *    2019/10/29 >>> v0.0.2.20191029 - Modified motion
- *    2019/10/29 >>> v0.0.1.20191029 - Initialize Super Virtual Device
+ *    2020/05/22 >>> v0.0.5 - Explicit displayed flag
+ *    2019/11/06 >>> v0.0.4 - Add capability Battery
+ *    2019/10/29 >>> v0.0.3 - Add capability power, temperature, humidity
+ *    2019/10/29 >>> v0.0.2 - Modified motion
+ *    2019/10/29 >>> v0.0.1 - Initialize Super Virtual Device
  */
 metadata {
     definition (name: "Super Virtual Device", namespace: "WooBooung", author: "Booung") {
@@ -239,7 +240,7 @@ def updated() {
 private initialize() {
     log.trace "Executing 'initialize'"
 
-    sendEvent(name: "battery", value: 100, unit: "%")
+    sendEvent(name: "battery", value: 100, unit: "%", diplayed: true)
     sendEvent(name: "temp_unit", value: "C")
     sendEvent(name: "supportedValues", value: "{\"value\": [\"human\"]}", displayed: false)
 
@@ -256,117 +257,121 @@ def parse(String description) {
 
 def smoke_detected() {
     log.debug "smoke()"
-    sendEvent(name: "smoke", value: "detected", descriptionText: "$device.displayName smoke detected!")
+    sendEvent(name: "smoke", value: "detected", descriptionText: "$device.displayName smoke detected!", diplayed: true)
 }
 
 def smoke_clear() {
     log.debug "smoke_clear()"
-    sendEvent(name: "smoke", value: "clear", descriptionText: "$device.displayName clear")
+    sendEvent(name: "smoke", value: "clear", descriptionText: "$device.displayName clear", diplayed: true)
 }
 
 def sound_detected() {
     log.debug "sound_detected()"
-    sendEvent(name: "sound", value: "detected", descriptionText: "$device.displayName sound detected")
+    sendEvent(name: "sound", value: "detected", descriptionText: "$device.displayName sound detected", diplayed: true)
 }
 
 def sound_clear() {
     log.debug "sound_clear()"
-    sendEvent(name: "sound", value: "not detected", descriptionText: "$device.displayName sound not detected")
+    sendEvent(name: "sound", value: "not detected", descriptionText: "$device.displayName sound not detected", diplayed: true)
+    
+    0.step 10, 2, {
+    log.debug "$it"
+	}
 }
 
 def human1() {
     log.debug "human1()"
     active()
-    sendEvent(name: "detected", value: "{\"data\": {\"qty\": 1},\"value\": \"human\", \"qty\": 1}", descriptionText: "$device.displayName human 1 detected")
+    sendEvent(name: "detected", value: "{\"data\": {\"qty\": 1},\"value\": \"human\", \"qty\": 1}", descriptionText: "$device.displayName human 1 detected", diplayed: true)
     sendEvent(name: "humanqty", value: 1, displayed: false)
 }
 
 def human2() {
     log.debug "human2()"
     active()
-    sendEvent(name: "detected", value: "{\"data\": {\"qty\": 2},\"value\": \"human\", \"qty\":  2}", descriptionText: "$device.displayName human 2 detected")
+    sendEvent(name: "detected", value: "{\"data\": {\"qty\": 2},\"value\": \"human\", \"qty\":  2}", descriptionText: "$device.displayName human 2 detected", diplayed: true)
     sendEvent(name: "humanqty", value: 2, displayed: false)
 }
 
 def active() {
     log.debug "motion_active()"
-    sendEvent(name: "motion", value: "active", descriptionText: "$device.displayName motion active")
+    sendEvent(name: "motion", value: "active", descriptionText: "$device.displayName motion active", diplayed: true)
 }
 
 def inactive() {
     log.debug "motion_inactive()"
-    sendEvent(name: "motion", value: "inactive", descriptionText: "$device.displayName motion inactive")
-    sendEvent(name: "detected", value: "{\"data\": {\"qty\": 0},\"value\": \"human\", \"qty\":  0}", descriptionText: "$device.displayName human 0 detected")
+    sendEvent(name: "motion", value: "inactive", descriptionText: "$device.displayName motion inactive", diplayed: true)
+    sendEvent(name: "detected", value: "{\"data\": {\"qty\": 0},\"value\": \"human\", \"qty\":  0}", descriptionText: "$device.displayName human 0 detected", diplayed: true)
     sendEvent(name: "humanqty", value: 0, displayed: false)
 }
 
 def wet() {
     log.debug "wet()"
-    sendEvent(name: "water", value: "wet")
+    sendEvent(name: "water", value: "wet", diplayed: true)
 }
 
 def dry() {
     log.debug "dry()"
-    sendEvent(name: "water", value: "dry")
+    sendEvent(name: "water", value: "dry", diplayed: true)
 }
 
 def open() {
     log.debug "open()"
-    sendEvent(name: "contact", value: "open")
+    sendEvent(name: "contact", value: "open", diplayed: true)
 }
 
 def close() {
     log.debug "close()"
-    sendEvent(name: "contact", value: "closed")
+    sendEvent(name: "contact", value: "closed", diplayed: true)
 }
 
 def co_detected() {
     log.debug "carbonMonoxide_detected()"
-    sendEvent(name: "carbonMonoxide", value: "detected")
+    sendEvent(name: "carbonMonoxide", value: "detected", diplayed: true)
 }
 
 def co_clear() {
     log.debug "carbonMonoxide_clear()"
-    sendEvent(name: "carbonMonoxide", value: "clear")
+    sendEvent(name: "carbonMonoxide", value: "clear", diplayed: true)
 }
 
 def present() {
     log.debug "present()"
-    sendEvent(name: "presence", value: "present")
+    sendEvent(name: "presence", value: "present", diplayed: true)
 }
 
 def not_present() {
     log.debug "not_present()"
-    sendEvent(name: "presence", value: "not present")
+    sendEvent(name: "presence", value: "not present", diplayed: true)
 }
 
 def occupied() {
     log.debug "occupied()"
-    sendEvent(name: "occupancy", value: "occupied")
+    sendEvent(name: "occupancy", value: "occupied", diplayed: true)
 }
 
 def unoccupied() {
     log.debug "unoccupied()"
-    sendEvent(name: "occupancy", value: "unoccupied")
+    sendEvent(name: "occupancy", value: "unoccupied", diplayed: true)
 }
 
 def on() {
     log.debug "switch_on()"
-    sendEvent(name: "switch", value: "on")
-    sendEvent(name:"power", value: 100)
+    sendEvent(name: "switch", value: "on", diplayed: true)
+    sendEvent(name:"power", value: 100, diplayed: true)
 }
 
 def off() {
     log.debug "switch_off()"
-    sendEvent(name: "switch", value: "off")
-    sendEvent(name:"power", value: 0 )
+    sendEvent(name: "switch", value: "off", diplayed: true)
+    sendEvent(name:"power", value: 0, diplayed: true)
 }
 
 def watt_up() {
     def ts = device.currentState("power")
     def value = ts ? ts.integerValue + 10 : 100 
 
-    sendEvent(name:"power", value: value )
+    sendEvent(name:"power", value: value, diplayed: true)
 }
 
 def watt_down() {
@@ -375,14 +380,14 @@ def watt_down() {
 
     if (value < 0) value = 0
 
-    sendEvent(name:"power", value: value)
+    sendEvent(name:"power", value: value, diplayed: true)
 }
 
 def humi_up() {
     def ts = device.currentState("humidity")
     def value = ts ? ts.integerValue + 1 : 40 
 
-    sendEvent(name:"humidity", value: value )
+    sendEvent(name:"humidity", value: value, diplayed: true)
 }
 
 def humi_down() {
@@ -391,7 +396,7 @@ def humi_down() {
 
     if (value < 0) value = 0
 
-    sendEvent(name:"humidity", value: value)
+    sendEvent(name:"humidity", value: value, diplayed: true)
 }
 
 def unitC() {
@@ -407,7 +412,7 @@ def temp_up() {
     def value = ts ? ts.integerValue + 1 : 40 
 
     def unit = device.currentState("temp_unit")
-    sendEvent(name:"temperature", value: value, unit: unit.stringValue)
+    sendEvent(name:"temperature", value: value, unit: unit.stringValue, diplayed: true)
 }
 
 def temp_down() {
@@ -415,7 +420,7 @@ def temp_down() {
     def value = ts ? ts.integerValue - 1 : 0 
 
     def unit = device.currentState("temp_unit")
-    sendEvent(name:"temperature", value: value, unit: unit.stringValue)
+    sendEvent(name:"temperature", value: value, unit: unit.stringValue, diplayed: true)
 }
 
 def batt_up() {
@@ -424,7 +429,7 @@ def batt_up() {
 
     if (value > 100) value = 100
 
-    sendEvent(name:"battery", value: value, unit: "%")
+    sendEvent(name:"battery", value: value, unit: "%", diplayed: true)
 }
 
 def batt_down() {
@@ -433,5 +438,5 @@ def batt_down() {
 
     if (value < 0) value = 0
 
-    sendEvent(name:"battery", value: value, unit: "%")
+    sendEvent(name:"battery", value: value, unit: "%", diplayed: true)
 }
