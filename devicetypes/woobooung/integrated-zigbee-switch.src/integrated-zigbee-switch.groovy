@@ -82,6 +82,8 @@ private getMODEL_MAP() {
         'E220-KR6N0Z1-HA' : 6,
         'Lamp_01' : 1,
         'lumi.switch.b1naus01': 1,
+        'lumi.switch.b2naus01': 2,
+        'lumi.switch.b3naus01': 3,
         'lumi.ctrl_neutral1' : 1
     ]
 }
@@ -123,6 +125,8 @@ metadata {
 
 		// Aqara Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b1naus01", deviceJoinName: "Aqara Switch"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b2naus01", deviceJoinName: "Aqara Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b3naus01", deviceJoinName: "Aqara Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0006", inClusters: "0000, 0003, 0001, 0002, 0019, 000A", outClusters: "0000, 000A, 0019", manufacturer: "LUMI", model: "lumi.ctrl_neutral1", deviceJoinName: "Aqara Switch"
         
         // Zigbee OnOff Swtich
