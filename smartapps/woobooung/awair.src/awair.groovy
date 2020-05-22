@@ -13,21 +13,22 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.13.20200423" }
+public static String version() { return "v0.0.14.20200522" }
 /*
- *  2020/04/23 >>> v0.0.13.20200423 - Support Awair-element
- *  2019/12/24 >>> v0.0.12.20191224 - Explicit pausable, and Fixed error in GetUserInfos
- *  2019/06/12 >>> v0.0.11.20190612 - Prevent duplication post command
- *  2019/06/06 >>> v0.0.10.20190606 - Added API Call Count in Awair SmartApp Page
- *  2019/06/06 >>> v0.0.9.20190606 - Added Awair-Omni
- *  2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking
- *  2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
- *  2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor(Only for Awair-R1)
- *  2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
- *  2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
- *	2019/05/10 >>> v0.0.3.20190510 - Modified data type of temperature (Integer -> Double)
- *	2019/05/07 >>> v0.0.2.20190507 - Modified data type of AirQualitySensor
- *	2019/05/05 >>> v0.0.1.20190505 - Initialize
+ *	2020/05/22 >>> v0.0.14 - Explicit displayed flag
+ *  2020/04/23 >>> v0.0.13 - Support Awair-element
+ *  2019/12/24 >>> v0.0.12 - Explicit pausable, and Fixed error in GetUserInfos
+ *  2019/06/12 >>> v0.0.11 - Prevent duplication post command
+ *  2019/06/06 >>> v0.0.10 - Added API Call Count in Awair SmartApp Page
+ *  2019/06/06 >>> v0.0.9 - Added Awair-Omni
+ *  2019/05/22 >>> v0.0.8 - Get current status Display Led Knocking
+ *  2019/05/21 >>> v0.0.7 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
+ *  2019/05/15 >>> v0.0.6 - Changed Dust Sensor to Fine Dust Sensor(Only for Awair-R1)
+ *  2019/05/13 >>> v0.0.5 - Seperated DTH (Need to Update SmartApp and DTH)
+ *  2019/05/13 >>> v0.0.4 - Added Commands (Need to Update SmartApp and DTH)
+ *	2019/05/10 >>> v0.0.3 - Modified data type of temperature (Integer -> Double)
+ *	2019/05/07 >>> v0.0.2 - Modified data type of AirQualitySensor
+ *	2019/05/05 >>> v0.0.1 - Initialize
  */
 
 import groovy.json.*
@@ -402,7 +403,7 @@ private updateChildDeviceAirData(UUID, airLatestData) {
     if (airLatestData) {
         log.debug "updateChildDeviceData airData : ${airLatestData}"
 
-        childDevice?.sendEvent(name: "airQuality", value: airLatestData.score as Integer)
+        childDevice?.sendEvent(name: "airQuality", value: airLatestData.score as Integer, displayed: true)
 
         //log.debug "updateStatus indices : ${airLatestData.indices}"
         //log.debug "updateStatus sensors : ${airLatestData.sensors}"
@@ -411,19 +412,19 @@ private updateChildDeviceAirData(UUID, airLatestData) {
             switch (it.comp) {
                 case "temp":
                 Double tempDouble = it.value
-                childDevice?.sendEvent(name: "temperature", value: tempDouble.round(1), unit: getTemperatureScale())
+                childDevice?.sendEvent(name: "temperature", value: tempDouble.round(1), unit: getTemperatureScale(), displayed: true)
                 break
-                case "humid": childDevice?.sendEvent(name: "humidity", value: it.value as Integer, unit: "%"); break
+                case "humid": childDevice?.sendEvent(name: "humidity", value: it.value as Integer, unit: "%", displayed: true); break
                 case "co2": 
                 def co2ppm = it.value as Integer
                 childDevice?.co2homekitNotice(co2ppm)
-                childDevice?.sendEvent(name: "carbonDioxide", value: co2ppm, unit: "ppm"); break;
-                case "voc": childDevice?.sendEvent(name: "tvocLevel", value: it.value as Integer, unit: "ppb"); break;
-                case "pm25": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
-                case "pm10": childDevice?.sendEvent(name: "dustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
-                case "dust": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥"); break;
-                case "lux": childDevice?.sendEvent(name: "illuminance", value: it.value as Integer); break;
-                case "spl_a": childDevice?.sendEvent(name: "soundPressureLevel", value: it.value as Integer, unit: "db"); break;
+                childDevice?.sendEvent(name: "carbonDioxide", value: co2ppm, unit: "ppm", displayed: true); break;
+                case "voc": childDevice?.sendEvent(name: "tvocLevel", value: it.value as Integer, unit: "ppb", displayed: true); break;
+                case "pm25": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥", displayed: true); break;
+                case "pm10": childDevice?.sendEvent(name: "dustLevel", value: it.value as Integer, unit: "㎍/㎥", displayed: true); break;
+                case "dust": childDevice?.sendEvent(name: "fineDustLevel", value: it.value as Integer, unit: "㎍/㎥", displayed: true); break;
+                case "lux": childDevice?.sendEvent(name: "illuminance", value: it.value as Integer, displayed: true); break;
+                case "spl_a": childDevice?.sendEvent(name: "soundPressureLevel", value: it.value as Integer, unit: "db", displayed: true); break;
             }
         }
 
@@ -443,7 +444,7 @@ private updateChildDeviceAirData(UUID, airLatestData) {
 
         childDevice?.sendEvent(name: "data_time", value: now, displayed: false)
     } else {
-        childDevice?.sendEvent(name: "data_time", value: "$now\n!!! Error - Data is empty !!!")
+        childDevice?.sendEvent(name: "data_time", value: "$now\n!!! Error - Data is empty !!!", displayed: false)
     }
 }
 
@@ -504,8 +505,8 @@ private updateChildDevicePowerData(UUID, responseData) {
     if (responseData) {
         log.debug "updateChildDevicePowerData : ${responseData}"
 
-        childDevice?.sendEvent(name: "powerSource", value: responseData.plugged ? "dc" : "battery")
-        childDevice?.sendEvent(name: "battery", value: responseData.plugged ? 100 : responseData.percentage as Integer, unit: "%")
+        childDevice?.sendEvent(name: "powerSource", value: responseData.plugged ? "dc" : "battery", displayed: true)
+        childDevice?.sendEvent(name: "battery", value: responseData.plugged ? 100 : responseData.percentage as Integer, unit: "%", displayed: true)
     }
 }
 
