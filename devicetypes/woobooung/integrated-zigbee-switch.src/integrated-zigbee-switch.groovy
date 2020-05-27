@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.11.20200522" }
+public static String version() { return "v0.0.12.20200527" }
 /*
+ *   2020/05/27 >>> v0.0.12 - Aqara 1gang switch mapping to ZigBee Switch Power
  *   2020/05/22 >>> v0.0.11 - Added Aqara switch 1gang
  *   2020/05/14 >>> v0.0.10 - Added Zemi1gang switch
  *   2020/05/08 >>> v0.0.9  - Modified for Zemi 2gang switch
@@ -171,11 +172,15 @@ metadata {
 def installed() {
     log.debug "installed()"
     def endpointCount = getEndpointCount()
+    def model = device.getDataValue("model")
     if (endpointCount == 1) {
         // for 1 gang switch - ST Official local dth
-        setDeviceType("ZigBee Switch")
+        if (model == 'lumi.switch.b1naus01' || model == 'lumi.ctrl_neutral1') {
+        	setDeviceType("ZigBee Switch Power")
+        } else {
+        	setDeviceType("ZigBee Switch")
+        }
     } else if (endpointCount > 1){
-        def model = device.getDataValue("model")
         if (model == 'FB56+ZSW1HKJ2.5' || model == 'FB56+ZSW1IKJ2.7') {
             device.updateDataValue("endpointId", "10")
         }
