@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.12.20200527" }
+public static String version() { return "v0.0.13.20200529" }
 /*
+ *   2020/05/29 >>> v0.0.13 - Tuya multitab with USB
  *   2020/05/27 >>> v0.0.12 - Aqara 1gang switch mapping to ZigBee Switch Power
  *   2020/05/22 >>> v0.0.11 - Added Aqara switch 1gang
  *   2020/05/14 >>> v0.0.10 - Added Zemi1gang switch
@@ -71,6 +72,7 @@ private getMODEL_MAP() {
         'TS0003' : 3,
         'TS0002' : 2,
         'TS0001' : 1,
+        'TS0115' : 5,
         'PM-S340-ZB' : 3,
         'PM-S240-ZB' : 2,
         'PM-S140-ZB' : 1,
@@ -101,25 +103,25 @@ metadata {
         command "childOff", ["string"]
 
         // Bandi ZigBee Multi Switch
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_pdevogdj", model: "TS0003", deviceJoinName: "Bandi Zigbee Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_tas0zemd", model: "TS0002", deviceJoinName: "Bandi Zigbee Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_ddg0cycp", model: "TS0001", deviceJoinName: "Bandi Zigbee Switch"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_pdevogdj", model: "TS0003", deviceJoinName: "Bandi Zigbee Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_tas0zemd", model: "TS0002", deviceJoinName: "Bandi Zigbee Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_ddg0cycp", model: "TS0001", deviceJoinName: "Bandi Zigbee Switch"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_pdevogdj", model: "TS0003", deviceJoinName: "Bandi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_tas0zemd", model: "TS0002", deviceJoinName: "Bandi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_ddg0cycp", model: "TS0001", deviceJoinName: "Bandi ZigBee Switch"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_pdevogdj", model: "TS0003", deviceJoinName: "Bandi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_tas0zemd", model: "TS0002", deviceJoinName: "Bandi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_ddg0cycp", model: "TS0001", deviceJoinName: "Bandi ZigBee Switch"
 
         // DAWON DNS ZigBee Multi Switch
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S140-ZB", deviceJoinName: "DAWON Zigbee Switch"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S240-ZB", deviceJoinName: "DAWON Zigbee Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S340-ZB", deviceJoinName: "DAWON Zigbee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S140-ZB", deviceJoinName: "DAWON ZigBee Switch"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S240-ZB", deviceJoinName: "DAWON ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", outClusters: "0000, 0004, 0003, 0006, 0019, 0002, 0009", manufacturer: "DAWON_DNS", model: "PM-S340-ZB", deviceJoinName: "DAWON ZigBee Switch 1"
 
         // Zemi ZigBee Multi Switch
-        fingerprint endpointId: "10", profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1GKJ2.7", deviceJoinName: "Zemi Zigbee Switch"
-        fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", outClusters: "0000", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1HKJ2.5", deviceJoinName: "Zemi Zigbee Switch 1"
-        fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.7", deviceJoinName: "Zemi Zigbee Switch 1"
-        fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW01LX2.0", deviceJoinName: "Zemi Zigbee Switch"
-        fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
-        fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi Zigbee Switch 1"
+        fingerprint endpointId: "10", profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1GKJ2.7", deviceJoinName: "Zemi ZigBee Switch"
+        fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", outClusters: "0000", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1HKJ2.5", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.7", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW01LX2.0", deviceJoinName: "Zemi ZigBee Switch"
+        fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi ZigBee Switch 1"
 
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex Zigbee Switch 1"
@@ -132,6 +134,10 @@ metadata {
         
         // Zigbee OnOff Swtich
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
+        
+        // Tuya multitab with USB
+        //01 0104 0009 00 05 0000 000A 0004 0005 0006 01 0019
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
 
         // Unclear devices without model, meanufacturer
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch 1"
@@ -175,7 +181,7 @@ def installed() {
     def model = device.getDataValue("model")
     if (endpointCount == 1) {
         // for 1 gang switch - ST Official local dth
-        if (model == 'lumi.switch.b1naus01' || model == 'lumi.ctrl_neutral1') {
+        if (model == 'lumi.switch.b1naus01') {
         	setDeviceType("ZigBee Switch Power")
         } else {
         	setDeviceType("ZigBee Switch")
