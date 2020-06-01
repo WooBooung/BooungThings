@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.13.20200529" }
+public static String version() { return "v0.0.14.20200601" }
 /*
+ *   2020/06/01 >>> v0.0.14 - Tuya multitab without USB
  *   2020/05/29 >>> v0.0.13 - Tuya multitab with USB
  *   2020/05/27 >>> v0.0.12 - Aqara 1gang switch mapping to ZigBee Switch Power
  *   2020/05/22 >>> v0.0.11 - Added Aqara switch 1gang
@@ -72,7 +73,7 @@ private getMODEL_MAP() {
         'TS0003' : 3,
         'TS0002' : 2,
         'TS0001' : 1,
-        'TS0115' : 5,
+        'TS0115' : 4,
         'PM-S340-ZB' : 3,
         'PM-S240-ZB' : 2,
         'PM-S140-ZB' : 1,
@@ -126,15 +127,15 @@ metadata {
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex Zigbee Switch 1"
 
-		// Aqara Switch
+        // Aqara Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b1naus01", deviceJoinName: "Aqara Switch"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b2naus01", deviceJoinName: "Aqara Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b3naus01", deviceJoinName: "Aqara Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0006", inClusters: "0000, 0003, 0001, 0002, 0019, 000A", outClusters: "0000, 000A, 0019", manufacturer: "LUMI", model: "lumi.ctrl_neutral1", deviceJoinName: "Aqara Switch"
-        
+
         // Zigbee OnOff Swtich
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
-        
+
         // Tuya multitab with USB
         //01 0104 0009 00 05 0000 000A 0004 0005 0006 01 0019
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
@@ -182,9 +183,9 @@ def installed() {
     if (endpointCount == 1) {
         // for 1 gang switch - ST Official local dth
         if (model == 'lumi.switch.b1naus01') {
-        	setDeviceType("ZigBee Switch Power")
+            setDeviceType("ZigBee Switch Power")
         } else {
-        	setDeviceType("ZigBee Switch")
+            setDeviceType("ZigBee Switch")
         }
     } else if (endpointCount > 1){
         if (model == 'FB56+ZSW1HKJ2.5' || model == 'FB56+ZSW1IKJ2.7') {
@@ -218,7 +219,7 @@ def parse(String description) {
     if (eventMap) {
         def endpointId = device.getDataValue("endpointId")
         log.debug "eventMap $eventMap | eventDescMap $eventDescMap"
-		eventMap[displayed] = true
+        eventMap[displayed] = true
         if (eventDescMap?.sourceEndpoint == endpointId) {
             log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
             sendEvent(eventMap)
@@ -230,13 +231,18 @@ def parse(String description) {
                 log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
                 childDevice.sendEvent(eventMap)
             } else {
-                log.debug "Child device: $device.deviceNetworkId:${eventDescMap.sourceEndpoint} was not found"
-                def parentEndpointInt = zigbee.convertHexToInt(endpointId)
-                def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
-                def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
-                def deviceLabel = "${device.displayName[0..-2]}"
-                def deviceIndex = Math.abs(childEndpointInt - parentEndpointInt) + 1
-                createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
+                def model = device.getDataValue("model")
+                if ( model == 'TS0115' &&  eventDescMap?.sourceEndpoint == "05") {
+                    log.debug "SKIP Tuya mulit tab USB Device"
+                } else {
+                    log.debug "Child device: $device.deviceNetworkId:${eventDescMap.sourceEndpoint} was not found"
+                    def parentEndpointInt = zigbee.convertHexToInt(endpointId)
+                    def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
+                    def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
+                    def deviceLabel = "${device.displayName[0..-2]}"
+                    def deviceIndex = Math.abs(childEndpointInt - parentEndpointInt) + 1
+                    createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
+                }
             }
         }
     }

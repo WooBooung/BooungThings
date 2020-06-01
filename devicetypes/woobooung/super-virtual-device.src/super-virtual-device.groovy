@@ -74,6 +74,8 @@ metadata {
         command "watt_down"
         command "batt_up"
         command "batt_down"
+        command "offline"
+        command "online"
     }
 
     simulator {
@@ -224,6 +226,14 @@ metadata {
         standardTile("batt_down", "device.battery", inactiveLabel: false, decoration: "flat") {
             state("default", label:'-5%', backgroundColor:"#e86d13", action: "batt_down")
         }
+
+        standardTile("online", "device.status", inactiveLabel: false, decoration: "flat") {
+            state("occupied", label:'online',  backgroundColor:"#00A0DC", action: "online")
+        }
+
+        standardTile("offline", "device.status", inactiveLabel: false, decoration: "flat") {
+            state("unoccupied", label:'offline', backgroundColor:"#e86d13", action: "offline")
+        }
     }
 }
 
@@ -273,10 +283,10 @@ def sound_detected() {
 def sound_clear() {
     log.debug "sound_clear()"
     sendEvent(name: "sound", value: "not detected", descriptionText: "$device.displayName sound not detected", diplayed: true)
-    
+
     0.step 10, 2, {
-    log.debug "$it"
-	}
+        log.debug "$it"
+    }
 }
 
 def human1() {
@@ -439,4 +449,12 @@ def batt_down() {
     if (value < 0) value = 0
 
     sendEvent(name:"battery", value: value, unit: "%", diplayed: true)
+}
+
+def offline() {
+    sendEvent(name: "DeviceWatch-DeviceStatus", value: "offline", displayed: false)
+}
+
+def online() {
+    sendEvent(name: "DeviceWatch-DeviceStatus", value: "online", displayed: false)
 }
