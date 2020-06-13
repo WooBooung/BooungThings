@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.15.20200613" }
+public static String version() { return "v0.0.16.20200614" }
 /*
+ *   2020/06/14 >>> v0.0.16 - Support All Controller switch and fixed for Tuya usb switch offline issue
  *   2020/06/13 >>> v0.0.15 - Tuya multitab support USB
  *   2020/06/01 >>> v0.0.14 - Tuya multitab without USB
  *   2020/05/29 >>> v0.0.13 - Tuya multitab with USB
@@ -148,6 +149,7 @@ metadata {
     }
 
     preferences {
+        input name: "isCreateAllControllerSwitch", type: "bool", title: "Create All Controller switch", defaultValue: false, required: true
         input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
     }
 
@@ -243,7 +245,48 @@ def parse(String description) {
                 def deviceIndex = Math.abs(childEndpointInt - parentEndpointInt) + 1
                 createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
             }
+
+            if (isCreateAllControllerSwitch) {
+                def allControlChildDevice = childDevices.find {
+                    it.deviceNetworkId == "$device.deviceNetworkId:ALL"
+                }
+                if (!allControlChildDevice) {
+                    def deviceLabel = "${device.displayName[0..-2]}"
+                    createChildDevice("${deviceLabel}ALL", "ALL")
+                }
+            }
         }
+
+        checkAllSwtichValue()
+    }
+}
+
+private checkAllSwtichValue() {
+    def parentSwitchValue = device.currentState("switch").value
+    log.debug("${device.label} : ${parentSwitchValue}")
+
+    def allChildDeviceValue = parentSwitchValue
+
+    log.debug("allChildDeviceValue $allChildDeviceValue")
+
+    def allChildDevice = null
+    childDevices?.each {
+        log.debug("${it.label} : ${it.currentState("switch").value}")
+        if (it.deviceNetworkId == "$device.deviceNetworkId:ALL") {
+            allChildDevice = it
+        } else {
+            if (it.currentState("switch").value == "on") {
+                log.debug("ON ON HIT HIT")
+
+                allChildDeviceValue = "on"
+            }
+        }
+    }
+
+    log.debug("allChildDevice ${allChildDevice?.currentState("switch").value} : allChildDeviceValue ${allChildDeviceValue}")
+
+    if (allChildDevice?.currentState("switch") != allChildDeviceValue) {
+        allChildDevice?.sendEvent(name: "switch", value : allChildDeviceValue)
     }
 }
 
@@ -271,8 +314,6 @@ private void createChildDevices() {
     if ( model == 'TS0115') {
         createChildDevice("${deviceLabel}USB", "07")
     }
-
-    //createChildDevice("${deviceLabel}ALL", "ALL")
 }
 
 private void createChildDevice(String deviceLabel, String endpointHexString) {
@@ -292,6 +333,33 @@ private getChildEndpoint(String dni) {
     dni.split(":")[-1] as String
 }
 
+private allChildOn() {
+    log.debug "Executing 'on all' for 0x${device.deviceNetworkId}"
+
+    childDevices.each {
+        if (it.deviceNetworkId == "$device.deviceNetworkId:ALL") {
+            it.sendEvent(name: "switch", value: "on") 
+        } else {
+            if (it.currentState("switch").value != "on") {
+                it.on()
+            }
+        }
+    }
+}
+
+private allChildOff() {
+    log.debug "Executing 'off all' for 0x${device.deviceNetworkId}"
+    childDevices.each {
+        if (it.deviceNetworkId == "$device.deviceNetworkId:ALL") {
+            it.sendEvent(name: "switch", value: "off") 
+        } else {
+            if (it.currentState("switch").value != "off") {
+                it.off()
+            }
+        }
+    }
+}
+
 def on() {
     log.debug("on")
     zigbee.on()
@@ -305,16 +373,31 @@ def off() {
 def childOn(String dni) {
     log.debug("child on ${dni}")
     def childEndpoint = getChildEndpoint(dni)
-    def endpointInt = zigbee.convertHexToInt(childEndpoint)
-    zigbee.command(zigbee.ONOFF_CLUSTER, 0x01, "", [destEndpoint: endpointInt])
+    if(childEndpoint == "ALL") {
+        allChildOn()
+        if (device.currentState("switch") != "on") {
+            zigbee.on()
+        }
+    } else {
+        def endpointInt = zigbee.convertHexToInt(childEndpoint)
+        zigbee.command(zigbee.ONOFF_CLUSTER, 0x01, "", [destEndpoint: endpointInt])
+    }
 }
 
 def childOff(String dni) {
     log.debug("child off ${dni}")
     def childEndpoint = getChildEndpoint(dni)
-    def endpointInt = zigbee.convertHexToInt(childEndpoint)
-    zigbee.command(zigbee.ONOFF_CLUSTER, 0x00, "", [destEndpoint: endpointInt])
+    if(childEndpoint == "ALL") {
+        allChildOff()
+        if (device.currentState("switch") != "off") {
+            zigbee.off()
+        }
+    }else {
+        def endpointInt = zigbee.convertHexToInt(childEndpoint)
+        zigbee.command(zigbee.ONOFF_CLUSTER, 0x00, "", [destEndpoint: endpointInt])
+    }
 }
+
 /**
  * PING is used by Device-Watch in attempt to reach the Device
  * */
@@ -327,12 +410,10 @@ def refresh() {
     def endpointCount = getEndpointCount()
 
     if (endpointCount > 1) {
-        def endpointId = device.getDataValue("endpointId")
-        def endpointInt = zigbee.convertHexToInt(endpointId)
-
-        for (i in 1..endpointCount - 1) {
-            def endpointValue = endpointInt + i
-            cmds += zigbee.readAttribute(zigbee.ONOFF_CLUSTER, 0x0000, [destEndpoint: endpointValue])
+        childDevices.each {
+        	def childEndpoint = getChildEndpoint(it.deviceNetworkId)
+            def endpointInt = zigbee.convertHexToInt(endpointId)
+            cmds += zigbee.readAttribute(zigbee.ONOFF_CLUSTER, 0x0000, [destEndpoint: endpointInt])
         }
     } else {
         cmds += zigbee.readAttribute(zigbee.ONOFF_CLUSTER, 0x0000, [destEndpoint: 0xFF])
@@ -376,12 +457,10 @@ def configure() {
     def endpointCount = getEndpointCount()
 
     if (endpointCount > 1) {
-        def endpointId = device.getDataValue("endpointId")
-        def endpointInt = zigbee.convertHexToInt(endpointId)
-
-        for (i in 1..endpointCount - 1) {
-            def endpointValue = endpointInt + i
-            cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: endpointValue])
+        childDevices.each {
+        	def childEndpoint = getChildEndpoint(it.deviceNetworkId)
+            def endpointInt = zigbee.convertHexToInt(endpointId)
+            cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: endpointInt])
         }
     } else {
         cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: 0xFF])
