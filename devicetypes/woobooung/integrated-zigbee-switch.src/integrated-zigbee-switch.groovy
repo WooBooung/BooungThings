@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.17.20200614" }
+public static String version() { return "v0.0.18.20200614" }
 /*
+ *   2020/06/14 >>> v0.0.18 - Child device type change
  *   2020/06/14 >>> v0.0.17 - Fixed health check issue
  *   2020/06/14 >>> v0.0.16 - Support All Controller switch and fixed for Tuya usb switch offline issue
  *   2020/06/13 >>> v0.0.15 - Tuya multitab support USB
@@ -318,7 +319,7 @@ private void createChildDevice(String deviceLabel, String endpointHexString) {
     }
     if (!childDevice) {
         log.debug("Need to createChildDevice: $device.deviceNetworkId:$endpointHexString")
-        addChildDevice("smartthings", "Child Switch Health", "$device.deviceNetworkId:$endpointHexString", device.hubId,
+        addChildDevice("smartthings", "Child Switch", "$device.deviceNetworkId:$endpointHexString", device.hubId,
                        [completedSetup: true, label: deviceLabel, isComponent: false])
     } else {
         log.debug("createChildDevice: SKIP - $device.deviceNetworkId:${endpointHexString}")
@@ -446,7 +447,7 @@ def configureHealthCheck() {
             if (childEndpoint.isNumber()) {
                 it.sendEvent(healthEvent)
             } else if (childEndpoint == "ALL") {
-            	it.sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zigbee", scheme:"untracked"]), displayed: false)
+                it.sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zigbee", scheme:"untracked"]), displayed: false)
             }
         }
         state.hasConfiguredHealthCheck = true
