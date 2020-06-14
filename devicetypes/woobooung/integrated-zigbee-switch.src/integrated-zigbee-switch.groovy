@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.18.20200614" }
+public static String version() { return "v0.0.19.20200614" }
 /*
+ *   2020/06/14 >>> v0.0.19 - Auto detecting and create option
  *   2020/06/14 >>> v0.0.18 - Child device type change
  *   2020/06/14 >>> v0.0.17 - Fixed health check issue
  *   2020/06/14 >>> v0.0.16 - Support All Controller switch and fixed for Tuya usb switch offline issue
@@ -151,6 +152,7 @@ metadata {
     }
 
     preferences {
+        input name: "isAutoCreateChildDevice", type: "bool", title: "Auto detecting and create device", defaultValue: false, required: true
         input name: "isCreateAllControllerSwitch", type: "bool", title: "Create All Controller switch", defaultValue: false, required: true
         input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
     }
@@ -202,12 +204,14 @@ def installed() {
         createChildDevices()
     }
     updateDataValue("onOff", "catchall")
+    state.hasConfiguredHealthCheck = false
     refresh()
 }
 
 def updated() {
     log.debug "updated()"
     updateDataValue("onOff", "catchall")
+    state.hasConfiguredHealthCheck = false
     refresh()
 }
 
@@ -237,7 +241,7 @@ def parse(String description) {
             if (childDevice) {
                 log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
                 childDevice.sendEvent(eventMap)
-            } else {
+            } else if (isAutoCreateChildDevice || getEndpointCount() == 0){
                 def model = device.getDataValue("model")
                 log.debug "Child device: $device.deviceNetworkId:${eventDescMap?.sourceEndpoint} was not found"
                 def parentEndpointInt = zigbee.convertHexToInt(endpointId)
@@ -276,7 +280,7 @@ private checkAllSwtichValue() {
         if (it.deviceNetworkId == "$device.deviceNetworkId:ALL") {
             allChildDevice = it
         } else {
-            if (it.currentState("switch").value == "on") {
+            if (it.currentState("switch")?.value == "on") {
                 allChildDeviceValue = "on"
             }
         }
@@ -296,20 +300,23 @@ private getEndpointCount() {
 }
 
 private void createChildDevices() {
-    log.debug("createChildDevices of $device.deviceNetworkId")
-    def endpointCount = getEndpointCount()
-    def endpointId = device.getDataValue("endpointId")
-    def endpointInt = zigbee.convertHexToInt(endpointId)
-    def deviceLabel = "${device.displayName[0..-2]}"
+    log.debug("=============createChildDevices of $device.deviceNetworkId")
+    if (!state.isCreateChildDone || isAutoCreateChildDevice) {
+        def endpointCount = getEndpointCount()
+        def endpointId = device.getDataValue("endpointId")
+        def endpointInt = zigbee.convertHexToInt(endpointId)
+        def deviceLabel = "${device.displayName[0..-2]}"
 
-    for (i in 1..endpointCount - 1) {
-        def endpointHexString = zigbee.convertToHexString(endpointInt + i, 2).toUpperCase()
-        createChildDevice("$deviceLabel${i + 1}", endpointHexString)
-    }
+        for (i in 1..endpointCount - 1) {
+            def endpointHexString = zigbee.convertToHexString(endpointInt + i, 2).toUpperCase()
+            createChildDevice("$deviceLabel${i + 1}", endpointHexString)
+        }
 
-    def model = device.getDataValue("model")
-    if ( model == 'TS0115') {
-        createChildDevice("${deviceLabel}USB", "07")
+        def model = device.getDataValue("model")
+        if ( model == 'TS0115') {
+            createChildDevice("${deviceLabel}USB", "07")
+        }
+        state.isCreateChildDone = true
     }
 }
 
@@ -318,7 +325,7 @@ private void createChildDevice(String deviceLabel, String endpointHexString) {
         it.deviceNetworkId == "$device.deviceNetworkId:$endpointHexString"
     }
     if (!childDevice) {
-        log.debug("Need to createChildDevice: $device.deviceNetworkId:$endpointHexString")
+        log.debug("===========Need to createChildDevice: $device.deviceNetworkId:$endpointHexString")
         addChildDevice("smartthings", "Child Switch", "$device.deviceNetworkId:$endpointHexString", device.hubId,
                        [completedSetup: true, label: deviceLabel, isComponent: false])
     } else {
