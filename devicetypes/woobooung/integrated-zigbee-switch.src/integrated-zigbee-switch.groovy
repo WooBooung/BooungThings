@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.20.20200614" }
+public static String version() { return "v0.0.21.20200616" }
 /*
+ *   2020/06/16 >>> v0.0.21 - When changed parent's dni, replace child's dni(select settings's "Auto detecting and create device" : ON)
  *   2020/06/14 >>> v0.0.20 - Added ZigBee 3.0 USB Socket Plug
  *   2020/06/14 >>> v0.0.19 - Auto detecting and create option
  *   2020/06/14 >>> v0.0.18 - Child device type change
@@ -253,7 +254,18 @@ def parse(String description) {
                     def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
                     def deviceLabel = "${device.displayName[0..-2]}"
                     def deviceIndex = Math.abs(childEndpointInt - parentEndpointInt) + 1
-                    createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
+
+                    def childByEndpointId = childDevices.find {
+                        it.deviceNetworkId.endsWith(":${eventDescMap.sourceEndpoint}")
+                    }
+
+                    if (childByEndpointId) {
+                        log.debug "FOUND CHILD!!!!! Change dni to $device.deviceNetworkId:$childEndpointHexString"
+                        childByEndpointId.setDeviceNetworkId("$device.deviceNetworkId:$childEndpointHexString")               
+                    } else {
+                    	log.debug "NOT FOUND CHILD!!!!! Create to $deviceLabel$deviceIndex"
+                        createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
+                    }
                 }
             }
 
