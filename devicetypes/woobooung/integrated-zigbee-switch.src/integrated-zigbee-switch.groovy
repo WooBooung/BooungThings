@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.21.20200616" }
+public static String version() { return "v0.0.22.20200619" }
 /*
+ *   2020/06/19 >>> v0.0.22 - Add Terncy Switch
  *   2020/06/16 >>> v0.0.21 - When changed parent's dni, replace child's dni(select settings's "Auto detecting and create device" : ON)
  *   2020/06/14 >>> v0.0.20 - Added ZigBee 3.0 USB Socket Plug
  *   2020/06/14 >>> v0.0.19 - Auto detecting and create option
@@ -97,7 +98,9 @@ private getMODEL_MAP() {
         'lumi.switch.b2naus01': 2,
         'lumi.switch.b3naus01': 3,
         'lumi.ctrl_neutral1' : 1,
-        'lumi.switch.b2laus01' : 2
+        'lumi.switch.b2laus01' : 2,
+        'TERNCY-WS01-S2' : 2,
+        'TERNCY-WS01-S3' : 3
     ]
 }
 
@@ -150,14 +153,17 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0003, 0004, 0005, 0006, 0702, 0B04", outClusters: "0019", manufacturer: "_TYZB01_b1ngbmlm", model: "TS0112", deviceJoinName: "Tuya USB Socket Plug 1"
 
+		// Terncy Switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S3", deviceJoinName: "Terncy Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S2", deviceJoinName: "Terncy Switch 1"
 
         // Unclear devices without model, meanufacturer
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "GoQual Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
     }
 
     preferences {
-        input name: "isAutoCreateChildDevice", type: "bool", title: "Auto detecting and create device", defaultValue: false, required: true
-        input name: "isCreateAllControllerSwitch", type: "bool", title: "Create All Controller switch", defaultValue: false, required: true
+        input name: "isAutoCreateChildDevice", type: "bool", title: "Auto detecting and create device", description: "default: true", defaultValue: true, required: true
+        input name: "isCreateAllControllerSwitch", type: "bool", title: "Create All switch", description: "default: false", defaultValue: false, required: true
         input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
     }
 
@@ -245,7 +251,7 @@ def parse(String description) {
             if (childDevice) {
                 log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
                 childDevice.sendEvent(eventMap)
-            } else if (isAutoCreateChildDevice || getEndpointCount() == 0){
+            } else if (isAutoCreateChildDevice != false || getEndpointCount() == 0){
                 def model = device.getDataValue("model")
                 log.debug "Child device: $device.deviceNetworkId:${eventDescMap?.sourceEndpoint} was not found"
                 def parentEndpointInt = zigbee.convertHexToInt(endpointId)
@@ -316,7 +322,7 @@ private getEndpointCount() {
 
 private void createChildDevices() {
     log.debug("=============createChildDevices of $device.deviceNetworkId")
-    if (!state.isCreateChildDone || isAutoCreateChildDevice) {
+    if (!state.isCreateChildDone || isAutoCreateChildDevice != false) {
         def endpointCount = getEndpointCount()
         def endpointId = device.getDataValue("endpointId")
         def endpointInt = zigbee.convertHexToInt(endpointId)
