@@ -15,8 +15,9 @@
  *
  *  author : woobooung@gmail.com
  */
-public static String version() { return "v0.0.3.20200522" }
+public static String version() { return "v0.0.4.20200624" }
 /*
+*	 2020/06/24 >>> v0.0.4 - createEvent -> sendEvent
  *   2020/05/22 >>> v0.0.3 - Explicit displayed flag
  *   2020/04/15 >>> v0.0.2 - Modified Device Watch
  *   2020/04/15 >>> v0.0.1 - Initialize
@@ -102,7 +103,7 @@ def parse(String description) {
     } 
 
     log.debug "Parse returned $map"
-    def result = map ? createEvent(map) : [:]
+    def result = map ? sendEvent(map) : [:]
 
     if (description?.startsWith('enroll request')) {
         List cmds = zigbee.enrollResponse()

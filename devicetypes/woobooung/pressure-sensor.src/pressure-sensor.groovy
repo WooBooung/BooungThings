@@ -155,10 +155,11 @@ def parse(String description) {
         }
         map.descriptionText = temperatureScale == 'C' ? '{{ device.displayName }} was {{ value }}°C' : '{{ device.displayName }} was {{ value }}°F'
         map.translatable = true
+        map.displayed = true
     }
 
 
-    def result = map ? createEvent(map) : [:]
+    def result = map ? sendEvent(map) : [:]
 
     if (description?.startsWith('enroll request')) {
         List cmds = zigbee.enrollResponse()
@@ -219,7 +220,7 @@ private Map getBatteryResult(rawValue) {
             roundedPct = 1
             result.value = Math.min(100, roundedPct)
         }
-
+		result.displayed = true
     }
 
     return result
@@ -234,6 +235,7 @@ private Map getBatteryPercentageResult(rawValue) {
         result.translatable = true
         result.descriptionText = "{{ device.displayName }} battery was {{ value }}%"
         result.value = Math.round(rawValue / 2)
+        result.displayed = true
     }
 
     return result
@@ -246,7 +248,8 @@ private Map getContactResult(value) {
 	return [
 		name           : 'presence',
 		value          : value,
-		descriptionText: descriptionText
+		descriptionText: descriptionText,
+        displayed      : true
 	]
 }
 
@@ -262,7 +265,8 @@ private Map getMoistureResult(value) {
 	return [
         name           : 'presence',
         value          : value,
-        descriptionText: "{{ device.displayName }} is ${value}"
+        descriptionText: "{{ device.displayName }} is ${value}",
+        displayed      : true
     ]
 }
 
