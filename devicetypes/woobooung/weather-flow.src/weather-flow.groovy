@@ -10,28 +10,12 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- *   - Version 0.0.4 (2018-09-22)
- *      Changed schedule function
- *
- *   - Version 0.0.3 (2018-09-20)
- *      When occured exception error, do rescheduling
- *      Modified interval minimum(10 sec -> 1 min)
- * 
- *   - Version 0.0.2 (2018-09-16)
- *      Added rain detected logic
- *      Before Every time detect option: 
- *				if (precip > 0) then Rain detected
- *				if (precip == 0) then Rain not detected
- *      Additional option first time detect :
- *				if (precip_accum_last_1hr == 0 && precip > 0) then Rain detected
- *				if (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected
- *
- *   - Version 0.0.1 (2018-09-15)
- *      Base code
+ *   - Since 2018-09-15
  */
- 
- public static String version() { return "v0.0.5.20200522" }
+
+public static String version() { return "v0.0.6.20200624" }
 /*
+ *	2020/06/24 >>> v0.0.6 - changed station Id type(passwd -> just text type)
  *	2020/05/22 >>> v0.0.5 - Explicit displayed flag
  */
 
@@ -48,28 +32,28 @@ LANGUAGE_MAP = [
         "Korean": "습도",
         "English": "Humidity"
     ],
-	"dew_point": [
+    "dew_point": [
         "Korean": "이슬점",
         "English": "Dew point"
     ],
-	"barometric_pressure":[
-    	"Korean": "기압",
+    "barometric_pressure":[
+        "Korean": "기압",
         "English": "Barometric Pressure"
     ],
     "sea_level_pressure":[
-    	"Korean": "해상 기압",
+        "Korean": "해상 기압",
         "English": "Sea Level Pressure"
     ],
     "precip": [
-    	"Korean": "강수량",
+        "Korean": "강수량",
         "English": "Precip"
     ],
     "precip_accum_local_day": [
-    	"Korean": "오늘 강수량",
+        "Korean": "오늘 강수량",
         "English": "Today precip"
     ],
     "precip_accum_local_yesterday": [
-    	"Korean": "어제 강수량",
+        "Korean": "어제 강수량",
         "English": "Yesterday precip"
     ],
     "wind_avg": [
@@ -123,17 +107,17 @@ LANGUAGE_MAP = [
 ]
 
 metadata {
-	definition (name: "Weather Flow", namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.airqualitysensor") {
+    definition (name: "Weather Flow", namespace: "WooBooung", author: "Booung", ocfDeviceType: "x.com.st.d.airqualitysensor") {
         capability "Water Sensor"
         capability "Temperature Measurement"
         capability "Relative Humidity Measurement"
         capability "Illuminance Measurement"
-		capability "Ultraviolet Index"
-		capability "Polling"
+        capability "Ultraviolet Index"
+        capability "Polling"
         capability "Configuration"
-		capability "Refresh"
-		capability "Sensor"
-        
+        capability "Refresh"
+        capability "Sensor"
+
         // Weather Station infos
         attribute "timestamp", "Date"
         // attribute "air_temperature", "number" - > capability "Temperature Measurement"
@@ -162,8 +146,8 @@ metadata {
         attribute "dew_point", "number"
         attribute "wet_bulb_temperature", "number"
         attribute "delta_t", "number"
-      	attribute "air_density", "number"
-        
+        attribute "air_density", "number"
+
         // units
         attribute "units_temp", "string"
         attribute "units_wind", "string"
@@ -172,190 +156,190 @@ metadata {
         attribute "units_distance", "string"
         attribute "units_direction", "string"
         attribute "units_other", "string"
-       
+
         command "refresh"
         command "pollWeatherFlow"
-	}
+    }
 
-	preferences {
-		input name: "api_key", title: "API Key", type: "text", defaultValue: "20c70eae-e62f-4d3b-b3a4-8586e90f3ac8", required: true
-		input name: "station_id", title: "Station Id", type: "password", description: "Refer to below \"how to get station id\"", required: true
+    preferences {
+        input name: "api_key", title: "API Key", type: "text", defaultValue: "20c70eae-e62f-4d3b-b3a4-8586e90f3ac8", required: true
+        input name: "station_id", title: "Station Id", type: "text", description: "Refer to below \"how to get station id\"", required: true
         input name: "polling_interval", title: "Update interval", type: "enum", options:[1 : "1 min", 5 : "5 min", 10 : "10 min", 30 : "30 min"], defaultValue: 1, displayDuringSetup: true
         input name: "rain_detected_option", title: "Rain Detected Option", type: "enum", options: ["Every time", "First time"], defaultValue: "Every time", description: "Refor to below \"Rain detect options\"", displayDuringSetup: true
         input name: "selected_lang", title:"Select a language", type: "enum", options: ["English", "Korean"], defaultValue: "English", displayDuringSetup: true
         input type: "paragraph", element: "paragraph", title: "How to get station Id", description: "Weather Flow app -> Settings's Manage -> Stations -> Status click", displayDuringSetup: false
         input type: "paragraph", element: "paragraph", title: "Rain detect option", description: "Every time : (Default value)\nif (precip > 0) then Rain detected\nif (precip == 0) then Rain not detected\n\nFirst time :\nif (precip_accum_last_1hr == 0 && precip > 0) then Rain detected\nif (precip_accum_last_1hr == 0 && precip == 0) then Rain not detected", displayDuringSetup: false
         input type: "paragraph", element: "paragraph", title: "Version", description: version(), displayDuringSetup: false
-	}
+    }
 
-	simulator {
-		// TODO: define status and reply messages here
-	}
+    simulator {
+        // TODO: define status and reply messages here
+    }
 
-	tiles {
-		multiAttributeTile(name:"water", type: "generic", width: 6, height: 4){
-			tileAttribute ("device.water", key: "PRIMARY_CONTROL") {
-               	attributeState "dry", label:'Rain is None', icon: "st.alarm.water.dry", backgroundColor: "#ffffff"
-            	attributeState "wet", label:'Rain detected', icon: "st.alarm.water.wet", backgroundColor: "#00A0DC"
-			}
-            tileAttribute("device.timestamp", key: "SECONDARY_CONTROL") {
-    			attributeState("default", label:'Last Update: ${currentValue}',icon: "st.Health & Wellness.health9")
+    tiles {
+        multiAttributeTile(name:"water", type: "generic", width: 6, height: 4){
+            tileAttribute ("device.water", key: "PRIMARY_CONTROL") {
+                attributeState "dry", label:'Rain is None', icon: "st.alarm.water.dry", backgroundColor: "#ffffff"
+                attributeState "wet", label:'Rain detected', icon: "st.alarm.water.wet", backgroundColor: "#00A0DC"
             }
-		}
-        
+            tileAttribute("device.timestamp", key: "SECONDARY_CONTROL") {
+                attributeState("default", label:'Last Update: ${currentValue}',icon: "st.Health & Wellness.health9")
+            }
+        }
+
         valueTile("air_temperature_level", "air_temperature_level", decoration: "flat") {
             state "default", label: 'Temp'
         }
 
         valueTile("air_temperature", "device.temperature",  decoration: "flat") {
-			state "default", label:'${currentValue}°'
-		}
+            state "default", label:'${currentValue}°'
+        }
 
         valueTile("relative_humidity_label", "relative_humidity_label", decoration: "flat") {
             state "default", label: 'Humi'
         }
 
-		valueTile("relative_humidity", "device.humidity", decoration: "flat") {
-			state "default", label:'${currentValue}%'
-		}
-        
+        valueTile("relative_humidity", "device.humidity", decoration: "flat") {
+            state "default", label:'${currentValue}%'
+        }
+
         valueTile("dew_point_label", "device.dew_point_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("dew_point", "device.dew_point", decoration: "flat") {
-			state "default", label:'${currentValue}°'
-		}
-		
+        valueTile("dew_point", "device.dew_point", decoration: "flat") {
+            state "default", label:'${currentValue}°'
+        }
+
         valueTile("precip_label", "device.precip_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("precip", "device.precip", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
+        valueTile("precip", "device.precip", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
 
         valueTile("precip_accum_local_day_label", "device.precip_accum_local_day_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("precip_accum_local_day", "device.precip_accum_local_day", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("precip_accum_local_day", "device.precip_accum_local_day", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("precip_accum_local_yesterday_label", "device.precip_accum_local_yesterday_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("precip_accum_local_yesterday", "device.precip_accum_local_yesterday", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
+        valueTile("precip_accum_local_yesterday", "device.precip_accum_local_yesterday", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
 
         valueTile("wind_avg_label", "device.wind_avg_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("wind_avg", "device.wind_avg", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
+        valueTile("wind_avg", "device.wind_avg", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
 
         valueTile("wind_direction_label", "device.wind_direction_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("wind_direction", "device.wind_direction", decoration: "flat") {
-			state "default", label:'${currentValue}°'
-		}
-        
+        valueTile("wind_direction", "device.wind_direction", decoration: "flat") {
+            state "default", label:'${currentValue}°'
+        }
+
         valueTile("wind_gust_label", "device.wind_gust_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("wind_gust", "device.wind_gust", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		} 
-        
+        valueTile("wind_gust", "device.wind_gust", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        } 
+
         valueTile("solar_radiation_label", "device.solar_radiation_label", decoration: "flat") {
             state "default", label: '${currentValue} W/㎡'
         }
 
-		valueTile("solar_radiation", "device.solar_radiation", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("solar_radiation", "device.solar_radiation", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("uv_label", "device.uv_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("uv", "device.ultravioletIndex", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("uv", "device.ultravioletIndex", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("brightness_label", "device.brightness_label", decoration: "flat") {
             state "default", label: '${currentValue} lux'
         }
 
-		valueTile("brightness", "device.illuminance", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("brightness", "device.illuminance", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("lightning_strike_last_epoch_label", "device.lightning_strike_last_epoch_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("lightning_strike_last_epoch", "device.lightning_strike_last_epoch", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("lightning_strike_last_epoch", "device.lightning_strike_last_epoch", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("lightning_strike_last_distance_label", "device.lightning_strike_last_distance_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("lightning_strike_last_distance", "device.lightning_strike_last_distance", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-       
+        valueTile("lightning_strike_last_distance", "device.lightning_strike_last_distance", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("lightning_strike_count_last_3hr_label", "device.lightning_strike_count_last_3hr_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("lightning_strike_count_last_3hr", "device.lightning_strike_count_last_3hr", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("lightning_strike_count_last_3hr", "device.lightning_strike_count_last_3hr", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("barometric_pressure_label", "device.barometric_pressure_label", width: 2, decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("barometric_pressure", "device.barometric_pressure", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("barometric_pressure", "device.barometric_pressure", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("sea_level_pressure_label", "device.sea_level_pressure_label", width: 2, decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("sea_level_pressure", "device.sea_level_pressure", decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("sea_level_pressure", "device.sea_level_pressure", decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("latitude_label", "device.latitude_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("latitude", "device.latitude", width: 2, decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("latitude", "device.latitude", width: 2, decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("longitude_label", "device.longitude_label", decoration: "flat") {
             state "default", label: '${currentValue}'
         }
 
-		valueTile("longitude", "device.longitude", width: 2, decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-	
-/*        valueTile("station_id_label", "device.station_id_label", decoration: "flat") {
+        valueTile("longitude", "device.longitude", width: 2, decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
+        /*        valueTile("station_id_label", "device.station_id_label", decoration: "flat") {
             state "default", label: 'Station Id'
         }
 
@@ -366,51 +350,51 @@ metadata {
         valueTile("timezone_label", "device.timezone_label", decoration: "flat") {
             state "default", label:'${currentValue}'
         }
-        
+
         valueTile("timezone", "device.timezone", width: 2, decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+            state "default", label:'${currentValue}'
+        }
+
         valueTile("station_name_label", "device.station_name_label", decoration: "flat") {
             state "default", label: 'Station Name'
         }
 
-		valueTile("station_name", "device.station_name", width: 2, decoration: "flat") {
-			state "default", label:'${currentValue}'
-		}
-        
+        valueTile("station_name", "device.station_name", width: 2, decoration: "flat") {
+            state "default", label:'${currentValue}'
+        }
+
         standardTile("refresh_value", "device.refresh", width: 2, decoration: "flat") {
-			state "default", label: "", action: "refresh", icon:"st.secondary.refresh"
-		}
-	}
+            state "default", label: "", action: "refresh", icon:"st.secondary.refresh"
+        }
+    }
 }
 
 // parse events into attributes
 def parse(String description) {
-	debugLog("Parsing '${description}'")
+    debugLog("Parsing '${description}'")
 }
 
 def installed() {
-	debugLog("installed()")
+    debugLog("installed()")
     refresh()
     setLanguage(settings.selected_lang)
 }
 
 def uninstalled() {
-	debugLog("uninstalled()")
-	unschedule()
+    debugLog("uninstalled()")
+    unschedule()
 }
 
 def updated() {
-	debugLog("updated()")
-	refresh()
+    debugLog("updated()")
+    refresh()
     setLanguage(settings.selected_lang)
 }
 
 def refresh() {
-	debugLog("refresh()")
+    debugLog("refresh()")
     unschedule()
-	try {
+    try {
         startPoll()
     } catch (e) {
         log.error "error: pollWeatherFlow $e"
@@ -418,7 +402,7 @@ def refresh() {
 }
 
 def startPoll() {
-	def healthCheckInterval = "0/${settings.polling_interval}"
+    def healthCheckInterval = "0/${settings.polling_interval}"
     log.debug "startPoll $healthCheckInterval"
     schedule("0 $healthCheckInterval * * * ?", pollWeatherFlow)
 }
@@ -445,31 +429,31 @@ def setLanguage(language){
     sendEvent(name:"lightning_strike_last_distance_label", value: LANGUAGE_MAP["lightning_strike_last_distance"][language])
     sendEvent(name:"lightning_strike_count_last_3hr_label", value: LANGUAGE_MAP["lightning_strike_count_last_3hr"][language])
     sendEvent(name:"latitude_label", value: LANGUAGE_MAP["latitude"][language])
-	sendEvent(name:"longitude_label", value: LANGUAGE_MAP["longitude"][language])
+    sendEvent(name:"longitude_label", value: LANGUAGE_MAP["longitude"][language])
     sendEvent(name:"timezone_label", value: LANGUAGE_MAP["timezone"][language])
 }
 
 def configure() {
-	debugLog("Configuare()")
+    debugLog("Configuare()")
     refresh()
     setLanguage(settings.selected_lang)
 }
 
 // Weather Flow handle commands
 def pollWeatherFlow() {
-	debugLog("pollWeatherFlow()")
+    debugLog("pollWeatherFlow()")
     def dthVersion = "0.0.1"
     if (station_id && api_key) {
         def params = [
-    	    uri: "https://swd.weatherflow.com/swd/rest/observations/station/${station_id}?api_key=${api_key}",
-        	contentType: 'application/json'
-    	]
+            uri: "https://swd.weatherflow.com/swd/rest/observations/station/${station_id}?api_key=${api_key}",
+            contentType: 'application/json'
+        ]
         //def refreshTime = (polling_interval as int)
-        
+
         try {
-    	    //runIn(refreshTime, pollWeatherFlow)
-    		//debugLog("Data will repoll every ${polling_interval} seconds")
-           
+            //runIn(refreshTime, pollWeatherFlow)
+            //debugLog("Data will repoll every ${polling_interval} seconds")
+
             httpGet(params) {response ->
                 response.headers.each {
                     debugLog("${it.name} : ${it.value}")
@@ -481,41 +465,41 @@ def pollWeatherFlow() {
                     // get the data from the response body
                     log.debug "response data: ${response.data}"
 
-    				def station_id = response.data.station_id
+                    def station_id = response.data.station_id
                     def station_name = response.data.station_name
                     def latitude = response.data.latitude
                     def longitude = response.data.longitude
                     def timezone = response.data.timezone
-                    
+
                     if (station_id > 0) {
                         debugLog("station_id: ${station_id}")
                         sendEvent(name: "station_id", value: station_id as Integer, displayed: false)
                     } else {
-                    	log.error "station_id error: ${station_id}"
+                        log.error "station_id error: ${station_id}"
                         sendEvent(name: "station_id", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (station_name != "") {
                         debugLog("station_name: ${station_name}")
                         sendEvent(name: "station_name", value: station_name as String, displayed: false)
                     } else {
-                    	log.error "station_name error: ${station_name}"
+                        log.error "station_name error: ${station_name}"
                         sendEvent(name: "station_name", value: "-", isStateChange: false, displayed: false)
                     }
-                    
+
                     if (latitude > 0) {
                         debugLog("latitude: ${latitude}")
                         sendEvent(name: "latitude", value: latitude as String, displayed: false)
                     } else {
-                    	log.error "latitude error: ${station_id}"
+                        log.error "latitude error: ${station_id}"
                         sendEvent(name: "latitude", value: "", isStateChange: false, displayed: false)
                     }
-                    
+
                     if (longitude > 0) {
                         debugLog("longitude: ${longitude}")
                         sendEvent(name: "longitude", value: longitude as String, displayed: false)
                     } else {
-                    	log.error "longitude error: ${longitude}"
+                        log.error "longitude error: ${longitude}"
                         sendEvent(name: "longitude", value: "", isStateChange: false, displayed: false)
                     }
 
@@ -523,7 +507,7 @@ def pollWeatherFlow() {
                         debugLog("timezone: ${timezone}")
                         sendEvent(name: "timezone", value: timezone as String, displayed: false)
                     } else {
-                    	log.error "timezone error: ${timezone}"
+                        log.error "timezone error: ${timezone}"
                         sendEvent(name: "timezone", value: "-", isStateChange: false, displayed: false)
                     }
 
@@ -618,7 +602,7 @@ def pollWeatherFlow() {
                     def wind_chill = response.data.obs[0].wind_chill
 
                     if (timestamp != "") {
-                    	def convertDate = new Date(timestamp * 1000L).format("yyyy-MM-dd HH:mm:ss", location.timeZone)
+                        def convertDate = new Date(timestamp * 1000L).format("yyyy-MM-dd HH:mm:ss", location.timeZone)
                         debugLog("timestamp: ${convertDate}")
                         sendEvent(name: "timestamp", value: convertDate, displayed: false)
                     } else {
@@ -641,7 +625,7 @@ def pollWeatherFlow() {
                         log.error "relative_humidity error: ${relative_humidity}"
                         sendEvent(name: "humidity", value: -100, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (dew_point != "") {
                         debugLog("dew_point: ${dew_point}°${units_temp}")
                         sendEvent(name: "dew_point", value: dew_point, unit: units_temp)
@@ -649,7 +633,7 @@ def pollWeatherFlow() {
                         log.error "dew_point error: ${dew_point}"
                         sendEvent(name: "dew_point", value: -100, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (barometric_pressure != "") {
                         debugLog("barometric_pressure: ${barometric_pressure} ${units_pressure}")
                         def label = "${LANGUAGE_MAP["barometric_pressure"][state.language]} ${units_pressure}"
@@ -659,7 +643,7 @@ def pollWeatherFlow() {
                         log.error "barometric_pressure error: ${barometric_pressure}"
                         sendEvent(name: "barometric_pressure", value: -100, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (sea_level_pressure != "") {
                         debugLog("sea_level_pressure: ${sea_level_pressure} ${units_pressure}")
                         def label = "${LANGUAGE_MAP["sea_level_pressure"][state.language]} ${units_pressure}"
@@ -677,7 +661,7 @@ def pollWeatherFlow() {
                         log.error "precip_accum_last_1hr error: ${precip_accum_last_1hr}"
                         sendEvent(name: "precip_accum_last_1hr", value: 0, isStateChange: false, displayed: false)
                     }
-                  
+
                     if (precip_accum_local_day != "") {
                         debugLog("precip_accum_local_day: ${precip_accum_local_day} ${units_precip}")
                         def label = "${LANGUAGE_MAP["precip_accum_local_day"][state.language]} ${units_precip}"
@@ -687,7 +671,7 @@ def pollWeatherFlow() {
                         log.error "precip_accum_local_day error: ${precip_accum_local_day}"
                         sendEvent(name: "precip_accum_local_day", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (precip_accum_local_yesterday != "") {
                         debugLog("precip_accum_local_yesterday: ${precip_accum_local_yesterday} ${units_precip}")
                         def label = "${LANGUAGE_MAP["precip_accum_local_yesterday"][state.language]} ${units_precip}"
@@ -697,23 +681,23 @@ def pollWeatherFlow() {
                         log.error "precip_accum_local_yesterday error: ${precip_accum_local_yesterday}"
                         sendEvent(name: "precip_accum_local_yesterday", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (precip != "") {
                         debugLog("precip: ${precip} ${units_precip}")
                         def label = "${LANGUAGE_MAP["precip"][state.language]} ${units_precip}"
                         sendEvent(name: "precip_label", value:label)
                         sendEvent(name: "precip", value: precip, unit: units_precip)
-                           
+
                         debugLog("precip option: ${rain_detected_option}")
 
                         if (rain_detected_option == "First time") {
-                         	if (precip_accum_last_1hr == 0) {
-                        		sendEvent(name:"water", value: "dry", displayed: true)
+                            if (precip_accum_last_1hr == 0) {
+                                sendEvent(name:"water", value: "dry", displayed: true)
                             } else if (precip_accum_last_1hr > 0 || precip > 0){
-								sendEvent(name:"water", value: "wet", displayed: true)                  	
+                                sendEvent(name:"water", value: "wet", displayed: true)                  	
                             }
                         } else {
-                        	sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"))
+                            sendEvent(name:"water", value: (precip > 0 ? "wet" : "dry"))
                         }
                     } else {
                         log.error "precip error: ${precip}"
@@ -729,7 +713,7 @@ def pollWeatherFlow() {
                         log.error "wind_avg error: ${wind_avg}"
                         sendEvent(name: "wind_avg", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (wind_direction != "") {
                         debugLog("wind_direction: ${wind_direction}°")
                         sendEvent(name: "wind_direction", value: wind_direction, unit: "°")
@@ -737,7 +721,7 @@ def pollWeatherFlow() {
                         log.error "wind_avg error: ${wind_avg}"
                         sendEvent(name: "wind_avg", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (wind_gust != "") {
                         debugLog("wind_gust: ${wind_gust} ${units_wind}")
                         def label = "${LANGUAGE_MAP["wind_gust"][state.language]} ${units_wind}"
@@ -747,7 +731,7 @@ def pollWeatherFlow() {
                         log.error "wind_gust error: ${wind_gust}"
                         sendEvent(name: "wind_gust", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (solar_radiation != "") {
                         debugLog("solar_radiation: ${solar_radiation}")
                         sendEvent(name: "solar_radiation", value: solar_radiation, unit: "W/㎡")
@@ -755,7 +739,7 @@ def pollWeatherFlow() {
                         log.error "solar_radiation error: ${solar_radiation}"
                         sendEvent(name: "solar_radiation", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (uv != "") {
                         debugLog("uv: ${uv}")
                         sendEvent(name: "ultravioletIndex", value: uv)
@@ -763,7 +747,7 @@ def pollWeatherFlow() {
                         log.error "uv error: ${uv}"
                         sendEvent(name: "ultravioletIndex", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (brightness != "") {
                         debugLog("brightness: ${brightness}")
                         sendEvent(name: "illuminance", value: brightness, unit: "lux", displayed: true)
@@ -771,16 +755,16 @@ def pollWeatherFlow() {
                         log.error "brightness error: ${brightness}"
                         sendEvent(name: "illuminance", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (lightning_strike_last_epoch != "") {
-                    	def convertDate = new Date(lightning_strike_last_epoch * 1000L).format("yyyy-MM-dd HH:mm:ss", location.timeZone)
+                        def convertDate = new Date(lightning_strike_last_epoch * 1000L).format("yyyy-MM-dd HH:mm:ss", location.timeZone)
                         debugLog("lightning_strike_last_epoch: ${convertDate}")
                         sendEvent(name: "lightning_strike_last_epoch", value: convertDate)
                     } else {
                         log.error "lightning_strike_last_epoch error: ${lightning_strike_last_epoch}"
                         sendEvent(name: "lightning_strike_last_epoch", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (lightning_strike_last_distance != "") {
                         debugLog("lightning_strike_last_distance: ${lightning_strike_last_distance} ${units_distance}")
                         def label = "${LANGUAGE_MAP["lightning_strike_last_distance"][state.language]} ${units_distance}"
@@ -790,7 +774,7 @@ def pollWeatherFlow() {
                         log.error "lightning_strike_last_distance error: ${lightning_strike_last_distance}"
                         sendEvent(name: "lightning_strike_last_distance", value: 0, isStateChange: false, displayed: false)
                     }
-                    
+
                     if (lightning_strike_count_last_3hr != "") {
                         debugLog("lightning_strike_count_last_3hr: ${lightning_strike_count_last_3hr}")
                         sendEvent(name: "lightning_strike_count_last_3hr", value: lightning_strike_count_last_3hr)
@@ -798,20 +782,20 @@ def pollWeatherFlow() {
                         log.error "lightning_strike_count_last_3hr error: ${lightning_strike_count_last_3hr}"
                         sendEvent(name: "lightning_strike_count_last_3hr", value: 0, isStateChange: false, displayed: false)
                     }
-          		}
+                }
                 else log.error "server error${response.status}"
             }
         } catch (e) {
             log.error "error: $e"
             //runIn(refreshTime, pollWeatherFlow)
-    		//debugLog("Data will repoll every ${polling_interval} seconds")
+            //debugLog("Data will repoll every ${polling_interval} seconds")
         }
-	}
+    }
     else log.error "Missing data from the device settings station id or api key"
 }
 
 def debugLog(msg) {
-	//log.debug msg
+    //log.debug msg
 }
 
 /*
