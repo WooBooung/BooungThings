@@ -7,7 +7,7 @@
  *  use this file except in compliance with the License. You may obtain a copy
  *  of the License at:
  *
- *		http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -15,10 +15,11 @@
  *  License for the specific language governing permissions and limitations
  *  under the License.
  *
- *  author : woobooung@gmail.com
+ *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.22.20200619" }
+public static String version() { return "v0.0.23.20200902" }
 /*
+ *   2020/09/02 >>> v0.0.23 - Add Zemi ZigBee inline Switch
  *   2020/06/19 >>> v0.0.22 - Add Terncy Switch
  *   2020/06/16 >>> v0.0.21 - When changed parent's dni, replace child's dni(select settings's "Auto detecting and create device" : ON)
  *   2020/06/14 >>> v0.0.20 - Added ZigBee 3.0 USB Socket Plug
@@ -51,12 +52,12 @@ import groovy.json.JsonOutput
     > Usage <
 
     Example) Bandi 3gang switch model
-    IDE Device Data	
+    IDE Device Data   
       manufacturer: _TYZB01_pdevogdj
       model: TS0003
 
-      Raw Description	01 0104 0100 00 05 0000 000A 0004 0005 0006 01 0019
-    	Analysis -> '01'(endpointId) '0104'(profileId) '0100'(deviceId) 00(skip) 05(skip) '0000 000A 0004 0005 0006'(inClusters) 01(skil) '0019'(outClusters)
+      Raw Description   01 0104 0100 00 05 0000 000A 0004 0005 0006 01 0019
+       Analysis -> '01'(endpointId) '0104'(profileId) '0100'(deviceId) 00(skip) 05(skip) '0000 000A 0004 0005 0006'(inClusters) 01(skil) '0019'(outClusters)
 
     > Step1 - Add fingerprint
     fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_pdevogdj", model: "TS0003", deviceJoinName: "Bandi Zigbee Switch 1"
@@ -100,7 +101,8 @@ private getMODEL_MAP() {
         'lumi.ctrl_neutral1' : 1,
         'lumi.switch.b2laus01' : 2,
         'TERNCY-WS01-S2' : 2,
-        'TERNCY-WS01-S3' : 3
+        'TERNCY-WS01-S3' : 3,
+        'LXN59-2S7LX1.0' : 2
     ]
 }
 
@@ -153,12 +155,15 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0003, 0004, 0005, 0006, 0702, 0B04", outClusters: "0019", manufacturer: "_TYZB01_b1ngbmlm", model: "TS0112", deviceJoinName: "Tuya USB Socket Plug 1"
 
-		// Terncy Switch
+        // Terncy Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S3", deviceJoinName: "Terncy Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S2", deviceJoinName: "Terncy Switch 1"
 
         // Unclear devices without model, meanufacturer
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
+
+        // zemismart zigbee in-wall switch 2gang
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN59-2S7LX1.0", deviceJoinName: "Zemi ZigBee inline Switch 1"
     }
 
     preferences {
@@ -269,7 +274,7 @@ def parse(String description) {
                         log.debug "FOUND CHILD!!!!! Change dni to $device.deviceNetworkId:$childEndpointHexString"
                         childByEndpointId.setDeviceNetworkId("$device.deviceNetworkId:$childEndpointHexString")               
                     } else {
-                    	log.debug "NOT FOUND CHILD!!!!! Create to $deviceLabel$deviceIndex"
+                        log.debug "NOT FOUND CHILD!!!!! Create to $deviceLabel$deviceIndex"
                         createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
                     }
                 }
