@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.23.20200902" }
+public static String version() { return "v0.0.24.20201024" }
 /*
+ *   2020/10/24 >>> v0.0.24 - Add Zemi ZigBee 3Gang v2.5, eZex 4Gang switch
  *   2020/09/02 >>> v0.0.23 - Add Zemi ZigBee inline Switch
  *   2020/06/19 >>> v0.0.22 - Add Terncy Switch
  *   2020/06/16 >>> v0.0.21 - When changed parent's dni, replace child's dni(select settings's "Auto detecting and create device" : ON)
@@ -93,6 +94,8 @@ private getMODEL_MAP() {
         'FB56+ZSW1GKJ2.7' : 1,
         'FB56+ZSW1HKJ2.5' : 2,
         'FB56+ZSW1IKJ2.7' : 3,
+        'FB56+ZSW1IKJ2.5' : 3,
+        'E220-KR4N0Z1-HA' : 4,
         'E220-KR6N0Z1-HA' : 6,
         'Lamp_01' : 1,
         'lumi.switch.b1naus01': 1,
@@ -134,12 +137,14 @@ metadata {
         fingerprint endpointId: "10", profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1GKJ2.7", deviceJoinName: "Zemi ZigBee Switch"
         fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", outClusters: "0000", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1HKJ2.5", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "10", profileId: "0104", deviceId: "0002", inClusters: "0000, 0003, 0004, 0005, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.7", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "12", profileId: "0104", deviceId: "0002", inClusters: "0000, 0005, 0004, 0006", manufacturer: "Feibit Inc co.", model: "FB56+ZSW1IKJ2.5", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW01LX2.0", deviceJoinName: "Zemi ZigBee Switch"
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi ZigBee Switch 1"
 
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR4N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
 
         // Aqara Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0002, 0003, 0004, 0005, 0006, 0009, 0702, 0B04", outClusters: "000A, 0019", manufacturer: "LUMI", model: "lumi.switch.b1naus01", deviceJoinName: "Aqara Switch"
