@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.25.20201209" }
+public static String version() { return "v0.0.26.20201211" }
 /*
+ *   2020/12/11 >>> v0.0.26 - Add Tuay moes inner 2Gang switch(Zigbee+rf)
  *   2020/12/09 >>> v0.0.25 - Add Lonsonho Tuya Zigbee Smart Switch No Neutral 3Gang switch
  *   2020/10/24 >>> v0.0.24 - Add Zemi ZigBee 3Gang v2.5, eZex 4Gang switch, Tuya 2Gang switch
  *   2020/09/02 >>> v0.0.23 - Add Zemi ZigBee inline Switch
@@ -88,6 +89,7 @@ private getMODEL_MAP() {
         'TS0112' : 2,
         'TS0012' : 2,
         'TS0013' : 3,
+        'TS011F' : 2,
         'PM-S340-ZB' : 3,
         'PM-S240-ZB' : 2,
         'PM-S140-ZB' : 1,
@@ -161,7 +163,10 @@ metadata {
 
         // Tuya multi switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_fvh3pjaz", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_pmz6mjyu", model: "TS011F", deviceJoinName: "Tuya Multi Switch 1"
+
+        // not working
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1" //< - not workin
 
         // Tuya multitab with USB
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
