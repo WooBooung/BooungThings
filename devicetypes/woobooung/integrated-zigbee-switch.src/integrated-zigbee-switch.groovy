@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.27.20201213" }
+public static String version() { return "v0.0.28.20210101" }
 /*
+ *   2021/01/01 >>> v0.0.28 - Modfied for ZemiSmart Switchs & eZex Switchs
  *   2020/12/13 >>> v0.0.27 - Add Tuya 4Gang switch(by bubibuhome@gmail.com)
  *   2020/12/11 >>> v0.0.26 - Add Tuya moes inner 2Gang switch(Zigbee+rf)
  *   2020/12/09 >>> v0.0.25 - Add Lonsonho Tuya Zigbee Smart Switch No Neutral 3Gang switch
@@ -261,56 +262,58 @@ def parse(String description) {
         }
     }
 
-    if (eventMap) {
-        def endpointId = device.getDataValue("endpointId")
-        log.debug "eventMap $eventMap | eventDescMap $eventDescMap"
-        eventMap[displayed] = true
-        if (eventDescMap?.sourceEndpoint == endpointId) {
-            log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
-            sendEvent(eventMap)
-        } else {
-            def childDevice = childDevices.find {
-                it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
-            }
-            if (childDevice) {
-                log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
-                childDevice.sendEvent(eventMap)
-            } else if (isAutoCreateChildDevice != false || getEndpointCount() == 0){
-                def model = device.getDataValue("model")
-                log.debug "Child device: $device.deviceNetworkId:${eventDescMap?.sourceEndpoint} was not found"
-                def parentEndpointInt = zigbee.convertHexToInt(endpointId)
-                if (eventDescMap?.sourceEndpoint != null) {
-                    def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
-                    def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
-                    def deviceLabel = "${device.displayName[0..-2]}"
-                    def deviceIndex = Math.abs(childEndpointInt - parentEndpointInt) + 1
+    if (eventMap && eventDescMap) {
+        if (eventDescMap?.attrId == "0000" || eventDescMap?.attId == null) {
+            def endpointId = device.getDataValue("endpointId")
+            log.debug "eventMap $eventMap | eventDescMap $eventDescMap"
+            eventMap[displayed] = true
+            if (eventDescMap?.sourceEndpoint == endpointId) {
+                log.debug "parse - sendEvent parent $eventDescMap.sourceEndpoint"
+                sendEvent(eventMap)
+            } else {
+                def childDevice = childDevices.find {
+                    it.deviceNetworkId == "$device.deviceNetworkId:${eventDescMap.sourceEndpoint}"
+                }
+                if (childDevice) {
+                    log.debug "parse - sendEvent child  $eventDescMap.sourceEndpoint"
+                    childDevice.sendEvent(eventMap)
+                } else if (isAutoCreateChildDevice != false || getEndpointCount() == 0){
+                    def model = device.getDataValue("model")
+                    log.debug "Child device: $device.deviceNetworkId:${eventDescMap?.sourceEndpoint} was not found"
+                    def parentEndpointInt = zigbee.convertHexToInt(endpointId)
+                    if (eventDescMap?.sourceEndpoint != null) {
+                        def childEndpointInt = zigbee.convertHexToInt(eventDescMap?.sourceEndpoint)
+                        def childEndpointHexString = zigbee.convertToHexString(childEndpointInt, 2).toUpperCase()
+                        def deviceLabel = "${device.displayName[0..-2]}"
+                        def deviceIndex = Math.abs(childEndpointInt - parentEndpointInt) + 1
 
-                    def childByEndpointId = childDevices.find {
-                        it.deviceNetworkId.endsWith(":${eventDescMap.sourceEndpoint}")
+                        def childByEndpointId = childDevices.find {
+                            it.deviceNetworkId.endsWith(":${eventDescMap.sourceEndpoint}")
+                        }
+
+                        if (childByEndpointId) {
+                            log.debug "FOUND CHILD!!!!! Change dni to $device.deviceNetworkId:$childEndpointHexString"
+                            childByEndpointId.setDeviceNetworkId("$device.deviceNetworkId:$childEndpointHexString")               
+                        } else {
+                            log.debug "NOT FOUND CHILD!!!!! Create to $deviceLabel$deviceIndex"
+                            createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
+                        }
                     }
+                }
 
-                    if (childByEndpointId) {
-                        log.debug "FOUND CHILD!!!!! Change dni to $device.deviceNetworkId:$childEndpointHexString"
-                        childByEndpointId.setDeviceNetworkId("$device.deviceNetworkId:$childEndpointHexString")               
-                    } else {
-                        log.debug "NOT FOUND CHILD!!!!! Create to $deviceLabel$deviceIndex"
-                        createChildDevice("$deviceLabel$deviceIndex", childEndpointHexString)
+                if (isCreateAllControllerSwitch) {
+                    def allControlChildDevice = childDevices.find {
+                        it.deviceNetworkId == "$device.deviceNetworkId:ALL"
+                    }
+                    if (!allControlChildDevice) {
+                        def deviceLabel = "${device.displayName[0..-2]}"
+                        createChildDevice("${deviceLabel}ALL", "ALL")
                     }
                 }
             }
 
-            if (isCreateAllControllerSwitch) {
-                def allControlChildDevice = childDevices.find {
-                    it.deviceNetworkId == "$device.deviceNetworkId:ALL"
-                }
-                if (!allControlChildDevice) {
-                    def deviceLabel = "${device.displayName[0..-2]}"
-                    createChildDevice("${deviceLabel}ALL", "ALL")
-                }
-            }
+            checkAllSwtichValue()
         }
-
-        checkAllSwtichValue()
     }
 }
 
