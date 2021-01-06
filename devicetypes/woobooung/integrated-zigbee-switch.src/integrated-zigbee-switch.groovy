@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.28.20210101" }
+public static String version() { return "v0.0.29.20210107" }
 /*
+ *   2021/01/07 >>> v0.0.29 - Add Zemismart Black 3gang(ceborita@gmail.com), Tuya 4 gang switch(naver cafe: incident)
  *   2021/01/01 >>> v0.0.28 - Modfied for ZemiSmart Switchs & eZex Switchs
  *   2020/12/13 >>> v0.0.27 - Add Tuya 4Gang switch(by bubibuhome@gmail.com)
  *   2020/12/11 >>> v0.0.26 - Add Tuya moes inner 2Gang switch(Zigbee+rf)
@@ -84,6 +85,7 @@ import groovy.json.JsonOutput
 
 private getMODEL_MAP() { 
     [
+        'TS0601' : 4,
         'TS0004' : 4,
         'TS0003' : 3,
         'TS0002' : 2,
@@ -113,7 +115,8 @@ private getMODEL_MAP() {
         'lumi.switch.b2laus01' : 2,
         'TERNCY-WS01-S2' : 2,
         'TERNCY-WS01-S3' : 3,
-        'LXN59-2S7LX1.0' : 2
+        'LXN59-2S7LX1.0' : 2,
+        'LXN-3S27LX1.0' : 3
     ]
 }
 
@@ -149,6 +152,8 @@ metadata {
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW01LX2.0", deviceJoinName: "Zemi ZigBee Switch"
         fingerprint endpointId: "0B", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN59-2S7LX1.0", deviceJoinName: "Zemi ZigBee inline Switch 1"
+        fingerprint endpointId: "01", profileId: "C05E", deviceId: "0000", inClusters: "0000, 0004, 0003, 0006, 0005", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN-3S27LX1.0", deviceJoinName: "Zemi ZigBee Switch 1"
 
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
@@ -168,6 +173,7 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_fvh3pjaz", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_pmz6mjyu", model: "TS011F", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_go9rahj5", model: "TS0004", deviceJoinName: "Tuya Multi Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_aqnazj70", model: "TS0601", deviceJoinName: "Tuya Multi Switch 1"
         // not working
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1" //< - not working
 
@@ -181,9 +187,6 @@ metadata {
 
         // Unclear devices without model, meanufacturer
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
-
-        // ZemiSmart zigbee in-wall switch 2gang
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN59-2S7LX1.0", deviceJoinName: "Zemi ZigBee inline Switch 1"
     }
 
     preferences {
