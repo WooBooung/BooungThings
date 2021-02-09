@@ -568,7 +568,7 @@ def pollAirKorea() {
     def dthVersion = "0.0.11"
     if (stationName && accessKey) {
         def params = [
-    	    uri: "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName=${stationName}&dataTerm=DAILY&pageNo=1&numOfRows=1&ServiceKey=${accessKey}&ver=1.3&_returnType=json",
+    	    uri: "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName=${stationName}&dataTerm=DAILY&pageNo=1&numOfRows=1&ServiceKey=${accessKey}&ver=1.3&returnType=json",
         	contentType: 'application/json'
     	]
         
@@ -587,53 +587,53 @@ def pollAirKorea() {
                     // get the data from the response body
                     //log.debug "response data: ${resp.data}"
               
-                    if( resp.data.list[0].pm10Value != "-" ) {
-                        log.debug "PM10 value: ${resp.data.list[0].pm10Value}"
-                        sendEvent(name: "pm10_value", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥")
-                        sendEvent(name: "dustLevel", value: resp.data.list[0].pm10Value as Integer, unit: "㎍/㎥", displayed: true)
+                    if( resp.data.response.body.items[0].pm10Value != "-" ) {
+                        log.debug "PM10 value: ${resp.data.response.body.items[0].pm10Value}"
+                        sendEvent(name: "pm10_value", value: resp.data.response.body.items[0].pm10Value as Integer, unit: "㎍/㎥")
+                        sendEvent(name: "dustLevel", value: resp.data.response.body.items[0].pm10Value as Integer, unit: "㎍/㎥", displayed: true)
                     } else {
                     	sendEvent(name: "pm10_value", value: "--", unit: "㎍/㎥")
                         sendEvent(name: "dustLevel", value: "--", unit: "㎍/㎥")
                     }
                     
-                    if( resp.data.list[0].pm25Value != "-" ) { 
-                        log.debug "PM25 value: ${resp.data.list[0].pm25Value}"
-                        sendEvent(name: "pm25_value", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥")
-                        sendEvent(name: "fineDustLevel", value: resp.data.list[0].pm25Value as Integer, unit: "㎍/㎥", displayed: true)
+                    if( resp.data.response.body.items[0].pm25Value != "-" ) { 
+                        log.debug "PM25 value: ${resp.data.response.body.items[0].pm25Value}"
+                        sendEvent(name: "pm25_value", value: resp.data.response.body.items[0].pm25Value as Integer, unit: "㎍/㎥")
+                        sendEvent(name: "fineDustLevel", value: resp.data.response.body.items[0].pm25Value as Integer, unit: "㎍/㎥", displayed: true)
                     } else {
                     	sendEvent(name: "pm25_value", value: "--", unit: "㎍/㎥")
                         sendEvent(name: "fineDustLevel", value: "--", unit: "㎍/㎥")
                     }
                     
                     def display_value
-                    if( resp.data.list[0].o3Value != "-" ) {
-                    	log.debug "Ozone: ${resp.data.list[0].o3Value}"
-                        display_value = "\n" + resp.data.list[0].o3Value + "\n"
+                    if( resp.data.response.body.items[0].o3Value != "-" ) {
+                    	log.debug "Ozone: ${resp.data.response.body.items[0].o3Value}"
+                        display_value = "\n" + resp.data.response.body.items[0].o3Value + "\n"
                         sendEvent(name: "o3_value", value: display_value as String, unit: "ppm")
                     } else
                     	sendEvent(name: "o3_value", value: "--", unit: "ppm")
                     
-                    if( resp.data.list[0].no2Value != "-" ) {
-                        log.debug "NO2: ${resp.data.list[0].no2Value}"
-                        display_value = "\n" + resp.data.list[0].no2Value + "\n"
+                    if( resp.data.response.body.items[0].no2Value != "-" ) {
+                        log.debug "NO2: ${resp.data.response.body.items[0].no2Value}"
+                        display_value = "\n" + resp.data.response.body.items[0].no2Value + "\n"
                         sendEvent(name: "no2_value", value: display_value as String, unit: "ppm")
                     } else
                     	sendEvent(name: "no2_value", value: "--", unit: "ppm")
                     
-                    if( resp.data.list[0].so2Value != "-" ) {
-                        log.debug "SO2: ${resp.data.list[0].so2Value}"
-                        display_value = "\n" + resp.data.list[0].so2Value + "\n"
+                    if( resp.data.response.body.items[0].so2Value != "-" ) {
+                        log.debug "SO2: ${resp.data.response.body.items[0].so2Value}"
+                        display_value = "\n" + resp.data.response.body.items[0].so2Value + "\n"
                         sendEvent(name: "so2_value", value: display_value as String, unit: "ppm")
                     } else
                     	sendEvent(name: "so2_value", value: "--", unit: "ppm")
                     
-                    if( resp.data.list[0].coValue != "-" ) {
-                        log.debug "CO: ${resp.data.list[0].coValue}"
-                        display_value = "\n" + resp.data.list[0].coValue + "\n"
+                    if( resp.data.response.body.items[0].coValue != "-" ) {
+                        log.debug "CO: ${resp.data.response.body.items[0].coValue}"
+                        display_value = "\n" + resp.data.response.body.items[0].coValue + "\n"
                         
                         def carbonMonoxide_value = "clear"
                         
-                        if ((resp.data.list[0].coValue as Float) >= (coThresholdValue as Float)) {
+                        if ((resp.data.response.body.items[0].coValue as Float) >= (coThresholdValue as Float)) {
                         	carbonMonoxide_value = "detected"
                         }
                         
@@ -643,8 +643,8 @@ def pollAirKorea() {
                     	sendEvent(name: "co_value", value: "--", unit: "ppm")
                     
                     def khai_text = "알수없음"
-                    if( resp.data.list[0].khaiValue != "-" ) {
-                        def khai = resp.data.list[0].khaiValue as Integer
+                    if( resp.data.response.body.items[0].khaiValue != "-" ) {
+                        def khai = resp.data.response.body.items[0].khaiValue as Integer
                         log.debug "Khai value: ${khai}"
                         
                         def station_display_name = resp.data.parm.stationName
@@ -652,9 +652,9 @@ def pollAirKorea() {
                         if (fakeStationName)
                         	station_display_name = fakeStationName
                         
-	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.list[0].dataTime + "\nVersion: " + dthVersion)
+	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: ${khai}\n 측정 시간: " + resp.data.response.body.items[0].dataTime + "\nVersion: " + dthVersion)
                         
-                  		sendEvent(name: "airQuality", value: resp.data.list[0].khaiValue as Integer, displayed: true)
+                  		sendEvent(name: "airQuality", value: resp.data.response.body.items[0].khaiValue as Integer, displayed: true)
 
                         if (khai > 250) khai_text="매우나쁨"
                         else if (khai > 100) khai_text="나쁨"
@@ -670,7 +670,7 @@ def pollAirKorea() {
                         	station_display_name = fakeStationName
 
                     
-	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: 정보없음\n 측정 시간: " + resp.data.list[0].dataTime)                    
+	                    sendEvent(name:"data_time", value: " " + station_display_name + " 대기질 수치: 정보없음\n 측정 시간: " + resp.data.response.body.items[0].dataTime)                    
                     	sendEvent(name: "airQualityStatus", value: khai_text)
                     }
           		}
