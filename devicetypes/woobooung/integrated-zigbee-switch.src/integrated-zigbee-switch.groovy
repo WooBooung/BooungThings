@@ -376,9 +376,14 @@ private void createChildDevices() {
         def model = device.getDataValue("model")
         def manufacturer = device.getDataValue("manufacturer")
 
-        if ( model == 'TS0115' || ( model == 'TS011F' && manufacturer == '_TZ3000_o005nuxx') ) {
+        if ( model == 'TS0115' ) {
             createChildDevice("${deviceLabel}USB", "07")
         }
+        
+        if ( model == 'TS011F' && manufacturer == '_TZ3000_o005nuxx' ) {
+            createChildDevice("${deviceLabel}USB", "05")
+        }
+        
         state.isCreateChildDone = true
     }
 }
