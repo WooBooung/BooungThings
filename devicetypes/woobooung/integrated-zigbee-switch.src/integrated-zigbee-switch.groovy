@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.30.20210115" }
+public static String version() { return "v0.0.31.20210213" }
 /*
+ *   2021/02/13 >>> v0.0.31 - Add useelink model: "TS011F"
  *   2021/01/15 >>> v0.0.30 - Add Zemismart 2gang manufacturer: "_TZ3000_7hp93xpr", model: "TS0002"
  *   2021/01/07 >>> v0.0.29 - Add Zemismart Black 3gang(ceborita@gmail.com), Tuya 4 gang switch(naver cafe: incident)
  *   2021/01/01 >>> v0.0.28 - Modfied for ZemiSmart Switchs & eZex Switchs
@@ -182,7 +183,8 @@ metadata {
         // Tuya multitab with USB
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0003, 0004, 0005, 0006, 0702, 0B04", outClusters: "0019", manufacturer: "_TYZB01_b1ngbmlm", model: "TS0112", deviceJoinName: "Tuya USB Socket Plug 1"
-
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "010A", inClusters: "0000, 0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_o005nuxx", model: "TS011F", deviceJoinName: "Tuya Multi Tab Switch 1"
+      
         // Terncy Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S3", deviceJoinName: "Terncy Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S2", deviceJoinName: "Terncy Switch 1"
@@ -347,6 +349,12 @@ private checkAllSwtichValue() {
 private getEndpointCount() {
     def model = device.getDataValue("model")
     def count = MODEL_MAP[model] ?: 0
+    
+    def manufacturer = device.getDataValue("manufacturer")
+    
+    if ( model == 'TS011F' && manufacturer == '_TZ3000_o005nuxx') {
+    	count = 4
+    }
 
     log.debug("getEndpointCount[$model] : $count")
     return count
@@ -366,7 +374,9 @@ private void createChildDevices() {
         }
 
         def model = device.getDataValue("model")
-        if ( model == 'TS0115') {
+        def manufacturer = device.getDataValue("manufacturer")
+
+        if ( model == 'TS0115' || ( model == 'TS011F' && manufacturer == '_TZ3000_o005nuxx') ) {
             createChildDevice("${deviceLabel}USB", "07")
         }
         state.isCreateChildDone = true
