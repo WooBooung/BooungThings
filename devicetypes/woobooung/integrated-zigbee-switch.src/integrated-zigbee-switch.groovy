@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.31.20210213" }
+public static String version() { return "v0.0.32.20210215" }
 /*
+ *   2021/02/15 >>> v0.0.32 - Add zemismart no neutral switch
  *   2021/02/13 >>> v0.0.31 - Add useelink model: "TS011F"
  *   2021/01/15 >>> v0.0.30 - Add Zemismart 2gang manufacturer: "_TZ3000_7hp93xpr", model: "TS0002"
  *   2021/01/07 >>> v0.0.29 - Add Zemismart Black 3gang(ceborita@gmail.com), Tuya 4 gang switch(naver cafe: incident)
@@ -158,6 +159,11 @@ metadata {
         fingerprint endpointId: "01", profileId: "C05E", deviceId: "0000", inClusters: "0000, 0004, 0003, 0006, 0005", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN-3S27LX1.0", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 000A 0004 0005 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
 
+        // zemi no neutral switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_oysiif07", model: "TS0001", deviceJoinName: "zemismart no N"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "zemismart no N1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "zemismart no N1"
+
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR4N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
@@ -184,7 +190,7 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0003, 0004, 0005, 0006, 0702, 0B04", outClusters: "0019", manufacturer: "_TYZB01_b1ngbmlm", model: "TS0112", deviceJoinName: "Tuya USB Socket Plug 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "010A", inClusters: "0000, 0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_o005nuxx", model: "TS011F", deviceJoinName: "Tuya Multi Tab Switch 1"
-      
+
         // Terncy Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S3", deviceJoinName: "Terncy Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S2", deviceJoinName: "Terncy Switch 1"
@@ -349,11 +355,11 @@ private checkAllSwtichValue() {
 private getEndpointCount() {
     def model = device.getDataValue("model")
     def count = MODEL_MAP[model] ?: 0
-    
+
     def manufacturer = device.getDataValue("manufacturer")
-    
+
     if ( model == 'TS011F' && manufacturer == '_TZ3000_o005nuxx') {
-    	count = 4
+        count = 4
     }
 
     log.debug("getEndpointCount[$model] : $count")
@@ -379,11 +385,11 @@ private void createChildDevices() {
         if ( model == 'TS0115' ) {
             createChildDevice("${deviceLabel}USB", "07")
         }
-        
+
         if ( model == 'TS011F' && manufacturer == '_TZ3000_o005nuxx' ) {
             createChildDevice("${deviceLabel}USB", "05")
         }
-        
+
         state.isCreateChildDone = true
     }
 }
