@@ -19,7 +19,7 @@ import physicalgraph.zigbee.zcl.DataType
 
 // Change Water Sensor to Presence Sensor
 metadata {
-    definition(name: "Pressure Sensor", namespace: "WooBooung", author: "Booung", runLocally: true, minHubCoreVersion: '000.017.0012', executeCommandsLocally: false, mnmn: "SmartThings", genericHandler: "Zigbee") {
+    definition(name: "Pressure Sensor", namespace: "WooBooung", author: "Booung", mnmn: "SmartThings", genericHandler: "Zigbee") {
         capability "Configuration"
         capability "Battery"
         capability "Presence Sensor"
