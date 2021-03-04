@@ -17,15 +17,15 @@
 metadata {
 	definition (name: "Member Presence", namespace: "WooBooung", author: "Booung") {
 		capability "Presence Sensor"
-		capability "Occupancy Sensor"
+		//capability "Occupancy Sensor"
 		capability "Sensor"
 	}
 
 	simulator {
 		status "present": "presence: 1"
 		status "not present": "presence: 0"
-		status "occupied": "occupancy: 1"
-		status "unoccupied": "occupancy: 0"
+		//status "occupied": "occupancy: 1"
+		//status "unoccupied": "occupancy: 0"
 	}
 
 	tiles {
@@ -97,8 +97,8 @@ private String parseValue(String description) {
 	switch(description) {
 		case "presence: 1": return "present"
 		case "presence: 0": return "not present"
-		case "occupancy: 1": return "occupied"
-		case "occupancy: 0": return "unoccupied"
+		//case "occupancy: 1": return "occupied"
+		//case "occupancy: 0": return "unoccupied"
 		default: return description
 	}
 }
