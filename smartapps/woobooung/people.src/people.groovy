@@ -13,8 +13,9 @@
  *
  *  Version history
 */
-public static String version() { return "v0.0.1.20200510" }
+public static String version() { return "v0.0.2.20210304" }
 /*
+ *  2021/03/04 >>> v0.0.2 - Not supported occupancy on st app
  *	2020/05/10 >>> v0.0.1 - Init App
  */
 definition(
@@ -26,7 +27,7 @@ definition(
     iconUrl: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/family.jpg",
     iconX2Url: "https://raw.githubusercontent.com/WooBooung/BooungThings/master/icons/family.jpg",
     usesThirdPartyAuthentication: false,
-    pausable: false
+    pausable: true
 )
 
 preferences {
@@ -44,10 +45,10 @@ def mainPage() {
             input "switchDevicesToPresence", "capability.switch", title: "Which Switch?", required: false, multiple: true
         }
 
-        section("Select devices to send occupancy events (occupied/unoccupied)") {
+       /* section("Select devices to send occupancy events (occupied/unoccupied)") {
             input "occupancyDevices", "capability.occupancySensor", title: "Which Occupancy Sensor?", required: false, multiple: true
             input "switchDevicesToOccupancy", "capability.switch", title: "Which Switch?", required: false,  multiple: true
-        }
+        } */
 
         section("About"){
             paragraph "${version()}"
@@ -73,9 +74,9 @@ def updated() {
 
 def eventSubscribes() {
     subscribe(presenceDevices, "presence", presenceHandler)
-    subscribe(occupancyDevices, "occupancy", occupancyHandler)
+    //subscribe(occupancyDevices, "occupancy", occupancyHandler)
     subscribe(switchDevicesToPresence, "switch", switchToPresenceHandler)
-    subscribe(switchDevicesToOccupancy, "switch", switchToOccupancyHandler)
+    //subscribe(switchDevicesToOccupancy, "switch", switchToOccupancyHandler)
 }
 
 def presenceHandler(evt) {
