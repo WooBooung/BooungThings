@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.32.20210215" }
+public static String version() { return "v0.0.33.20210421" }
 /*
+ *   2021/04/21 >>> v0.0.33 - Add UIOT 3gang swtich
  *   2021/02/15 >>> v0.0.32 - Add zemismart no neutral switch
  *   2021/02/13 >>> v0.0.31 - Add useelink model: "TS011F"
  *   2021/01/15 >>> v0.0.30 - Add Zemismart 2gang manufacturer: "_TZ3000_7hp93xpr", model: "TS0002"
@@ -119,7 +120,8 @@ private getMODEL_MAP() {
         'TERNCY-WS01-S2' : 2,
         'TERNCY-WS01-S3' : 3,
         'LXN59-2S7LX1.0' : 2,
-        'LXN-3S27LX1.0' : 3
+        'LXN-3S27LX1.0' : 3,
+        '3AFE330100068603' : 3
     ]
 }
 
@@ -194,6 +196,9 @@ metadata {
         // Terncy Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S3", deviceJoinName: "Terncy Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S2", deviceJoinName: "Terncy Switch 1"
+        
+        // UIOT Switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0003, 0004, 0005, 0006, 0B05, FCC0", outClusters: "0003, 0019, FCC0", manufacturer: "Konke", model: "3AFE330100068603", deviceJoinName: "UIOT Switch 1"
 
         // Unclear devices without model, meanufacturer
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
