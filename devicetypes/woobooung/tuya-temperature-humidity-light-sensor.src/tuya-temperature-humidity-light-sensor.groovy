@@ -76,9 +76,35 @@ def parse(String description) {
             map.value = map.value + humidityOffset as float
         }
     }
+    
+    map = handleErrorForTempHumi(map)
 
     log.debug "Parse returned $map"
     return map ? createEvent(map) : [:]
+}
+
+def handleErrorForTempHumi(map) {
+	def errorDiffValue = 10
+    def mapValue = map?.value as Float
+    if (map?.name == "temperature") {
+        def currentTempValue = device.currentState("temperature").value.toFloat()
+        def currentTempUnit = device.currentState("temperature").unit
+        if (currentTempValue != null 
+        	&& currentTempUnit == map.unit
+        	&& (map.value < 0 || Math.abs(currentTempValue - mapValue) > errorDiffValue)) {
+            	log.debug "handleErrorForTempHumi: skip temperature value $mapValue / currentValue $currentTempValue"
+                map = [:]
+            }
+    } else if (map?.name == "humidity") {
+    	def currentHumiValue = device.currentState("humidity").value.toFloat()
+        if (currenHumiValue != null 
+        	&& Math.abs(currenHumiValue - mapValue) > errorDiffValue) {
+				log.debug "handleErrorForTempHumi: skip humidity value $mapValue / currentValue $currentHumiValue"
+                map = [:]
+            }
+    }
+
+    return map
 }
 
 def installed() {
