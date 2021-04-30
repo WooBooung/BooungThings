@@ -158,34 +158,22 @@ private Map getBatteryResult(rawValue) {
     return result
 }
 
-/**
- * PING is used by Device-Watch in attempt to reach the Device
- * */
-def ping() {
-    return zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0020)// Read the Battery Level
-        zigbee.readAttribute(0x0400, 0x0000)
-}
-
 def refresh() {
-    log.debug "refresh temperature, humidity, and battery"
+    log.debug "refresh temperature, humidity, illuminence and battery"
 
-    return zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0020)+
+    return zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021)+
         zigbee.readAttribute(zigbee.TEMPERATURE_MEASUREMENT_CLUSTER, 0x0000)+
         zigbee.readAttribute(zigbee.RELATIVE_HUMIDITY_CLUSTER, 0x0000) + 
         zigbee.readAttribute(0x0400, 0x0000)
 }
 
 def configure() {
-    //sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zigbee", scheme:"untracked"]), displayed: false)
-    sendEvent(name: "checkInterval", value: 2 * 60 * 60 + 2 * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
-
     log.debug "Configuring Reporting and Bindings."
+    sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zigbee", scheme:"untracked"]), displayed: false)
 
-    // temperature minReportTime 30 seconds, maxReportTime 5 min. Reporting interval if no activity
-    // battery minReport 30 seconds, maxReportTime 6 hrs by default
     return refresh() +
         zigbee.configureReporting(zigbee.RELATIVE_HUMIDITY_CLUSTER, 0x0000, DataType.UINT16, 30, 300, 1*100) +
         zigbee.configureReporting(zigbee.TEMPERATURE_MEASUREMENT_CLUSTER, 0x0000, DataType.INT16, 30, 300, 0x1) +
-        zigbee.configureReporting(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0020, DataType.UINT8, 30, 21600, 0x1) +
+        zigbee.configureReporting(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021, DataType.UINT8, 30, 21600, 0x1) +
         zigbee.configureReporting(0x0400, 0x0000, 0x21, 30, 3600, 0x15)
 }
