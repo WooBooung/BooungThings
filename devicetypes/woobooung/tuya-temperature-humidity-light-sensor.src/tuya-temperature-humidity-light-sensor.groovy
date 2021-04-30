@@ -64,18 +64,17 @@ def parse(String description) {
             map.value = Math.ceil(zigbee.lux(rawValue as Integer))
         }
     } else if (map.name == "temperature") {
-        if (tempOffset) {
-            map.value = new BigDecimal((map.value as float) + (tempOffset as float)).setScale(1, BigDecimal.ROUND_HALF_UP)
+        if (description?.startsWith('temperature:')) {
+            map.value = ((description - "temperature: ").trim()) as float
         }
-        map.descriptionText = temperatureScale == 'C' ? '{{ device.displayName }} was {{ value }}°C' : '{{ device.displayName }} was {{ value }}°F'
+        map.value = new BigDecimal((map.value as float) + (tempOffset ?: 0) as float).setScale(1, BigDecimal.ROUND_DOWN)
+        map.descriptionText = temperatureScale == 'C' ? "$device.displayName was $map.value°C" : "$device.displayName was $map.value°F"
         map.translatable = true
     } else if (map.name == "humidity") {
         if (description?.startsWith('humidity:')) {
             map.value = description.substring(10, description.indexOf("%")) as float
         }
-		if (humidityOffset) {
-            map.value = map.value + humidityOffset as float
-        }
+        map.value = new BigDecimal(map.value + (humidityOffset ?: 0) as float).setScale(1, BigDecimal.ROUND_DOWN)
     }
     
     //if (wrongValuefilter == true) { // not working.. why?
