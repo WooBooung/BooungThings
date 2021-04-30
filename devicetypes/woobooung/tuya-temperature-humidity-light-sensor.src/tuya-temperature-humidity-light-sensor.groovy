@@ -32,11 +32,12 @@ metadata {
     preferences {
         input "tempOffset", "number", title: "Temperature offset", description: "Select how many degrees to adjust the temperature.", range: "-100..100", displayDuringSetup: false
         input "humidityOffset", "number", title: "Humidity offset", description: "Enter a percentage to adjust the humidity.", range: "*..*", displayDuringSetup: false
+        input "wrongValuefilter", "boolean", title: "Filter: Temperature, Humidity wrong value", defaultValue: false
     }
 }
 
 def parse(String description) {
-    log.debug "description: $description"
+    //log.debug "description: $description"
 
     // getEvent will handle temperature and humidity
     Map descMap = zigbee.parseDescriptionAsMap(description)
@@ -77,13 +78,17 @@ def parse(String description) {
         }
     }
     
-    map = handleErrorForTempHumi(map)
+    //if (wrongValuefilter == true) { // not working.. why?
+    if ("$wrongValuefilter" == "true") {
+    	map = handleErrorForTempHumi(map)
+    }
 
     log.debug "Parse returned $map"
     return map ? createEvent(map) : [:]
 }
 
 def handleErrorForTempHumi(map) {
+	log.debug "handleErrorForTempHumi"
 	def errorDiffValue = 10
     def mapValue = map?.value as Float
     if (map?.name == "temperature") {
@@ -108,10 +113,12 @@ def handleErrorForTempHumi(map) {
 }
 
 def installed() {
+	log.debug "installed"
     configure()
 }
 
 def updated() {
+	log.debug "updated"
     configure()
 }
 
@@ -173,15 +180,6 @@ def configure() {
     sendEvent(name: "checkInterval", value: 2 * 60 * 60 + 2 * 60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
 
     log.debug "Configuring Reporting and Bindings."
-
-    // is need?
-    [
-        "zdo bind 0x${device.deviceNetworkId} 1 1 0x000 {${device.zigbeeId}} {}", "delay 1000",	// basic cluster
-        "zdo bind 0x${device.deviceNetworkId} 1 1 0x001 {${device.zigbeeId}} {}", "delay 1000",	// power cluster
-        "zdo bind 0x${device.deviceNetworkId} 1 1 0x003 {${device.zigbeeId}} {}", "delay 1000",	// identify cluster
-        "zdo bind 0x${device.deviceNetworkId} 1 1 0x400 {${device.zigbeeId}} {}", "delay 1000",	// illuminance cluster
-        "send 0x${device.deviceNetworkId} 1 1"
-    ]
 
     // temperature minReportTime 30 seconds, maxReportTime 5 min. Reporting interval if no activity
     // battery minReport 30 seconds, maxReportTime 6 hrs by default
