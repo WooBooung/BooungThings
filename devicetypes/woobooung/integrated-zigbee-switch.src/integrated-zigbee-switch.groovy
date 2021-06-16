@@ -17,10 +17,11 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.33.20210421" }
+public static String version() { return "v0.0.34.20210616" }
 /*
+ *   2021/06/16 >>> v0.0.34 - Add Zemismart 2gang switch
  *   2021/04/21 >>> v0.0.33 - Add UIOT 3gang swtich
- *   2021/02/15 >>> v0.0.32 - Add zemismart no neutral switch
+ *   2021/02/15 >>> v0.0.32 - Add Zemismart no neutral switch
  *   2021/02/13 >>> v0.0.31 - Add useelink model: "TS011F"
  *   2021/01/15 >>> v0.0.30 - Add Zemismart 2gang manufacturer: "_TZ3000_7hp93xpr", model: "TS0002"
  *   2021/01/07 >>> v0.0.29 - Add Zemismart Black 3gang(ceborita@gmail.com), Tuya 4 gang switch(naver cafe: incident)
@@ -159,7 +160,8 @@ metadata {
         fingerprint endpointId: "01", profileId: "C05E", inClusters: "0000, 0004, 0003, 0006, 0005, 1000, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW03LX2.0", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN59-2S7LX1.0", deviceJoinName: "Zemi ZigBee inline Switch 1"
         fingerprint endpointId: "01", profileId: "C05E", deviceId: "0000", inClusters: "0000, 0004, 0003, 0006, 0005", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN-3S27LX1.0", deviceJoinName: "Zemi ZigBee Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 000A 0004 0005 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_vjhyd6ar", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
 
         // zemi no neutral switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_oysiif07", model: "TS0001", deviceJoinName: "zemismart no N"
@@ -196,7 +198,7 @@ metadata {
         // Terncy Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S3", deviceJoinName: "Terncy Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S2", deviceJoinName: "Terncy Switch 1"
-        
+
         // UIOT Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0003, 0004, 0005, 0006, 0B05, FCC0", outClusters: "0003, 0019, FCC0", manufacturer: "Konke", model: "3AFE330100068603", deviceJoinName: "UIOT Switch 1"
 
