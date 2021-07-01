@@ -11,14 +11,14 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
-public static String version() { return "v0.0.8.20190522" }
+public static String version() { return "v0.0.8.20200522" }
 /*
- *   2019/05/22 >>> v0.0.8.20190522 - Get current status Display Led Knocking (Need to Update SmartApp and DTH)
- *   2019/05/21 >>> v0.0.7.20190521 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
- *   2019/05/15 >>> v0.0.6.20190515 - Changed Dust Sensor to Fine Dust Sensor
- *   2019/05/13 >>> v0.0.5.20190513 - Seperated DTH (Need to Update SmartApp and DTH)
- *   2019/05/13 >>> v0.0.4.20190513 - Added Commands (Need to Update SmartApp and DTH)
- *   2019/05/05 >>> v0.0.1.20190505 - Initialize
+ *   2019/05/22 >>> v0.0.8 - Get current status Display Led Knocking (Need to Update SmartApp and DTH)
+ *   2019/05/21 >>> v0.0.7 - Added co2homekitNotice for Homekit by shin4299 (Need to Update SmartApp and DTH)
+ *   2019/05/15 >>> v0.0.6 - Changed Dust Sensor to Fine Dust Sensor
+ *   2019/05/13 >>> v0.0.5 - Seperated DTH (Need to Update SmartApp and DTH)
+ *   2019/05/13 >>> v0.0.4 - Added Commands (Need to Update SmartApp and DTH)
+ *   2019/05/05 >>> v0.0.1 - Initialize
  */
 import groovy.json.*
 import java.text.SimpleDateFormat

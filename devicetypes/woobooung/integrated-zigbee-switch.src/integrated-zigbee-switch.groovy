@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.34.20210616" }
+public static String version() { return "v0.0.35.20210701" }
 /*
+ *   2021/07/01 >>> v0.0.35 - Add Tuya 1gang switch by adenburd@gmail.com, Add Zemi No neutral switchs by JayN
  *   2021/06/16 >>> v0.0.34 - Add Zemismart 2gang switch
  *   2021/04/21 >>> v0.0.33 - Add UIOT 3gang swtich
  *   2021/02/15 >>> v0.0.32 - Add Zemismart no neutral switch
@@ -100,6 +101,7 @@ private getMODEL_MAP() {
         'TS0012' : 2,
         'TS0013' : 3,
         'TS011F' : 2,
+		'TS0601' : 1,
         'PM-S340-ZB' : 3,
         'PM-S240-ZB' : 2,
         'PM-S140-ZB' : 1,
@@ -163,10 +165,13 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_vjhyd6ar", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
 
-        // zemi no neutral switch
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_oysiif07", model: "TS0001", deviceJoinName: "zemismart no N"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "zemismart no N1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "zemismart no N1"
+        // Zemi no neutral switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_oysiif07", model: "TS0001", deviceJoinName: "Zemi ZigBee Switch"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
+
+		fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_vjhyd6ar", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
 
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
@@ -182,6 +187,9 @@ metadata {
         // Zigbee OnOff Swtich
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
 
+		// Tuya 1 gang switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_amp6tsvy", model: "TS0601", deviceJoinName: "Tuya ZigBee Switch"
+        
         // Tuya multi switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_fvh3pjaz", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_pmz6mjyu", model: "TS011F", deviceJoinName: "Tuya Multi Switch 1"
