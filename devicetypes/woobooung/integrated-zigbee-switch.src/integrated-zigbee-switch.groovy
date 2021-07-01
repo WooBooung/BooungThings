@@ -101,7 +101,7 @@ private getMODEL_MAP() {
         'TS0012' : 2,
         'TS0013' : 3,
         'TS011F' : 2,
-		'TS0601' : 1,
+        'TS0601' : 1,
         'PM-S340-ZB' : 3,
         'PM-S240-ZB' : 2,
         'PM-S140-ZB' : 1,
@@ -170,7 +170,7 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
 
-		fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_vjhyd6ar", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_vjhyd6ar", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
 
         // eZex ZigBee Multi Switch
@@ -187,9 +187,9 @@ metadata {
         // Zigbee OnOff Swtich
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
 
-		// Tuya 1 gang switch
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_amp6tsvy", model: "TS0601", deviceJoinName: "Tuya ZigBee Switch"
-        
+        // Tuya 1 gang switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_amp6tsvy", model: "TS0601", deviceJoinName: "Tuya ZigBee Switch"  // <- not working
+
         // Tuya multi switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_fvh3pjaz", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_pmz6mjyu", model: "TS011F", deviceJoinName: "Tuya Multi Switch 1"
