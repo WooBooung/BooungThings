@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.35.20210701" }
+public static String version() { return "v0.0.36.20210720" }
 /*
+ *   2021/07/20 >>> v0.0.36 - Add Moeshouse 3gang switch by jaengie
  *   2021/07/01 >>> v0.0.35 - Add Tuya 1gang switch by adenburd@gmail.com, Add Zemi No neutral switchs by JayN
  *   2021/06/16 >>> v0.0.34 - Add Zemismart 2gang switch
  *   2021/04/21 >>> v0.0.33 - Add UIOT 3gang swtich
@@ -188,7 +189,7 @@ metadata {
         fingerprint endpointId: "0B", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0000", manufacturer: "SZ", model: "Lamp_01", deviceJoinName: "Zigbee OnOff Switch"
 
         // Tuya 1 gang switch
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_amp6tsvy", model: "TS0601", deviceJoinName: "Tuya ZigBee Switch"  // <- not working
+        //fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_amp6tsvy", model: "TS0601", deviceJoinName: "Tuya ZigBee Switch"  // <- not working
 
         // Tuya multi switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_fvh3pjaz", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1"
@@ -196,7 +197,7 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_go9rahj5", model: "TS0004", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_aqnazj70", model: "TS0601", deviceJoinName: "Tuya Multi Switch 1"
         // not working
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1" //< - not working
+        //fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1" //< - not working
 
         // Tuya multitab with USB
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
@@ -209,6 +210,9 @@ metadata {
 
         // UIOT Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0103", inClusters: "0000, 0003, 0004, 0005, 0006, 0B05, FCC0", outClusters: "0003, 0019, FCC0", manufacturer: "Konke", model: "3AFE330100068603", deviceJoinName: "UIOT Switch 1"
+
+        //Moeshouse Switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_mqel1whf", model: "TS0013", deviceJoinName: "Moes Multi Switch 1" //by jaengie
 
         // Unclear devices without model, meanufacturer
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
