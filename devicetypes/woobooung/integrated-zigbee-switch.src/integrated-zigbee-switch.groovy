@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.36.20210720" }
+public static String version() { return "v0.0.37.20211104" }
 /*
+ *   2021/11/04 >>> v0.0.37 - Add more switch(zemi, Lerlink, tuya)
  *   2021/07/20 >>> v0.0.36 - Add Moeshouse 3gang switch by jaengie
  *   2021/07/01 >>> v0.0.35 - Add Tuya 1gang switch by adenburd@gmail.com, Add Zemi No neutral switchs by JayN
  *   2021/06/16 >>> v0.0.34 - Add Zemismart 2gang switch
@@ -98,6 +99,9 @@ private getMODEL_MAP() {
         'TS0002' : 2,
         'TS0001' : 1,
         'TS0115' : 4,
+        'TS0011' : 1,
+        'TS0012' : 2,
+        'TS0013' : 3,
         'TS0112' : 2,
         'TS0012' : 2,
         'TS0013' : 3,
@@ -171,9 +175,15 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_7hp93xpr", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
 
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_vjhyd6ar", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
-
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wqfdvxen", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_tbfw3xj0", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
+        
+        // zemi New no neutral switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_ybaprszv", model: "TS0011", deviceJoinName: "Zemi New no N"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_uz5xzdgy", model: "TS0012", deviceJoinName: "Zemi New no N1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_k44bsygw", model: "TS0013", deviceJoinName: "Zemi New no N1"
+       
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR4N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
@@ -196,6 +206,8 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_pmz6mjyu", model: "TS011F", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_go9rahj5", model: "TS0004", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_aqnazj70", model: "TS0601", deviceJoinName: "Tuya Multi Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006, EF00", outClusters: "0019, 000A", manufacturer: "_TZ3000_lupfd8zu", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1" // by JayN
+        
         // not working
         //fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1" //< - not working
 
@@ -203,6 +215,10 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0003, 0004, 0005, 0006, 0702, 0B04", outClusters: "0019", manufacturer: "_TYZB01_b1ngbmlm", model: "TS0112", deviceJoinName: "Tuya USB Socket Plug 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "010A", inClusters: "0000, 0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_o005nuxx", model: "TS011F", deviceJoinName: "Tuya Multi Tab Switch 1"
+
+		// Lerlink multi switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_yhagrqmd", model: "TS0002", deviceJoinName: "Lerlink Multi Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_aqgofyol", model: "TS0004", deviceJoinName: "Lerlink Multi Switch 1"
 
         // Terncy Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0006, 0020, FCCC", outClusters: "0019", manufacturer: "Terncy", model: "TERNCY-WS01-S3", deviceJoinName: "Terncy Switch 1"
@@ -215,7 +231,7 @@ metadata {
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_mqel1whf", model: "TS0013", deviceJoinName: "Moes Multi Switch 1" //by jaengie
 
         // Unclear devices without model, meanufacturer
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
+        // fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
     }
 
     preferences {
