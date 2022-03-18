@@ -19,7 +19,7 @@
  */
 public static String version() { return "v0.0.38.20220318" }
 /*
- *   2022/03/18 >>> v0.0.38 - Add more switch(Zemi, Girier), modified parse function
+ *   2022/03/18 >>> v0.0.38 - Add more switch(Zemi, Girier), modified parse function, add function isSpecificDevice
  *   2021/11/04 >>> v0.0.37 - Add more switch(zemi, Lerlink, tuya)
  *   2021/07/20 >>> v0.0.36 - Add Moeshouse 3gang switch by jaengie
  *   2021/07/01 >>> v0.0.35 - Add Tuya 1gang switch by adenburd@gmail.com, Add Zemi No neutral switchs by JayN
@@ -207,14 +207,13 @@ metadata {
         //fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_amp6tsvy", model: "TS0601", deviceJoinName: "Tuya ZigBee Switch"  // <- not working
 
         // Tuya multi switch
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_fvh3pjaz", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_fvh3pjaz", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1" // specific device
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_pmz6mjyu", model: "TS011F", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_go9rahj5", model: "TS0004", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0051", inClusters: "0000, 0004, 0005, EF00", outClusters: "0019, 000A", manufacturer: "_TZE200_aqnazj70", model: "TS0601", deviceJoinName: "Tuya Multi Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006, EF00", outClusters: "0019, 000A", manufacturer: "_TZ3000_lupfd8zu", model: "TS0012", deviceJoinName: "Tuya Multi Switch 1" // by JayN
         
-        // not working
-        //fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1" //< - not working
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wyhuocal", model: "TS0013", deviceJoinName: "Tuya Multi Switch 1" // specific device
 
         // Tuya multitab with USB
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 000A, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_vkwryfdr", model: "TS0115", deviceJoinName: "Tuya Multi Tab Switch 1"
@@ -584,22 +583,40 @@ def configure() {
     log.debug "configure()"
     configureHealthCheck()
 
-    //other devices supported by this DTH in the future
-    def cmds = zigbee.onOffConfig(0, 120)
-    def endpointCount = getEndpointCount()
-
-    if (endpointCount > 1) {
-        childDevices.each {
-            def childEndpoint = getChildEndpoint(it.deviceNetworkId)
-            if (childEndpoint.isNumber()) {
-                log.debug "configure(): $childEndpoint"
-                def endpointInt = zigbee.convertHexToInt(childEndpoint)
-                cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: endpointInt])
-            }
-        }
+	if (isSpecificDevice()) {
+		//the orvibo switch, Zemi some switchs will send out device anounce message at ervery 2 mins as heart beat,setting 0x0099 to 1 will disable it.
+		def cmds = zigbee.writeAttribute(zigbee.BASIC_CLUSTER, 0x0099, 0x20, 0x01, [mfgCode: 0x0000])
+		cmds += refresh()
+		return cmds
     } else {
-        cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: 0xFF])
+        //other devices supported by this DTH in the future
+        def cmds = zigbee.onOffConfig(0, 120)
+        def endpointCount = getEndpointCount()
+
+        if (endpointCount > 1) {
+            childDevices.each {
+                def childEndpoint = getChildEndpoint(it.deviceNetworkId)
+                if (childEndpoint.isNumber()) {
+                    log.debug "configure(): $childEndpoint"
+                    def endpointInt = zigbee.convertHexToInt(childEndpoint)
+                    cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: endpointInt])
+                }
+            }
+        } else {
+            cmds += zigbee.configureReporting(zigbee.ONOFF_CLUSTER, 0x0000, 0x10, 0, 120, null, [destEndpoint: 0xFF])
+        }
+        cmds += refresh()
+        return cmds
     }
-    cmds += refresh()
-    return cmds
+}
+
+private Boolean isSpecificDevice() {
+    switch (device.getDataValue("manufacturer")) {
+    	case "ORVIBO":
+        case "_TZ3000_fvh3pjaz":
+        case "_TZ3000_wyhuocal":
+        	return true
+        default:
+        	return false
+    }
 }
