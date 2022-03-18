@@ -17,8 +17,9 @@
  *
  *  author : woobooung@gmail.com 
  */
-public static String version() { return "v0.0.37.20211104" }
+public static String version() { return "v0.0.38.20220318" }
 /*
+ *   2022/03/18 >>> v0.0.38 - Add more switch(Zemi, Girier), modified parse function
  *   2021/11/04 >>> v0.0.37 - Add more switch(zemi, Lerlink, tuya)
  *   2021/07/20 >>> v0.0.36 - Add Moeshouse 3gang switch by jaengie
  *   2021/07/01 >>> v0.0.35 - Add Tuya 1gang switch by adenburd@gmail.com, Add Zemi No neutral switchs by JayN
@@ -103,7 +104,6 @@ private getMODEL_MAP() {
         'TS0012' : 2,
         'TS0013' : 3,
         'TS0112' : 2,
-        'TS0012' : 2,
         'TS0013' : 3,
         'TS011F' : 2,
         'TS0601' : 1,
@@ -177,13 +177,18 @@ metadata {
 
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_c0wbnbbf", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_wqfdvxen", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
-        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_tbfw3xj0", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_wqfdvxen", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1"
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_tbfw3xj0", model: "TS0003", deviceJoinName: "Zemi ZigBee Switch 1" // 해피윤음
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "01, 07, 0000, 0003, 0004, 0005, 0006 E000, E001, 02", outClusters: "0019 000A", manufacturer: "_TZ3000_k008kbls", model: "TS0012", deviceJoinName: "Zemi ZigBee Switch 1" // HS222
+        
+        // Zemi neutral switch
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_qn8qvk9y", model: "TS0002", deviceJoinName: "Zemi ZigBee Switch 1" // JayN
         
         // zemi New no neutral switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_ybaprszv", model: "TS0011", deviceJoinName: "Zemi New no N"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_uz5xzdgy", model: "TS0012", deviceJoinName: "Zemi New no N1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TZ3000_k44bsygw", model: "TS0013", deviceJoinName: "Zemi New no N1"
-       
+               
         // eZex ZigBee Multi Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR6N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000 0003 0004 0006", outClusters: "0006, 000A, 0019", manufacturer: "", model: "E220-KR4N0Z1-HA", deviceJoinName: "eZex ZigBee Switch 1"
@@ -229,6 +234,11 @@ metadata {
 
         //Moeshouse Switch
         fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019", manufacturer: "_TYZB01_mqel1whf", model: "TS0013", deviceJoinName: "Moes Multi Switch 1" //by jaengie
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0009", inClusters: "0000, 0004, 0005, 0006", outClusters: "0019, 000A", manufacturer: "_TZ3000_zmy1waw6", model: "TS011F", deviceJoinName: "Moes Multi Switch" //by 오키바리
+        
+        //GIRIER ZigBee 3.0 Smart Switch Module 10A No Neutral Wire Required 2-Gang
+        //01 0104 0100 01 07 0003 0004 0005 0006 E000 E001 0000 02 0019 000A
+        fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0003, 0004, 0005, 0006, E000, E001", outClusters: "0019, 000A", manufacturer: "_TZ3000_jl7qyupf", model: "TS0012", deviceJoinName: "GIRIER Multi Switch 1" //by 신선한공기가필요해
 
         // Unclear devices without model, meanufacturer
         // fingerprint endpointId: "01", profileId: "0104", deviceId: "0100", inClusters: "0006, 0000, 0003", outClusters: "0019", manufacturer: "", model: "", deviceJoinName: "ZigBee Switch 1"
@@ -311,7 +321,7 @@ def parse(String description) {
     }
 
     if (eventMap && eventDescMap) {
-        if (eventDescMap?.attrId == "0000" || eventDescMap?.attId == null) {
+        if (eventDescMap?.attrId == "0000" || eventDescMap?.command == "0B") {//0x0000 : OnOff attributeId, 0x0B : default response command
             def endpointId = device.getDataValue("endpointId")
             log.debug "eventMap $eventMap | eventDescMap $eventDescMap"
             eventMap[displayed] = true
