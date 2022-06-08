@@ -13,6 +13,7 @@
  */
 
 /*
+ *    2022/06/08 >>> v0.0.6 - Add FeederOperatingState vid: "SmartThings-smartthings-Super_Virtual_Device_2"
  *    2020/05/22 >>> v0.0.5 - Explicit displayed flag
  *    2019/11/06 >>> v0.0.4 - Add capability Battery
  *    2019/10/29 >>> v0.0.3 - Add capability power, temperature, humidity
@@ -20,7 +21,7 @@
  *    2019/10/29 >>> v0.0.1 - Initialize Super Virtual Device
  */
 metadata {
-    definition (name: "Super Virtual Device", namespace: "WooBooung", author: "Booung") {
+    definition (name: "Super Virtual Device", namespace: "WooBooung", author: "Booung", vid: "SmartThings-smartthings-Super_Virtual_Device_2") {
         capability "Switch"
         capability "Presence Sensor"
         capability "Occupancy Sensor"
@@ -35,6 +36,7 @@ metadata {
         capability "Smoke Detector"
         capability "Water Sensor"
         capability "Battery"
+        capability "Feeder Operating State"
 
         capability "Actuator"
         capability "Sensor"
@@ -74,6 +76,8 @@ metadata {
         command "watt_down"
         command "batt_up"
         command "batt_down"
+        command "feed_feeding"
+        command "feed_idle"
         command "offline"
         command "online"
     }
@@ -226,6 +230,14 @@ metadata {
         standardTile("batt_down", "device.battery", inactiveLabel: false, decoration: "flat") {
             state("default", label:'-5%', backgroundColor:"#e86d13", action: "batt_down")
         }
+        
+        standardTile("feed_feeding", "device.feederOperatingState", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'Feeding',  backgroundColor:"#00A0DC", action: "feed_feeding")
+        }
+
+        standardTile("feed_idle", "device.feederOperatingState", inactiveLabel: false, decoration: "flat") {
+            state("default", label:'Feed-Idle', backgroundColor:"#e86d13", action: "feed_idle")
+        }
 
         standardTile("online", "device.status", inactiveLabel: false, decoration: "flat") {
             state("occupied", label:'online',  backgroundColor:"#00A0DC", action: "online")
@@ -253,6 +265,7 @@ private initialize() {
     sendEvent(name: "battery", value: 100, unit: "%", diplayed: true)
     sendEvent(name: "temp_unit", value: "C")
     sendEvent(name: "supportedValues", value: "{\"value\": [\"human\"]}", displayed: false)
+	sendEvent(name: "feederOperatingState", value: "idle", diplayed: true)
 
     sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
     sendEvent(name: "healthStatus", value: "online")
@@ -449,6 +462,16 @@ def batt_down() {
     if (value < 0) value = 0
 
     sendEvent(name:"battery", value: value, unit: "%", diplayed: true)
+}
+
+def feed_feeding() {
+	log.debug "feed_feeding()"
+    sendEvent(name: "feederOperatingState", value: "feeding", diplayed: true)
+}
+
+def feed_idle() {
+	log.debug "feed_idle()"
+	sendEvent(name: "feederOperatingState", value: "idle", diplayed: true)
 }
 
 def offline() {
